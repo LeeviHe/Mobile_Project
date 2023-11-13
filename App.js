@@ -19,8 +19,9 @@ export default function App() {
         tabBar={({ navigation, state, descriptors, insets }) => (
           <BottomNavigation.Bar
           navigationState={state}
-           safeAreaInsets={insets}
-            onTabPress={({ route, preventDefault }) => {
+          safeAreaInsets={insets}
+          style={{ backgroundColor: 'lightgray' }} // Set your desired background color for the tab bar
+          onTabPress={({ route, preventDefault }) => {
               const event = navigation.emit({
                 type: 'tabPress',
                 target: route.key,
@@ -36,10 +37,14 @@ export default function App() {
                 });
               }
             }}
-            renderIcon={({ route, focused, color }) => {
+            renderIcon={({ route, focused }) => {
               const { options } = descriptors[route.key];
+              const iconColor = focused ? 'red' : 'black' // Set desired colors for active/inactive icons
+
               if (options.tabBarIcon) {
-                return options.tabBarIcon({ focused, color, size: 24 });
+                return (
+                  options.tabBarIcon({ focused, color: iconColor, size: 24 ,})
+                )
               }
   
               return null;
