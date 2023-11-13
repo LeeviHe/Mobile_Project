@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 export default function Ingredients() {
   return (
     <View>
-      <Text>Ingredients</Text>
+      <Text style={{paddingTop: 100, paddingLeft: 120, fontSize: 28}}>Ingredients</Text>
     </View>
   );
 }

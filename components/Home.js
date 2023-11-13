@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Home() {
@@ -6,7 +6,7 @@ export default function Home() {
     <ScrollView>
         <View>
             <View>
-                <Text style={{paddingTop: 100, paddingLeft: 120, fontSize: 28}}>Pockettini</Text>
+                <Image source={require('../assets/icons/pockettini-logo-regular-256px.png')} style={{alignSelf: 'center', marginTop: 100, backgroundColor: 'red'}}/>
             </View>
             <View>
                 <Text style={{paddingTop: 100, paddingLeft: 100}}>Carousel here</Text>
