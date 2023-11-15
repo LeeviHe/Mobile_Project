@@ -36,7 +36,7 @@ export default function Cocktails() {
               
         } else {
 
-            alert('Error retrieving recipes!' + {searchQuery});
+            alert('Error retrieving recipes!' + {searchQuery}); //poista check
           }
       } catch (err) {
           alert(err);
@@ -52,7 +52,6 @@ export default function Cocktails() {
             source={{uri:data.strDrinkThumb}}
             style={{width: 100, height: 100}}/>
             <Text>{data.strDrink}</Text>
-            <Text>Type of glass:{data.strGlass}</Text>
             <Text>Category: {data.strCategory}</Text>
           </View>
       )
