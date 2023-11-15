@@ -8,40 +8,6 @@ const favIcon = '../assets/defaults/favicon.png'
 
 export default function Home() {
 
-    //Mahdollista koodia myöhempään käyttöön
-    //?Yrittää hakea apista drinkkitiedot?
-
-    /*const [recipeData, setRecipeData] = useState([])
-
-    async function getDrink(wanted) {
-                try {
-                    const response = await fetch(URL + wanted);
-            
-                    if (response.ok) {
-                    const json = await response.json();
-                    if (json.drinks === undefined || json.drinks === null || json.drinks === '' || json.drinks === 0 || !json.drinks) {
-                        alert("Can't find drinks")
-                        return
-                    }
-            
-                    const drinks = json.drinks;
-                    setRecipeData(drinks);
-            
-                    } else {
-                    alert('Error retrieving recipes!');
-                    }
-            
-                } catch (err) {
-                    alert(err);
-                }
-            }
-
-            //Esim. alkoholittomat
-    useEffect(() => {
-        getDrink('filter.php?a=Alcoholic')
-    }, [])*/
-    
-
   return (
     <ScrollView>
         <View>
