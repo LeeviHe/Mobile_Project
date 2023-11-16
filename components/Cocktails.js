@@ -3,49 +3,55 @@ import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
 
-const URL = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s=';
+const URL = 'https://www.thecocktaildb.com/api/json/v1/1/';
 
 export default function Cocktails() {
   const [searchQuery, setSearchQuery] = useState('');
   const [recipeData, setRecipeData] = useState([])
+  const [errorStatus, setErrorStatus] = useState('')
 
   const onChangeSearch = query => setSearchQuery(query);
 
   useEffect(() => {
+    if (searchQuery.trim().length === 0 ) {
+      defaultSetup()
+    } else {
       handleSearch()
-  }, [searchQuery])
-    
-  const handleSearch = () => {
-    async function getDrink() {
-      if (searchQuery === '' || searchQuery === ' ') {
-        setRecipeData([])
-        return
-      }
-      try {
-        const response = await fetch(URL + searchQuery);
-        if (response.ok) {
-          const json = await response.json();
-          if (json.drinks === undefined || json.drinks === null || json.drinks === '' || json.drinks === 0 || !json.drinks) {
-            console.log("Can't find drinks")
-            setRecipeData([])
-            return
-          }
-
-          const drinks = json.drinks;
-          setRecipeData(drinks);
-              
-        } else {
-
-            alert('Error retrieving recipes!' + {searchQuery}); //poista check
-          }
-      } catch (err) {
-          alert(err);
-        }
     }
-    getDrink();
+  }, [searchQuery])
+  
+  
+  async function getDrink(method) {
+    try {
+      const response = await fetch(URL + method);
+      if (response.ok) {
+        const json = await response.json();
+        if (json.drinks === undefined || json.drinks === null || json.drinks === '' || json.drinks === 0 || !json.drinks) {
+          setErrorStatus('No drinks found!')
+          setRecipeData([])
+          return
+        } else {
+          setErrorStatus('')
+        }
+        const drinks = json.drinks;
+        setRecipeData(drinks);
+      } else {
+          alert('Error retrieving recipes!');
+        }
+    } catch (err) {
+        alert(err);
+      }
   }
 
-    const recipe = recipeData.map((data, id) => {
+  const handleSearch = () => {
+    getDrink('search.php?s=' + searchQuery);
+  }
+
+  const defaultSetup = () => {
+    getDrink('search.php?s=')
+  }
+
+    const drink = recipeData.map((data, id) => {
       return (
           <View key={id}>
             <Image 
@@ -55,7 +61,6 @@ export default function Cocktails() {
             <Text>Category: {data.strCategory}</Text>
           </View>
       )
-  
     })
 
 
@@ -67,9 +72,15 @@ export default function Cocktails() {
       onChangeText={(value) => {onChangeSearch(value)}}
       value={searchQuery}/>
       <ScrollView>
+        {errorStatus.trim().length === 0 ? 
         <View>
-          {recipe}
+          {drink}
         </View>
+        : 
+        <View>
+          <Text>{errorStatus}</Text>
+        </View>}
+        
       </ScrollView>
     </View>
   );
