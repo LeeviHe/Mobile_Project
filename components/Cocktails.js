@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
 import { Container, Row, Col} from "react-native-flex-grid";
 
-const URL = 'https://www.thecocktaildb.com/api/json/v1/1/';
+const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 
 export default function Cocktails() {
   const [searchQuery, setSearchQuery] = useState('');

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
 import { Container, Row, Col} from "react-native-flex-grid";
 
-const URL = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?i=';
+const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 
 export default function Ingredients() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,14 +21,10 @@ export default function Ingredients() {
     }
   }, [searchQuery])
     
-      /*if (searchQuery === '' || searchQuery === ' ') {
-        setIngredientData([])
-        return
-      }*/
     async function getIngredient(method) {
 
       try {
-        const response = await fetch(URL + searchQuery);
+        const response = await fetch(URL + method);
         if (response.ok) {
           const json = await response.json();
           if (json.ingredients === undefined || json.ingredients === null || json.ingredients === '' || json.ingredients === 0 || !json.ingredients) {

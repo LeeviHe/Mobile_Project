@@ -3,7 +3,7 @@ import { ScrollView, Text, View, Image} from 'react-native';
 import { Container, Row, Col} from "react-native-flex-grid";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const URL = 'https://www.thecocktaildb.com/api/json/v1/1/';
+const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const favIcon = '../assets/defaults/favicon.png'
 
 export default function Home() {
