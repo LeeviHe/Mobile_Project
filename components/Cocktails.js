@@ -1,7 +1,8 @@
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, Pressable } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
+import { Container, Row, Col} from "react-native-flex-grid";
 
 const URL = 'https://www.thecocktaildb.com/api/json/v1/1/';
 
@@ -65,12 +66,22 @@ export default function Cocktails() {
 
 
   return (
-    <View>
+    <View style={{backgroundColor:'lightgray'}}>
       <Text style={{paddingTop: 100, paddingLeft: 120, fontSize: 28}}>Cocktails</Text>
-      <Searchbar
-      placeholder="Search"
-      onChangeText={(value) => {onChangeSearch(value)}}
-      value={searchQuery}/>
+      <Row>
+        <Col>
+          <Searchbar
+            placeholder="Search"
+            onChangeText={(value) => {onChangeSearch(value)}}
+            value={searchQuery}/>
+        </Col>
+        <Col>
+          <Pressable>
+            <Text>Filters</Text>
+          </Pressable>
+        </Col>
+    </Row>
+
       <ScrollView>
         {errorStatus.trim().length === 0 ? 
         <View>
@@ -80,7 +91,6 @@ export default function Cocktails() {
         <View>
           <Text>{errorStatus}</Text>
         </View>}
-        
       </ScrollView>
     </View>
   );

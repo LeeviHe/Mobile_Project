@@ -10,37 +10,45 @@ export default function Home() {
 
   return (
     <ScrollView>
-        <View>
+        <View style={{backgroundColor:'lightgray'}}>
             <View>
-                <Image source={require('../assets/icons/pockettini-logo-regular-256px.png')} style={{alignSelf: 'center', marginTop: 100, backgroundColor: 'red'}}/>
+                <Image source={require('../assets/icons/pockettini-logo-regular-256px.png')} style={{alignSelf: 'center', marginTop: 100}}/>
             </View>
             <View>
                 <Text style={{paddingTop: 100, paddingLeft: 100}}>Carousel here</Text>
             </View>
             <View>
-                <Text style={{paddingTop: 100, paddingLeft: 100, fontSize: 28}}>Featured</Text>
+                <Text style={{paddingTop: 100, paddingLeft: 100, fontSize: 28}}>Discover</Text>
             </View>
-            <View style={{paddingTop: 100, paddingLeft: 100}}>
+            <View style={{paddingTop: 100, paddingLeft: 100, paddingRight:100}}>
                 <Row>
-                    <Col>
+                <Col style={{backgroundColor:'lightyellow'}}>
+                        <Text>Surprise me!</Text>
+                        <Text style={{fontSize: 10}}>Description</Text>
                         <Image
                         source={require(favIcon)}
                         />
                     </Col>
-                    <Col>
+                    <Col style={{backgroundColor:'pink'}}>
+                        <Text>Coffee & tea</Text>
+                        <Text style={{fontSize: 10}}>Description</Text>
                         <Image
                         source={require(favIcon)}
-                         />
+                        />
                     </Col>
                 </Row>
                 <View>
                     <Row>
-                        <Col>
+                        <Col style={{backgroundColor:'lightgreen'}}>
+                            <Text>Alcohol free</Text>
+                            <Text style={{fontSize: 10}}>Description</Text>
                             <Image
                             source={require(favIcon)}
                             />
                         </Col>
-                        <Col>
+                        <Col style={{backgroundColor:'lightblue'}}>
+                            <Text>Alcoholic drinks</Text>
+                            <Text style={{fontSize: 10}}>Description</Text>
                             <Image
                             source={require(favIcon)}
                             />

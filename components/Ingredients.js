@@ -1,50 +1,61 @@
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, Pressable } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
+import { Container, Row, Col} from "react-native-flex-grid";
 
 const URL = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?i=';
 
 export default function Ingredients() {
   const [searchQuery, setSearchQuery] = useState('');
   const [ingredientData, setIngredientData] = useState([])
+  const [errorStatus, setErrorStatus] = useState('')
 
   const onChangeSearch = query => setSearchQuery(query);
 
   useEffect(() => {
+    if (searchQuery.trim().length === 0 ) {
+      defaultSetup()
+    } else {
       handleSearch()
+    }
   }, [searchQuery])
     
-  const handleSearch = () => {
-    async function getIngredient() {
-      if (searchQuery === '' || searchQuery === ' ') {
+      /*if (searchQuery === '' || searchQuery === ' ') {
         setIngredientData([])
         return
-      }
+      }*/
+    async function getIngredient(method) {
+
       try {
         const response = await fetch(URL + searchQuery);
         if (response.ok) {
           const json = await response.json();
           if (json.ingredients === undefined || json.ingredients === null || json.ingredients === '' || json.ingredients === 0 || !json.ingredients) {
-            console.log("Can't find ingredient")
+            setErrorStatus('No ingredients found!')
             setIngredientData([])
             return
+          } else {
+            setErrorStatus('')
           }
-
           const ingredients = json.ingredients;
           setIngredientData(ingredients);
-              
         } else {
-
-            alert('Error retrieving ingredients!' + {searchQuery}); //poista check
+            alert('Error retrieving ingredients!')
           }
       } catch (err) {
           alert(err);
         }
     }
-    getIngredient();
-  }
+    
+  
+const handleSearch = () => {
+  getIngredient('search.php?s=' + searchQuery)
+}
 
+const defaultSetup = () => {
+  getIngredient('search.php?s=')
+}
     const ingredient = ingredientData.map((data, id) => {
       return (
           <View key={id}>
@@ -62,16 +73,30 @@ export default function Ingredients() {
 
 
   return (
-    <View>
+    <View style={{backgroundColor:'lightgray'}}>
       <Text style={{paddingTop: 100, paddingLeft: 120, fontSize: 28}}>Ingredients</Text>
-      <Searchbar
-      placeholder="Search"
-      onChangeText={(value) => {onChangeSearch(value)}}
-      value={searchQuery}/>
-      <ScrollView>
+      <Row>
+        <Col>
+          <Searchbar
+            placeholder="Search"
+            onChangeText={(value) => {onChangeSearch(value)}}
+            value={searchQuery}/>
+        </Col>
+        <Col>
+          <Pressable>
+            <Text>Filters</Text>
+          </Pressable>
+        </Col>
+    </Row>
+    <ScrollView>
+        {errorStatus.trim().length === 0 ? 
         <View>
           {ingredient}
         </View>
+        : 
+        <View>
+          <Text>{errorStatus}</Text>
+        </View>}
       </ScrollView>
     </View>
   );
