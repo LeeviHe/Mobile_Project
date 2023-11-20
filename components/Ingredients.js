@@ -46,11 +46,11 @@ export default function Ingredients() {
     
   
 const handleSearch = () => {
-  getIngredient('search.php?s=' + searchQuery)
+  getIngredient('search.php?i=' + searchQuery)
 }
 
 const defaultSetup = () => {
-  getIngredient('search.php?s=')
+  getIngredient('search.php?i=')
 }
     const ingredient = ingredientData.map((data, id) => {
       return (
