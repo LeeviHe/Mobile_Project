@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PageSlider } from '@pietile-native-kit/page-slider';
 import styles from '../styles/styles'
 import { useFonts } from 'expo-font';
+import { StatusBar } from 'expo-status-bar';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const favIcon = '../assets/defaults/favicon.png'
@@ -26,14 +27,18 @@ function Home() {
     return (
         <ScrollView>
 
-            <View style={styles.viewHelper}>
-                <ImageBackground source={require('../assets/images/Carousel-cocktails-2.png')}
-                    style={styles.pageBackground} resizeMode='cover'>
-                    <View style={{ marginBottom: 50 }}>
+            <View style={styles.container}>
+                <StatusBar style='auto' />
+
+                <ImageBackground source={require('../assets/images/Carousel-background.png')}
+                    resizeMode='contain'
+                    opacity={0.5}
+                    blurRadius={30}>
+
+                    <View style={{ marginBottom: 80 }}>
                         <Image source={require('../assets/logos/pockettini-logo-regular-256px-black.png')}
                             style={styles.logo} />
                     </View>
-
 
                     <View>
                         <PageSlider
@@ -63,52 +68,54 @@ function Home() {
                         </PageSlider>
                     </View>
 
+                </ImageBackground>
+
+                <View>
+                    <Text style={{ paddingTop: 100, paddingLeft: 100, fontSize: 28 }}>Discover</Text>
+                </View>
+                <View style={{ paddingTop: 100, paddingLeft: 100, paddingRight: 100 }}>
+                    <Row>
+                        <Col style={{ backgroundColor: 'lightyellow' }}>
+                            <Text>Surprise me!</Text>
+                            <Text style={{ fontSize: 10 }}>Description</Text>
+                            <Image
+                                source={require(favIcon)}
+                            />
+                        </Col>
+                        <Col style={{ backgroundColor: 'pink' }}>
+                            <Text>Coffee & tea</Text>
+                            <Text style={{ fontSize: 10 }}>Description</Text>
+                            <Image
+                                source={require(favIcon)}
+                            />
+                        </Col>
+                    </Row>
                     <View>
-                        <Text style={{ paddingTop: 100, paddingLeft: 100, fontSize: 28 }}>Discover</Text>
-                    </View>
-                    <View style={{ paddingTop: 100, paddingLeft: 100, paddingRight: 100 }}>
                         <Row>
-                            <Col style={{ backgroundColor: 'lightyellow' }}>
-                                <Text>Surprise me!</Text>
+                            <Col style={{ backgroundColor: 'lightgreen' }}>
+                                <Text>Alcohol free</Text>
                                 <Text style={{ fontSize: 10 }}>Description</Text>
                                 <Image
                                     source={require(favIcon)}
                                 />
                             </Col>
-                            <Col style={{ backgroundColor: 'pink' }}>
-                                <Text>Coffee & tea</Text>
+                            <Col style={{ backgroundColor: 'lightblue' }}>
+                                <Text>Alcoholic drinks</Text>
                                 <Text style={{ fontSize: 10 }}>Description</Text>
                                 <Image
                                     source={require(favIcon)}
                                 />
                             </Col>
                         </Row>
-                        <View>
-                            <Row>
-                                <Col style={{ backgroundColor: 'lightgreen' }}>
-                                    <Text>Alcohol free</Text>
-                                    <Text style={{ fontSize: 10 }}>Description</Text>
-                                    <Image
-                                        source={require(favIcon)}
-                                    />
-                                </Col>
-                                <Col style={{ backgroundColor: 'lightblue' }}>
-                                    <Text>Alcoholic drinks</Text>
-                                    <Text style={{ fontSize: 10 }}>Description</Text>
-                                    <Image
-                                        source={require(favIcon)}
-                                    />
-                                </Col>
-                            </Row>
-                        </View>
+                    </View>
 
-                    </View>
-                    <View>
-                        <Text style={{ paddingTop: 100, paddingLeft: 50 }}>MAP</Text>
-                        <Icon name="map" style={{ paddingTop: 50, paddingLeft: 150, fontSize: 100 }}></Icon>
-                    </View>
-                </ImageBackground>
+                </View>
+                <View>
+                    <Text style={{ paddingTop: 100, paddingLeft: 50 }}>MAP</Text>
+                    <Icon name="map" style={{ paddingTop: 50, paddingLeft: 150, fontSize: 100 }}></Icon>
+                </View>
             </View>
+
         </ScrollView >
 
     );

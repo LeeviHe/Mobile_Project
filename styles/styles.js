@@ -1,11 +1,10 @@
 import { StyleSheet } from "react-native";
+import Constants from 'expo-constants';
 
 export default StyleSheet.create({
-  viewHelper: {
-    marginTop: 70
-  },
-  pageBackground: {
-    maxWidth: '100%'
+  container: {
+    paddingTop: Constants.statusBarHeight + 20,
+    backgroundColor: '#f5f5f5'
   },
   logo: {
     alignSelf: "center",
@@ -14,7 +13,7 @@ export default StyleSheet.create({
   },
   pageSlider: {
     width: '100%',
-    //backgroundColor: '#e580802d'
+    paddingVertical: 10
   },
   carouselImage: {
     width: '80%',
@@ -24,7 +23,8 @@ export default StyleSheet.create({
     color: '#5A5A5A',
     fontFamily: 'Raleway',
     fontSize: 20,
-    marginTop: 20
+    marginTop: 20,
+    paddingBottom: 50
   },
   page: {
     width: '100%',
