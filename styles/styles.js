@@ -41,7 +41,6 @@ export default StyleSheet.create({
     fontSize: 12,
     color: '#6c6c6c',
     fontFamily: fonts.header,
-    fontWeight: 300,
     alignSelf: "center",
     textAlign: "center",
     marginTop: 5

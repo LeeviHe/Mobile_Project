@@ -14,8 +14,6 @@ const favIcon = '../assets/defaults/favicon.png'
 function Home() {
     const [selectedPage, setSelectedPage] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
-    const [rowGap, setRowGap] = useState(10);
-    const [columnGap, setColumnGap] = useState(10);
 
     const [font] = useFonts({
         Montserrat: require('../assets/fonts/Montserrat/static/Montserrat-Regular.ttf'),
