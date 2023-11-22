@@ -38,7 +38,7 @@ function Home() {
             backgroundColor: '255, 244, 141',
             title: 'Surprise me!',
             text: 'Discover something\n new and exciting',
-            img: require('../assets/images/Alcoholic.png')
+            img: require('../assets/images/Carousel-cocktails-1.png')
         },
         {
             backgroundColor: '255, 132, 63',
