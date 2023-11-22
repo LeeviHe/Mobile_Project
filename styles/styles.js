@@ -1,10 +1,11 @@
 import { StyleSheet } from "react-native";
 import Constants from 'expo-constants';
+import { colors } from './style-constants'
 
 export default StyleSheet.create({
   container: {
     paddingTop: Constants.statusBarHeight + 20,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: colors.white
   },
   logo: {
     alignSelf: "center",
@@ -18,13 +19,6 @@ export default StyleSheet.create({
   carouselImage: {
     width: '80%',
     height: 150
-  },
-  H1: {
-    color: '#5A5A5A',
-    fontFamily: 'Raleway',
-    fontSize: 20,
-    marginTop: 20,
-    paddingBottom: 50
   },
   page: {
     width: '100%',

@@ -4,6 +4,7 @@ import { Container, Row, Col } from "react-native-flex-grid";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PageSlider } from '@pietile-native-kit/page-slider';
 import styles from '../styles/styles'
+import { colors, textStyles } from '../styles/style-constants';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 
@@ -52,17 +53,17 @@ function Home() {
 
                             <View style={styles.page}>
                                 <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-1.png')} />
-                                <Text style={styles.H1}>Devs' Favourites</Text>
+                                <Text style={textStyles.H1}>Devs' Favourites</Text>
                             </View>
 
                             <View style={styles.page}>
                                 <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-2.png')} />
-                                <Text style={styles.H1}>Most Popular</Text>
+                                <Text style={textStyles.H1}>Most Popular</Text>
                             </View>
 
                             <View style={styles.page}>
                                 <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-3.png')} />
-                                <Text style={styles.H1}>Latest Recipes</Text>
+                                <Text style={textStyles.H1}>Latest Recipes</Text>
                             </View>
 
                         </PageSlider>
@@ -71,7 +72,7 @@ function Home() {
                 </ImageBackground>
 
                 <View>
-                    <Text style={{ paddingTop: 100, paddingLeft: 100, fontSize: 28 }}>Discover</Text>
+                    <Text style={textStyles.H1Upper}>Discover</Text>
                 </View>
                 <View style={{ paddingTop: 100, paddingLeft: 100, paddingRight: 100 }}>
                     <Row>
