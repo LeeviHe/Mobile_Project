@@ -8,15 +8,34 @@ const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 
 export default function Cocktails() {
   const [searchQuery, setSearchQuery] = useState('');
+  //Non sorted drink data
   const [recipeData, setRecipeData] = useState([])
-  const [sortedDrinks, setSortedDrinks] = useState([])
+  //Sorted and final drink data for showing
+  const [activeDrinks, setActiveDrinks] = useState([])
+  //JSON for categories on filter page
   const [categoryJson, setCategoryJson] = useState([])
+  //JSON for ingredients on filter page
   const [ingredientJson, setIngredientJson] = useState([])
+  //Selected filters
+  const [selectedFilters, setSelectedFilters] = 
+    useState(new Array(489).fill(false))
+  //Activated multi-ingredient filters that are supposed to show
+  const [activeFilters, setActiveFilters] = useState([])
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
   const [ascendSort, setAscendSort] = useState(false)
   const [descendSort, setDescendSort] = useState(false)
   
+  useEffect(() => {
+    console.log(activeFilters)
+    let string = activeFilters.toString()
+    if (activeFilters.length === 0) {
+      console.log('empty')
+    } else {
+      searchFilter('i', string)
+    }
+  }, [activeFilters])
+
   useEffect(() => {
     if (categoryJson.length === 0){
       getJson("list.php?c=list" , setCategoryJson)
@@ -27,8 +46,11 @@ export default function Cocktails() {
   }, [categoryJson, ingredientJson])
 
   useEffect(() => {
-    if (searchQuery.trim().length === 0 && !ascendSort && !descendSort) {
+    if (searchQuery.trim().length === 0 && !ascendSort && !descendSort && activeFilters.length === 0) {
       defaultSetup()
+    } else if (activeFilters.length > 0 && searchQuery.trim().length === 0) {
+      let string = activeFilters.toString()
+      searchFilter('i', string)
     } else {
       handleSearch()
     }
@@ -36,24 +58,24 @@ export default function Cocktails() {
 
   useEffect(() => {
     if (ascendSort) {
-      setSortedDrinks(recipeData.sort((a, b) => a.strDrink.localeCompare(b.strDrink)))
+      setActiveDrinks(recipeData.sort((a, b) => a.strDrink.localeCompare(b.strDrink)))
       console.log('Ascend on')
     } else if (descendSort) {
-      setSortedDrinks(recipeData.sort((a, b) => b.strDrink.localeCompare(a.strDrink)))
+      setActiveDrinks(recipeData.sort((a, b) => b.strDrink.localeCompare(a.strDrink)))
       console.log('Descend on')
     } else {
       console.log('reset')
-      setSortedDrinks(recipeData)
+      setActiveDrinks(recipeData)
     }
   }, [ascendSort, descendSort, recipeData])
 
-  async function getJson(method, param) {
+  async function getJson(condition, setJsonData) {
     try {
-      const response = await fetch(URL + method);
+      const response = await fetch(URL + condition);
       if (response.ok) {
         const json = await response.json()
         const data = json.drinks
-        param(data)
+        setJsonData(data)
       } else {
           alert('Error retrieving recipes!');
         }
@@ -92,10 +114,32 @@ export default function Cocktails() {
   }
 
   const defaultSetup = () => {
-    getDrink('search.php?s=')
+    getDrink('search.php?s=White Russian') //White russian only for performance, 'search.php?s=' for actual app
   }
 
-  const drink = sortedDrinks.map((data, id) => {
+  const selectFilter = (i, ingredient) => {
+        let filters = [...selectedFilters]
+        filters[i] = selectedFilters[i] ? false : true
+        setSelectedFilters(filters)
+        
+        if (selectedFilters[i]) {
+          (console.log('splice'))
+          setActiveFilters(oldValues => {
+            return oldValues.filter(filter => filter !== ingredient)
+          })
+        } else {
+          console.log('push')
+          let filterCopy = [...activeFilters]
+          filterCopy.push(ingredient)
+          setActiveFilters(filterCopy)
+        }
+}
+
+function setFilterSelect(i) {
+  return selectedFilters[i] ? 'green' : 'red'
+}
+
+  const drink = activeDrinks.map((data, id) => {
     return (
         <View key={id}>
           <Image 
@@ -139,8 +183,8 @@ export default function Cocktails() {
             <Col>
               <Pressable
                 key={"ingrdt:" + data.strIngredient1}
-                onPress={() => searchFilter('i', data.strIngredient1)}>
-                <Text style={backgroundColor='red'}>x</Text>
+                onPress={() => selectFilter(id, data.strIngredient1)}>
+                <Text style={{color:setFilterSelect(id)}}>x</Text>
               </Pressable>
             </Col>
           </Row>
@@ -156,10 +200,10 @@ export default function Cocktails() {
     }
   }
 
-  function searchFilter (parame1, parame2) {
-    console.log(parame2)
-    getDrink('filter.php?' + parame1 + '=' + parame2)
-
+  // Condition for what you want to filter with
+  function searchFilter (condition, search) {
+    console.log(search)
+    getDrink('filter.php?' + condition + '=' + search)
   }
 
   function ascending () {
