@@ -1,10 +1,12 @@
 export const colors = {
   white: '#f5f5f5',
-  mainFontColour: '#5a5a5a'
+  mainFontColour: '#5a5a5a',
+  secondaryFontColour: '#313131'
 };
 
 export const fonts = {
   header: 'Raleway',
+  secondary: 'RalewayReg',
   text: 'Montserrat'
 }
 
@@ -20,8 +22,7 @@ export const textStyles = {
     color: colors.mainFontColour,
     fontFamily: fonts.header,
     fontSize: 20,
-    marginTop: 20,
-    paddingBottom: 50,
+    marginBottom: 40,
     textTransform: 'uppercase',
     marginLeft: 20
   },

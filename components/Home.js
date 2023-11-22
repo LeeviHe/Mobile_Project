@@ -14,15 +14,53 @@ const favIcon = '../assets/defaults/favicon.png'
 function Home() {
     const [selectedPage, setSelectedPage] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
+    const [rowGap, setRowGap] = useState(10);
+    const [columnGap, setColumnGap] = useState(10);
 
     const [font] = useFonts({
         Montserrat: require('../assets/fonts/Montserrat/static/Montserrat-Regular.ttf'),
-        Raleway: require('../assets/fonts/Raleway/static/Raleway-SemiBold.ttf')
+        Raleway: require('../assets/fonts/Raleway/static/Raleway-SemiBold.ttf'),
+        RalewayReg: require('../assets/fonts/Raleway/static/Raleway-Regular.ttf')
     })
 
     if (!font) {
         return null;
     }
+
+    const Card = ({ backgroundColor, title, text, img }) => (
+        <Col style={[styles.cardCol, { backgroundColor: `rgba(${backgroundColor}, 0.4)` }]}>
+            <Text style={styles.cardTitle}>{title}</Text>
+            <Text style={styles.cardText}>{text}</Text>
+            <Image source={img} style={styles.cardImg} />
+        </Col>
+    );
+
+    const cardData = [
+        {
+            backgroundColor: '255, 244, 141',
+            title: 'Surprise me!',
+            text: 'Discover something\n new and exciting',
+            img: require('../assets/images/Alcoholic.png')
+        },
+        {
+            backgroundColor: '255, 132, 63',
+            title: 'Coffee & Tea',
+            text: 'Brewed or steeped?',
+            img: require('../assets/images/CoffeeTea-category.png')
+        },
+        {
+            backgroundColor: '161, 193, 156',
+            title: 'Alcohol free',
+            text: 'Grant your liver a\n well-deserved break',
+            img: require('../assets/images/Alcoholfree-category.png')
+        },
+        {
+            backgroundColor: '153, 151, 224',
+            title: 'Alcoholic drinks',
+            text: "It's Happy Hour somewhere",
+            img: require('../assets/images/Alcoholic.png')
+        },
+    ];
 
 
     return (
@@ -74,42 +112,24 @@ function Home() {
                 <View>
                     <Text style={textStyles.H1Upper}>Discover</Text>
                 </View>
-                <View style={{ paddingTop: 100, paddingLeft: 100, paddingRight: 100 }}>
-                    <Row>
-                        <Col style={{ backgroundColor: 'lightyellow' }}>
-                            <Text>Surprise me!</Text>
-                            <Text style={{ fontSize: 10 }}>Description</Text>
-                            <Image
-                                source={require(favIcon)}
-                            />
+
+                <View style={{ marginHorizontal: 20, gap: 10 }}>
+                    <Row style={{ gap: 10 }}>
+                        <Col style={{ paddingHorizontal: 0 }}>
+                            <Card {...cardData[0]} />
                         </Col>
-                        <Col style={{ backgroundColor: 'pink' }}>
-                            <Text>Coffee & tea</Text>
-                            <Text style={{ fontSize: 10 }}>Description</Text>
-                            <Image
-                                source={require(favIcon)}
-                            />
+                        <Col style={{ paddingHorizontal: 0 }}>
+                            <Card {...cardData[1]} />
                         </Col>
                     </Row>
-                    <View>
-                        <Row>
-                            <Col style={{ backgroundColor: 'lightgreen' }}>
-                                <Text>Alcohol free</Text>
-                                <Text style={{ fontSize: 10 }}>Description</Text>
-                                <Image
-                                    source={require(favIcon)}
-                                />
-                            </Col>
-                            <Col style={{ backgroundColor: 'lightblue' }}>
-                                <Text>Alcoholic drinks</Text>
-                                <Text style={{ fontSize: 10 }}>Description</Text>
-                                <Image
-                                    source={require(favIcon)}
-                                />
-                            </Col>
-                        </Row>
-                    </View>
-
+                    <Row style={{ gap: 10 }}>
+                        <Col style={{ paddingHorizontal: 0 }}>
+                            <Card {...cardData[2]} />
+                        </Col>
+                        <Col style={{ paddingHorizontal: 0 }}>
+                            <Card {...cardData[3]} />
+                        </Col>
+                    </Row>
                 </View>
                 <View>
                     <Text style={{ paddingTop: 100, paddingLeft: 50 }}>MAP</Text>

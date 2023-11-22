@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import Constants from 'expo-constants';
-import { colors } from './style-constants'
+import { colors, fonts } from './style-constants'
 
 export default StyleSheet.create({
   container: {
@@ -27,4 +27,29 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
+  cardCol: {
+    borderRadius: 10,
+    paddingVertical: 20
+  },
+  cardTitle: {
+    fontSize: 18,
+    color: colors.secondaryFontColour,
+    fontFamily: fonts.header,
+    alignSelf: "center"
+  },
+  cardText: {
+    fontSize: 12,
+    color: '#6c6c6c',
+    fontFamily: fonts.header,
+    fontWeight: 300,
+    alignSelf: "center",
+    textAlign: "center",
+    marginTop: 5
+  },
+  cardImg: {
+    width: '100%',
+    height: 100,
+    alignSelf: "center",
+    marginTop: 20
+  }
 });
