@@ -1,14 +1,15 @@
-import { Text, View, Image, Pressable } from 'react-native';
+import { Text, View, Image, Pressable, Button } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
 import { Container, Row, Col} from "react-native-flex-grid";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
-
-export default function Cocktails() {
+const Stack = createNativeStackNavigator()
+export default function Cocktails({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
-  //Non sorted drink data
+  //Non-sorted drink data
   const [recipeData, setRecipeData] = useState([])
   //Sorted and final drink data for showing
   const [activeDrinks, setActiveDrinks] = useState([])
@@ -16,23 +17,33 @@ export default function Cocktails() {
   const [categoryJson, setCategoryJson] = useState([])
   //JSON for ingredients on filter page
   const [ingredientJson, setIngredientJson] = useState([])
-  //Selected filters
-  const [selectedFilters, setSelectedFilters] = 
+  //Selected category filter (11)
+  const [selectedCategory, setSelectedCategory] = 
+    useState(new Array(11).fill(false))
+  //Selected alcoholic filter (2) //fix alcoholselect / selectalcohol mixup
+  const [selectedAlcohol, setSelectedAlcohol] = 
+    useState(new Array(2).fill(false))
+  //Selected multi-ingredient filters (489)
+  const [selectedIngredients, setSelectedIngredients] = 
     useState(new Array(489).fill(false))
   //Activated multi-ingredient filters that are supposed to show
   const [activeFilters, setActiveFilters] = useState([])
+
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
   const [ascendSort, setAscendSort] = useState(false)
   const [descendSort, setDescendSort] = useState(false)
   
+
+  //
+  //useEffects
   useEffect(() => {
     console.log(activeFilters)
     let string = activeFilters.toString()
     if (activeFilters.length === 0) {
       console.log('empty')
     } else {
-      searchFilter('i', string)
+      searchFilter('','i', string)
     }
   }, [activeFilters])
 
@@ -69,6 +80,8 @@ export default function Cocktails() {
     }
   }, [ascendSort, descendSort, recipeData])
 
+  //
+  //functions
   async function getJson(condition, setJsonData) {
     try {
       const response = await fetch(URL + condition);
@@ -84,7 +97,13 @@ export default function Cocktails() {
       }
   }
 
-  const onChangeSearch = query => setSearchQuery(query);
+  async function viewFilter() {
+    if (!filterView) {
+      setFilterView(true)
+    } else if (filterView) {
+      setFilterView(false)
+    }
+  }
 
   async function getDrink(method) {
     try {
@@ -93,7 +112,6 @@ export default function Cocktails() {
         const json = await response.json();
         if (json.drinks === undefined || json.drinks === null || json.drinks === '' || json.drinks === 0 || !json.drinks || json.drinks === "None Found") {
           setErrorStatus('No drinks found!')
-          console.log('nodrinks')
           setRecipeData([])
           return
         } else {
@@ -109,6 +127,63 @@ export default function Cocktails() {
       }
   }
 
+  // Condition for what you want to filter with
+  function searchFilter (id, condition, search) {
+    /*
+    console.log(id + ' idd')
+    console.log(condition + ' condditii') 
+    console.log(search + ' searct')
+    */
+    if (condition == 'c') {
+      let filters = [...selectedCategory]
+      filters.fill(false)
+      filters[id] = selectedCategory[id] ? false : true
+      setSelectedCategory(filters)
+      selectedAlcohol.fill(false)
+      selectedIngredients.fill(false)
+      setActiveFilters([])
+    } else if (condition == 'a') {
+      let filters = [...selectedAlcohol]
+      filters.fill(false)
+      filters[id] = selectedAlcohol[id] ? false : true
+      setSelectedAlcohol(filters)
+      selectedCategory.fill(false)
+      selectedIngredients.fill(false)
+      setActiveFilters([])
+    }
+    getDrink('filter.php?' + condition + '=' + search)
+  }
+
+  function ascending () {
+    setAscendSort(!ascendSort)
+    console.log('toggle ascend')
+    setDescendSort(false)
+    handleSearch()
+  }
+
+  function descending () {
+    setDescendSort(!descendSort)
+    console.log('toggle descend')
+    setAscendSort(false)
+    handleSearch()
+  }
+
+  function multiFilterSelect(i) {
+    return selectedIngredients[i] ? 'green' : 'red'
+  }
+  //fix alcoholselect / selectalcohol mixup
+  function alcoholSelect (i)  {
+    return selectedAlcohol[i] ? 'green' : 'red'
+  }
+
+  function categorySelect (i) {
+    return selectedCategory[i] ? 'green' : 'red'
+  }
+
+  //
+  //consts
+  const onChangeSearch = query => setSearchQuery(query);
+
   const handleSearch = () => {
     getDrink('search.php?s=' + searchQuery);
   }
@@ -118,26 +193,30 @@ export default function Cocktails() {
   }
 
   const selectFilter = (i, ingredient) => {
-        let filters = [...selectedFilters]
-        filters[i] = selectedFilters[i] ? false : true
-        setSelectedFilters(filters)
-        
-        if (selectedFilters[i]) {
-          (console.log('splice'))
+        //Empty other filters
+        let alcoholic = [...selectedAlcohol]
+        let category = [...selectedCategory]
+        alcoholic.fill(false)
+        category.fill(false)
+        setSelectedAlcohol(alcoholic)
+        setSelectedCategory(category)
+        //Original
+        let filters = [...selectedIngredients]
+        filters[i] = selectedIngredients[i] ? false : true
+        setSelectedIngredients(filters)
+        if (selectedIngredients[i]) {
+          (console.log('splice'))//delete
           setActiveFilters(oldValues => {
             return oldValues.filter(filter => filter !== ingredient)
           })
         } else {
-          console.log('push')
+          console.log('push')//delete
           let filterCopy = [...activeFilters]
           filterCopy.push(ingredient)
           setActiveFilters(filterCopy)
         }
-}
+  }
 
-function setFilterSelect(i) {
-  return selectedFilters[i] ? 'green' : 'red'
-}
 
   const drink = activeDrinks.map((data, id) => {
     return (
@@ -150,6 +229,19 @@ function setFilterSelect(i) {
             <Text></Text>
             :
             <Text>Category: {data.strCategory}</Text>}
+            <Button
+            title='To recipe'
+            onPress={() => 
+            navigation.navigate('Recipe'
+             , /*{
+                drinkId: data.idDrink,
+                drinkName: data.strDrink,
+                image: data.strDrinkThumb,
+                category: data.strCategory,
+                glass: data.strGlass,
+              instructions: data.strInstructions
+             }*/)}
+            />
         </View>
     )
   })
@@ -164,8 +256,8 @@ function setFilterSelect(i) {
             <Col>
               <Pressable
                 key={"ctgr:" + data.strCategory}
-                onPress={() => searchFilter('c', data.strCategory)}>
-                <Text style={backgroundColor='red'}>x</Text>
+                onPress={() => searchFilter(id, 'c', data.strCategory)}>
+                <Text style={{color:categorySelect(id)}}>x</Text>
               </Pressable>
             </Col>
           </Row>
@@ -184,41 +276,13 @@ function setFilterSelect(i) {
               <Pressable
                 key={"ingrdt:" + data.strIngredient1}
                 onPress={() => selectFilter(id, data.strIngredient1)}>
-                <Text style={{color:setFilterSelect(id)}}>x</Text>
+                <Text style={{color:multiFilterSelect(id)}}>x</Text>
               </Pressable>
             </Col>
           </Row>
         </View>
     )
   })
-
-  async function viewFilter() {
-    if (!filterView) {
-      setFilterView(true)
-    } else if (filterView) {
-      setFilterView(false)
-    }
-  }
-
-  // Condition for what you want to filter with
-  function searchFilter (condition, search) {
-    console.log(search)
-    getDrink('filter.php?' + condition + '=' + search)
-  }
-
-  function ascending () {
-    setAscendSort(!ascendSort)
-    console.log('toggle ascend')
-    setDescendSort(false)
-    handleSearch()
-  }
-
-  function descending () {
-    setDescendSort(!descendSort)
-    console.log('toggle descend')
-    setAscendSort(false)
-    handleSearch()
-  }
 
   return (
     <View style={{backgroundColor:'lightgray'}}>
@@ -261,6 +325,16 @@ function setFilterSelect(i) {
           <ScrollView style={{height:200}}>
             {ingredients}
           </ScrollView>
+        </View>
+        <View>         
+          <Pressable
+          onPress={() => searchFilter(0, 'a', 'Alcoholic')}>
+            <Text style={{color:alcoholSelect(0)}}>Alcoholic</Text>
+          </Pressable>
+          <Pressable
+          onPress={() => searchFilter(1, 'a', 'Non_Alcoholic')}>
+            <Text style={{color:alcoholSelect(1)}}>Non-Alcoholic</Text>
+          </Pressable>
         </View>
       </ScrollView>
       :

@@ -6,14 +6,26 @@ import Cocktails from './components/Cocktails';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Home from './components/Home';
 import More from './components/More';
+import Recipe from './components/Recipe';
 import { colors } from './styles/style-constants';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Tab = createBottomTabNavigator()
+const Stack = createNativeStackNavigator();
+
+const CocktailsNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Cocktails" component={Cocktails} />
+      <Stack.Screen name="Recipe" component={Recipe} />
+    </Stack.Navigator>
+  );
+};
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Tab.Navigator
+      <Tab.Navigator initialRouteName='Home'
         screenOptions={{
           headerShown: false,
         }}
@@ -73,8 +85,8 @@ export default function App() {
             },
           }} />
         <Tab.Screen
-          name="Cocktails"
-          component={Cocktails}
+          name="CocktailsNavigator"
+          component={CocktailsNavigator}
           options={{
             tabBarLabel: 'Cocktails',
             tabBarIcon: ({ color, size }) => {
