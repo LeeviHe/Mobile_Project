@@ -50,5 +50,9 @@ export default StyleSheet.create({
     height: 100,
     alignSelf: "center",
     marginTop: 20
+  },
+  map: {
+    width: '100%',
+    height: '40%'
   }
 });

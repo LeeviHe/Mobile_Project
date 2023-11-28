@@ -7,6 +7,9 @@ import styles from '../styles/styles'
 import { colors, textStyles } from '../styles/style-constants';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import * as Location from 'expo-location';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const favIcon = '../assets/defaults/favicon.png'
@@ -14,6 +17,27 @@ const favIcon = '../assets/defaults/favicon.png'
 function Home() {
     const [selectedPage, setSelectedPage] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
+
+    const [latitude, setLatitude] = useState(0);
+    const [longitude, setLongitude] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [selectedLocation, setSelectedLocation] = useState(null);
+
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setIsLoading(false);
+                console.log("Geolocation failed.");
+                return;
+            }
+
+            const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Lowest });
+            setLatitude(location.coords.latitude);
+            setLongitude(location.coords.longitude);
+            setIsLoading(false);
+        })();
+    }, [])
 
     const [font] = useFonts({
         Montserrat: require('../assets/fonts/Montserrat/static/Montserrat-Regular.ttf'),
@@ -60,84 +84,112 @@ function Home() {
         },
     ];
 
+    const handleLocationSelect = (data, details) => {
+        const { geometry } = details;
+        const { location } = geometry;
+        setSelectedLocation({
+            latitude: location.lat,
+            longitude: location.lng,
+        });
+    };
 
-    return (
-        <ScrollView>
+    if (isLoading) {
+        return <View style={styles.container}>
+            <Text>Retrieving location...</Text>
+        </View>
+    } else
+        return (
+            <ScrollView>
 
-            <View style={styles.container}>
-                <StatusBar style='auto' />
+                <View style={styles.container}>
+                    <StatusBar style='auto' />
 
-                <ImageBackground source={require('../assets/images/Carousel-background.png')}
-                    resizeMode='contain'
-                    opacity={0.5}
-                    blurRadius={30}>
+                    <ImageBackground source={require('../assets/images/Carousel-background.png')}
+                        resizeMode='contain'
+                        opacity={0.5}
+                        blurRadius={30}>
 
-                    <View style={{ marginBottom: 80 }}>
-                        <Image source={require('../assets/logos/pockettini-logo-regular-256px-black.png')}
-                            style={styles.logo} />
-                    </View>
+                        <View style={{ marginBottom: 80 }}>
+                            <Image source={require('../assets/logos/pockettini-logo-regular-256px-black.png')}
+                                style={styles.logo} />
+                        </View>
+
+                        <View>
+                            <PageSlider
+                                style={styles.pageSlider}
+                                selectedPage={1}
+                                onSelectedPageChange={setSelectedPage}
+                                mode='card'
+                                peek={50}
+                                pageMargin={-10}
+                                onCurrentPageChange={setCurrentPage}>
+
+                                <View style={styles.page}>
+                                    <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-1.png')} />
+                                    <Text style={textStyles.H1}>Devs' Favourites</Text>
+                                </View>
+
+                                <View style={styles.page}>
+                                    <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-2.png')} />
+                                    <Text style={textStyles.H1}>Most Popular</Text>
+                                </View>
+
+                                <View style={styles.page}>
+                                    <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-3.png')} />
+                                    <Text style={textStyles.H1}>Latest Recipes</Text>
+                                </View>
+
+                            </PageSlider>
+                        </View>
+
+                    </ImageBackground>
 
                     <View>
-                        <PageSlider
-                            style={styles.pageSlider}
-                            selectedPage={1}
-                            onSelectedPageChange={setSelectedPage}
-                            mode='card'
-                            peek={50}
-                            pageMargin={-10}
-                            onCurrentPageChange={setCurrentPage}>
-
-                            <View style={styles.page}>
-                                <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-1.png')} />
-                                <Text style={textStyles.H1}>Devs' Favourites</Text>
-                            </View>
-
-                            <View style={styles.page}>
-                                <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-2.png')} />
-                                <Text style={textStyles.H1}>Most Popular</Text>
-                            </View>
-
-                            <View style={styles.page}>
-                                <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-3.png')} />
-                                <Text style={textStyles.H1}>Latest Recipes</Text>
-                            </View>
-
-                        </PageSlider>
+                        <Text style={textStyles.H1Upper}>Discover</Text>
                     </View>
 
-                </ImageBackground>
+                    <View style={{ marginHorizontal: 20, gap: 10 }}>
+                        <Row style={{ gap: 10 }}>
+                            <Col style={{ paddingHorizontal: 0 }}>
+                                <Card {...cardData[0]} />
+                            </Col>
+                            <Col style={{ paddingHorizontal: 0 }}>
+                                <Card {...cardData[1]} />
+                            </Col>
+                        </Row>
+                        <Row style={{ gap: 10 }}>
+                            <Col style={{ paddingHorizontal: 0 }}>
+                                <Card {...cardData[2]} />
+                            </Col>
+                            <Col style={{ paddingHorizontal: 0 }}>
+                                <Card {...cardData[3]} />
+                            </Col>
+                        </Row>
+                    </View>
 
-                <View>
-                    <Text style={textStyles.H1Upper}>Discover</Text>
+                    <View style={{ marginTop: 50, marginBottom: 300 }}>
+                        <Text style={textStyles.H1Upper}>Bars near me</Text>
+
+                        <MapView style={styles.map}
+                            provider={PROVIDER_GOOGLE}
+                            initialRegion={{
+                                latitude: latitude,
+                                longitude: longitude,
+                                latitudeDelta: 0.01,
+                                longitudeDelta: 0.01,
+                            }}>
+
+                            <Marker
+                                title='test'
+                                coordinate={{ latitude: latitude, longitude: longitude }} />
+                        </MapView>
+
+                    </View>
                 </View>
 
-                <View style={{ marginHorizontal: 20, gap: 10 }}>
-                    <Row style={{ gap: 10 }}>
-                        <Col style={{ paddingHorizontal: 0 }}>
-                            <Card {...cardData[0]} />
-                        </Col>
-                        <Col style={{ paddingHorizontal: 0 }}>
-                            <Card {...cardData[1]} />
-                        </Col>
-                    </Row>
-                    <Row style={{ gap: 10 }}>
-                        <Col style={{ paddingHorizontal: 0 }}>
-                            <Card {...cardData[2]} />
-                        </Col>
-                        <Col style={{ paddingHorizontal: 0 }}>
-                            <Card {...cardData[3]} />
-                        </Col>
-                    </Row>
-                </View>
-                <View>
-                    <Text style={{ paddingTop: 100, paddingLeft: 50 }}>MAP</Text>
-                    <Icon name="map" style={{ paddingTop: 50, paddingLeft: 150, fontSize: 100 }}></Icon>
-                </View>
-            </View>
+            </ScrollView >
 
-        </ScrollView >
-
-    );
+        );
 }
 
 export default Home;
