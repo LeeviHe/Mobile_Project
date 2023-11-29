@@ -53,6 +53,17 @@ export default StyleSheet.create({
   },
   map: {
     width: '100%',
-    height: '40%'
+    height: '45%'
+  },
+  alko: {
+    width: 40,
+    height: 40
+  },
+  mapView: {
+    flexDirection: 'row',
+    marginLeft: 20,
+    marginBottom: 20,
+    alignItems: "center",
+    gap: 10
   }
 });

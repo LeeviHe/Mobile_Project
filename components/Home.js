@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View, Image, ImageBackground } from 'react-native';
 import { Container, Row, Col } from "react-native-flex-grid";
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PageSlider } from '@pietile-native-kit/page-slider';
 import styles from '../styles/styles'
-import { colors, textStyles } from '../styles/style-constants';
+import { textStyles } from '../styles/style-constants';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
-const favIcon = '../assets/defaults/favicon.png'
+const MAPS_KEY = "AIzaSyAxr6uGD0CCuomLoT8JM3VtZM9uBFV6CvU"
 
 function Home() {
     const [selectedPage, setSelectedPage] = useState(0);
@@ -21,7 +19,21 @@ function Home() {
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [places, setPlaces] = useState([]);
+
+
+    useEffect(() => {
+        if (latitude !== 0 && longitude !== 0) {
+            fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=100000&type=liquor_store&key=${MAPS_KEY}`)
+                .then(response => response.json())
+                .then(data => {
+                    setPlaces(data.results);
+                })
+                .catch(error => {
+                    console.error('Error fetching nearby places:', error);
+                });
+        }
+    }, [latitude, longitude]);
 
     useEffect(() => {
         (async () => {
@@ -84,15 +96,6 @@ function Home() {
         },
     ];
 
-    const handleLocationSelect = (data, details) => {
-        const { geometry } = details;
-        const { location } = geometry;
-        setSelectedLocation({
-            latitude: location.lat,
-            longitude: location.lng,
-        });
-    };
-
     if (isLoading) {
         return <View style={styles.container}>
             <Text>Retrieving location...</Text>
@@ -103,6 +106,7 @@ function Home() {
 
                 <View style={styles.container}>
                     <StatusBar style='auto' />
+
 
                     <ImageBackground source={require('../assets/images/Carousel-background.png')}
                         resizeMode='contain'
@@ -144,7 +148,7 @@ function Home() {
 
                     </ImageBackground>
 
-                    <View>
+                    <View style={{ marginBottom: 40, marginLeft: 20 }}>
                         <Text style={textStyles.H1Upper}>Discover</Text>
                     </View>
 
@@ -166,25 +170,48 @@ function Home() {
                             </Col>
                         </Row>
                     </View>
+                </View>
 
-                    <View style={{ marginTop: 50, marginBottom: 300 }}>
-                        <Text style={textStyles.H1Upper}>Bars near me</Text>
-
-                        <MapView style={styles.map}
-                            provider={PROVIDER_GOOGLE}
-                            initialRegion={{
-                                latitude: latitude,
-                                longitude: longitude,
-                                latitudeDelta: 0.01,
-                                longitudeDelta: 0.01,
-                            }}>
-
-                            <Marker
-                                title='test'
-                                coordinate={{ latitude: latitude, longitude: longitude }} />
-                        </MapView>
-
+                <View style={{ marginTop: 50, marginBottom: 250 }}>
+                    <View style={styles.mapView}>
+                        <Image style={styles.alko} source={require('../assets/logos/small_Alko_logo.png')} />
+                        <Text style={textStyles.H1Upper}>near me</Text>
                     </View>
+
+
+                    <MapView style={styles.map}
+                        provider={PROVIDER_GOOGLE}
+                        initialRegion={{
+                            latitude: latitude,
+                            longitude: longitude,
+                            latitudeDelta: 0.03,
+                            longitudeDelta: 0.03,
+                        }}>
+
+                        {places.map(place => (
+                            <Marker
+                                key={place.place_id}
+                                title={place.name}
+                                description={place.vicinity}
+                                coordinate={{
+                                    latitude: place.geometry.location.lat,
+                                    longitude: place.geometry.location.lng
+                                }}
+                            />
+                        ))}
+
+                        <Marker
+                            title='Me'
+                            pinColor='green'
+
+                            coordinate={{
+                                latitude: latitude,
+                                longitude: longitude
+                            }}
+                        />
+
+                    </MapView>
+
                 </View>
 
             </ScrollView >

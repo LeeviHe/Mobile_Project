@@ -22,8 +22,6 @@ export const textStyles = {
     color: colors.mainFontColour,
     fontFamily: fonts.header,
     fontSize: 20,
-    marginBottom: 40,
-    textTransform: 'uppercase',
-    marginLeft: 20
+    textTransform: 'uppercase'
   },
 };
