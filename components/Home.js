@@ -8,6 +8,7 @@ import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { colors } from '../styles/style-constants'
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const MAPS_KEY = "AIzaSyAxr6uGD0CCuomLoT8JM3VtZM9uBFV6CvU"
@@ -62,7 +63,7 @@ function Home() {
     }
 
     const Card = ({ backgroundColor, title, text, img }) => (
-        <Col style={[styles.cardCol, { backgroundColor: `rgba(${backgroundColor}, 0.4)` }]}>
+        <Col style={[styles.cardCol, { backgroundColor: backgroundColor }]}>
             <Text style={styles.cardTitle}>{title}</Text>
             <Text style={styles.cardText}>{text}</Text>
             <Image source={img} style={styles.cardImg} />
@@ -71,25 +72,25 @@ function Home() {
 
     const cardData = [
         {
-            backgroundColor: '255, 244, 141',
+            backgroundColor: colors.yellow,
             title: 'Surprise me!',
             text: 'Discover something\n new and exciting',
             img: require('../assets/images/Carousel-cocktails-1.png')
         },
         {
-            backgroundColor: '255, 132, 63',
+            backgroundColor: colors.brown,
             title: 'Coffee & Tea',
             text: 'Brewed or steeped?',
             img: require('../assets/images/CoffeeTea-category.png')
         },
         {
-            backgroundColor: '161, 193, 156',
+            backgroundColor: colors.green,
             title: 'Alcohol free',
             text: 'Grant your liver a\n well-deserved break',
             img: require('../assets/images/Alcoholfree-category.png')
         },
         {
-            backgroundColor: '153, 151, 224',
+            backgroundColor: colors.purple,
             title: 'Alcoholic drinks',
             text: "It's Happy Hour somewhere",
             img: require('../assets/images/Alcoholic.png')
