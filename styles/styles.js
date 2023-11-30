@@ -3,6 +3,7 @@ import Constants from 'expo-constants';
 import { colors, fonts } from './style-constants'
 
 export default StyleSheet.create({
+  // HOME & APP
   container: {
     paddingTop: Constants.statusBarHeight + 20,
     backgroundColor: colors.white
@@ -65,5 +66,33 @@ export default StyleSheet.create({
     marginBottom: 20,
     alignItems: "center",
     gap: 10
+  },
+
+  // COCKTAILS & INGREDIENTS
+  searchFilterRow: {
+    alignItems: 'center',
+    gap: 20
+  },
+  searchFilterCol: {
+    flexBasis: '45%'
+  },
+  search: {
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.mainFontColour,
+    marginLeft: 30,
+    height: 35,
+    backgroundColor: 'white'
+  },
+  filterBtn: {
+    borderWidth: 1,
+    borderColor: colors.mainFontColour,
+    height: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 5,
+    backgroundColor: '#fff',
+    marginRight: 30,
+    paddingHorizontal: 5
   }
 });

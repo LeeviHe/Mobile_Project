@@ -28,4 +28,27 @@ export const textStyles = {
     fontSize: 20,
     textTransform: 'uppercase'
   },
+  button: {
+    fontFamily: fonts.header,
+    color: colors.mainFontColour
+  },
+  pageTitle: {
+    color: colors.mainFontColour,
+    fontFamily: fonts.header,
+    fontSize: 28,
+    textTransform: 'uppercase'
+  },
+  spacingHelp: {
+    marginTop: 100,
+    marginBottom: 25,
+    marginLeft: 20
+  }
+};
+
+export const padding = {
+  none: {
+    padding: 0,
+    paddingHorizontal: 0,
+    paddingVertical: 0
+  },
 };
