@@ -25,15 +25,18 @@ const CocktailsNavigator = () => {
 export default function App() {
   return (
     <NavigationContainer>
-      <Tab.Navigator initialRouteName='Home'
+      <Tab.Navigator
+        initialRouteName='Home'
         screenOptions={{
-          headerShown: false,
+          headerShown: false
         }}
         tabBar={({ navigation, state, descriptors, insets }) => (
           <BottomNavigation.Bar
             navigationState={state}
             safeAreaInsets={insets}
             style={{ backgroundColor: colors.white }} // Set background color for the tab bar
+            activeColor='#313131'
+            inactiveColor='#c0c0c0'
             onTabPress={({ route, preventDefault }) => {
               const event = navigation.emit({
                 type: 'tabPress',
@@ -52,7 +55,7 @@ export default function App() {
             }}
             renderIcon={({ route, focused }) => {
               const { options } = descriptors[route.key];
-              const iconColor = focused ? '#00c090' : colors.secondaryFontColour // Set colors for active/inactive icons
+              const iconColor = focused ? colors.secondaryFontColour : '#c0c0c0' // Set colors for active/inactive icons
 
               if (options.tabBarIcon) {
                 return (
@@ -75,6 +78,7 @@ export default function App() {
             }}
           />
         )}>
+
         <Tab.Screen
           name="Home"
           component={Home}
@@ -112,6 +116,6 @@ export default function App() {
             },
           }} />
       </Tab.Navigator>
-    </NavigationContainer>
+    </NavigationContainer >
   );
 }
