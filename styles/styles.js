@@ -94,5 +94,27 @@ export default StyleSheet.create({
     backgroundColor: '#fff',
     marginRight: 30,
     paddingHorizontal: 5
+  },
+  drinkContainer: {
+    marginHorizontal: 5
+  },
+  cocktail: {
+    flexDirection: "row",
+    marginBottom: 10,
+    borderRadius: 10
+  },
+  drinkImg: {
+    width: 75,
+    height: 85,
+    marginLeft: 20
+  },
+  cocktailInfo: {
+    justifyContent: "center",
+    marginLeft: 20,
+    gap: 5
+  },
+  drinkText: {
+    color: colors.textColour,
+    fontFamily: fonts.text
   }
 });

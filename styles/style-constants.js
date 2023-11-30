@@ -2,6 +2,7 @@ export const colors = {
   white: '#f5f5f5',
   mainFontColour: '#5a5a5a',
   secondaryFontColour: '#313131',
+  textColour: '#333',
   yellow: 'rgba(255, 244, 141, 0.4)',
   brown: 'rgba(255, 132, 63, 0.4)',
   green: 'rgba(161, 193, 156, 0.4)',

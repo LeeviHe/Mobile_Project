@@ -9,6 +9,7 @@ import styles from '../styles/styles';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const Stack = createNativeStackNavigator()
+
 export default function Cocktails({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
   //Non-sorted drink data
@@ -105,7 +106,6 @@ export default function Cocktails({ navigation }) {
     } else if (filterView) {
       setFilterView(false)
     }
-    console.log('pressed')
   }
 
   async function getDrink(method) {
@@ -220,18 +220,58 @@ export default function Cocktails({ navigation }) {
     }
   }
 
+  const isAlcoholic = (category) => {
+    const alcoholicCategories = [
+      'Ordinary Drink',
+      'Cocktail',
+      'Shot',
+      'Homemade Liqueur',
+      'Punch / Party Drink',
+      'Beer'
+    ]
+
+    return alcoholicCategories.includes(category)
+  }
+
+  const isNotAlcoholic = (category) => {
+    const nonAlcoholicCategories = [
+      'Shake',
+      'Cocoa',
+      'Shot',
+    ]
+
+    return nonAlcoholicCategories.includes(category)
+  }
 
   const drink = activeDrinks.map((data, id) => {
+    const categoryColors = {
+      'Coffee / Tea': colors.brown,
+      'Other / Unknown': '#999',
+      'Alcoholic': colors.purple,
+      'isNotAlcoholic': colors.green
+    }
+
+    const categoryBackgroundColor = isAlcoholic(data.strCategory)
+      ? categoryColors['Alcoholic']
+      : isNotAlcoholic(data.strCategory)
+        ? categoryColors['Non-Alcoholic']
+        : categoryColors[data.strCategory] || 'gray';
+
     return (
-      <View key={id}>
-        <Image
-          source={{ uri: data.strDrinkThumb }}
-          style={{ width: 100, height: 100 }} />
-        <Text>{data.strDrink}</Text>
-        {!data.strCategory ?
-          <Text></Text>
-          :
-          <Text>Category: {data.strCategory}</Text>}
+      <View style={styles.drinkContainer}>
+        <View key={id} style={[styles.cocktail, { backgroundColor: categoryBackgroundColor }]}>
+          <Image
+            source={{ uri: data.strDrinkThumb }}
+            style={styles.drinkImg} />
+
+          <View style={styles.cocktailInfo}>
+            <Text style={styles.drinkText}>{data.strDrink}</Text>
+            {!data.strCategory ?
+              <Text></Text>
+              :
+              <Text style={styles.drinkText}>{data.strCategory}</Text>}
+          </View>
+          {/**
         <Button
           title='To recipe'
           onPress={() =>
@@ -243,8 +283,9 @@ export default function Cocktails({ navigation }) {
                 category: data.strCategory,
                 glass: data.strGlass,
               instructions: data.strInstructions
-             }*/)}
-        />
+             })}
+        /> */}
+        </View>
       </View>
     )
   })
@@ -288,7 +329,7 @@ export default function Cocktails({ navigation }) {
   })
 
   return (
-    <View style={{ backgroundColor: colors.white }}>
+    <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>Cocktails</Text>
 
       <View style={{ marginBottom: 50 }}>
