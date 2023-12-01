@@ -7,7 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const Stack = createNativeStackNavigator()
-export default function Cocktails({ navigation }) {
+export default function Cocktails({ navigation, route}) {
   const [searchQuery, setSearchQuery] = useState('');
   //Non-sorted drink data
   const [recipeData, setRecipeData] = useState([])
@@ -23,11 +23,16 @@ export default function Cocktails({ navigation }) {
   //Selected alcoholic filter (2) //fix alcoholselect / selectalcohol mixup
   const [selectedAlcohol, setSelectedAlcohol] = 
     useState(new Array(2).fill(false))
+  //Selected Sorting
+  const [selectedSort, setSelectedSort] = 
+    useState(new Array(2).fill(false))
   //Selected multi-ingredient filters (489)
   const [selectedIngredients, setSelectedIngredients] = 
     useState(new Array(489).fill(false))
   //Activated multi-ingredient filters that are supposed to show
   const [activeFilters, setActiveFilters] = useState([])
+  // Checking if any categories/alc/non-alc are selected
+  const [activeCategory, setActiveCategory] = useState(false)
 
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
@@ -38,12 +43,11 @@ export default function Cocktails({ navigation }) {
   //
   //useEffects
   useEffect(() => {
-    console.log(activeFilters)
     let string = activeFilters.toString()
     if (activeFilters.length === 0) {
       console.log('empty')
-    } else {
-      searchFilter('','i', string)
+    } else if (activeFilters.length !== 0){
+      searchFilter('','i', string, false)
     }
   }, [activeFilters])
 
@@ -57,15 +61,26 @@ export default function Cocktails({ navigation }) {
   }, [categoryJson, ingredientJson])
 
   useEffect(() => {
-    if (searchQuery.trim().length === 0 && !ascendSort && !descendSort && activeFilters.length === 0) {
+    console.log(activeFilters)
+    if (route.params !== undefined && route.params.id !== 'empty' && searchQuery.trim().length === 0) {
+      console.log('Cocktails Screen Params:', route.params)
+      if (route.params.condition) {
+        searchFilter(route.params.id, route.params.condition, route.params.search, true)
+      }
+      // Random Drink to recipe screen
+      //else if (route.params.search == 'random.php') {
+      //getDrink
+      //}
+    } else if (searchQuery.trim().length === 0 && !ascendSort && !descendSort && activeFilters.length === 0 && activeCategory == false) {
       defaultSetup()
-    } else if (activeFilters.length > 0 && searchQuery.trim().length === 0) {
+    } else if (activeFilters.length > 0 && activeFilters !== true && activeFilters !== false && searchQuery.trim().length === 0) {
+      console.log(activeFilters)
       let string = activeFilters.toString()
-      searchFilter('i', string)
-    } else {
+      searchFilter('', 'i', string)
+    } else if (searchQuery.length > 0) {
       handleSearch()
     }
-  }, [searchQuery])
+  }, [searchQuery, route.params])
 
   useEffect(() => {
     if (ascendSort) {
@@ -74,9 +89,10 @@ export default function Cocktails({ navigation }) {
     } else if (descendSort) {
       setActiveDrinks(recipeData.sort((a, b) => b.strDrink.localeCompare(a.strDrink)))
       console.log('Descend on')
-    } else {
+    } else if (recipeData.length > 0){
       console.log('reset')
       setActiveDrinks(recipeData)
+
     }
   }, [ascendSort, descendSort, recipeData])
 
@@ -117,6 +133,7 @@ export default function Cocktails({ navigation }) {
         } else {
           setErrorStatus('')
         }
+        console.log(method)
         const drinks = json.drinks;
         setRecipeData(drinks);
       } else {
@@ -128,56 +145,85 @@ export default function Cocktails({ navigation }) {
   }
 
   // Condition for what you want to filter with
-  function searchFilter (id, condition, search) {
-    /*
-    console.log(id + ' idd')
-    console.log(condition + ' condditii') 
-    console.log(search + ' searct')
-    */
+  function searchFilter (id, condition, search, discovery) {
     if (condition == 'c') {
       let filters = [...selectedCategory]
       filters.fill(false)
-      filters[id] = selectedCategory[id] ? false : true
+      if (discovery === true) {
+        filters[id] = true
+      } else {
+        filters[id] = selectedCategory[id] ? false : true
+        navigation.setParams({id: 'empty'})
+      }
       setSelectedCategory(filters)
       selectedAlcohol.fill(false)
       selectedIngredients.fill(false)
       setActiveFilters([])
+      setActiveCategory(filters[id])
     } else if (condition == 'a') {
       let filters = [...selectedAlcohol]
       filters.fill(false)
-      filters[id] = selectedAlcohol[id] ? false : true
+      if (discovery === true) {
+        filters[id] = true
+      } else {
+        filters[id] = selectedAlcohol[id] ? false : true
+        navigation.setParams({id: 'empty'})
+      }
       setSelectedAlcohol(filters)
       selectedCategory.fill(false)
       selectedIngredients.fill(false)
       setActiveFilters([])
+      setActiveCategory(filters[id])
     }
     getDrink('filter.php?' + condition + '=' + search)
   }
 
-  function ascending () {
+  function ascending (i) {
+    let sort = [...selectedSort]
+    sort.fill(false)
+    sort[i] = selectedSort[i] ? false : true
+    setSelectedSort(sort)
+    console.log(ascendSort)
     setAscendSort(!ascendSort)
     console.log('toggle ascend')
+    console.log(ascendSort)
     setDescendSort(false)
-    handleSearch()
+    // Unknown
+    /*if (!route.params && !activeFilters) {
+      handleSearch()
+    }*/
   }
 
-  function descending () {
+  function descending (i) {
+    let sort = [...selectedSort]
+    sort.fill(false)
+    sort[i] = selectedSort[i] ? false : true
+    setSelectedSort(sort)
+    console.log(descendSort)
     setDescendSort(!descendSort)
     console.log('toggle descend')
+    console.log(descendSort)
     setAscendSort(false)
-    handleSearch()
+    //Unknown
+    /*if (!route.params && !activeFilters) {
+      handleSearch()
+    }*/
   }
 
-  function multiFilterSelect(i) {
+  function multiFilterSelectColor(i) {
     return selectedIngredients[i] ? 'green' : 'red'
   }
   //fix alcoholselect / selectalcohol mixup
-  function alcoholSelect (i)  {
+  function alcSelectColor (i)  {
     return selectedAlcohol[i] ? 'green' : 'red'
   }
 
-  function categorySelect (i) {
+  function categorySelectColor (i) {
     return selectedCategory[i] ? 'green' : 'red'
+  }
+
+  function sortColor (i) {
+    return selectedSort[i] ? 'green' : 'red'
   }
 
   //
@@ -185,6 +231,10 @@ export default function Cocktails({ navigation }) {
   const onChangeSearch = query => setSearchQuery(query);
 
   const handleSearch = () => {
+    selectedCategory.fill(false)
+    selectedIngredients.fill(false)
+    selectedAlcohol.fill(false)
+    setActiveFilters([])
     getDrink('search.php?s=' + searchQuery);
   }
 
@@ -256,8 +306,8 @@ export default function Cocktails({ navigation }) {
             <Col>
               <Pressable
                 key={"ctgr:" + data.strCategory}
-                onPress={() => searchFilter(id, 'c', data.strCategory)}>
-                <Text style={{color:categorySelect(id)}}>x</Text>
+                onPress={() => searchFilter(id, 'c', data.strCategory, false)}>
+                <Text style={{color:categorySelectColor(id)}}>x</Text>
               </Pressable>
             </Col>
           </Row>
@@ -276,7 +326,7 @@ export default function Cocktails({ navigation }) {
               <Pressable
                 key={"ingrdt:" + data.strIngredient1}
                 onPress={() => selectFilter(id, data.strIngredient1)}>
-                <Text style={{color:multiFilterSelect(id)}}>x</Text>
+                <Text style={{color:multiFilterSelectColor(id)}}>x</Text>
               </Pressable>
             </Col>
           </Row>
@@ -312,12 +362,12 @@ export default function Cocktails({ navigation }) {
         <View>
           <Text>Sort</Text>
           <Pressable
-          onPress={() => ascending()}>
-            <Text>A-Z</Text>
+          onPress={() => ascending(0)}>
+            <Text style={{color:sortColor(0)}}>A-Z</Text>
           </Pressable>
           <Pressable
-          onPress={() => descending()}>
-            <Text>Z-A</Text>
+          onPress={() => descending(1)}>
+            <Text style={{color:sortColor(1)}}>Z-A</Text>
           </Pressable>
         </View>
         <View>
@@ -329,11 +379,11 @@ export default function Cocktails({ navigation }) {
         <View>         
           <Pressable
           onPress={() => searchFilter(0, 'a', 'Alcoholic')}>
-            <Text style={{color:alcoholSelect(0)}}>Alcoholic</Text>
+            <Text style={{color:alcSelectColor(0)}}>Alcoholic</Text>
           </Pressable>
           <Pressable
           onPress={() => searchFilter(1, 'a', 'Non_Alcoholic')}>
-            <Text style={{color:alcoholSelect(1)}}>Non-Alcoholic</Text>
+            <Text style={{color:alcSelectColor(1)}}>Non-Alcoholic</Text>
           </Pressable>
         </View>
       </ScrollView>

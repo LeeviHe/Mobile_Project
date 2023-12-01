@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, View, Image, ImageBackground } from 'react-native';
+import { ScrollView, Text, View, Image, ImageBackground, TouchableOpacity } from 'react-native';
 import { Container, Row, Col } from "react-native-flex-grid";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PageSlider } from '@pietile-native-kit/page-slider';
@@ -13,8 +13,8 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const favIcon = '../assets/defaults/favicon.png'
-
-function Home() {
+const c = 'c'
+function Home({ navigation, route }) {
     const [selectedPage, setSelectedPage] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
 
@@ -79,7 +79,7 @@ function Home() {
         {
             backgroundColor: '153, 151, 224',
             title: 'Alcoholic drinks',
-            text: "It's Happy Hour somewhere",
+            text: "It's Happy Hour\n somewhere",
             img: require('../assets/images/Alcoholic.png')
         },
     ];
@@ -93,11 +93,11 @@ function Home() {
         });
     };
 
-    if (isLoading) {
+    /*if (isLoading) {
         return <View style={styles.container}>
             <Text>Retrieving location...</Text>
         </View>
-    } else
+    } else*/
         return (
             <ScrollView>
 
@@ -150,20 +150,37 @@ function Home() {
 
                     <View style={{ marginHorizontal: 20, gap: 10 }}>
                         <Row style={{ gap: 10 }}>
-                            <Col style={{ paddingHorizontal: 0 }}>
-                                <Card {...cardData[0]} />
-                            </Col>
-                            <Col style={{ paddingHorizontal: 0 }}>
-                                <Card {...cardData[1]} />
-                            </Col>
+                            <TouchableOpacity 
+                            onPress={() => navigation.navigate('CocktailsNavigator', {screen:'Recipe', params: { id: '', condition:'c', search:'random.php' }})} //Work in progress
+                            style={{ paddingHorizontal: 0 }}>
+                                <Col> 
+                                    <Card {...cardData[0]} />
+                                </Col>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                            onPress={() => {
+                                navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 6, condition:'c', search:'Coffee_/_Tea' }})}}
+                            style={{ paddingHorizontal: 0 }}>
+                                <Col> 
+                                    <Card {...cardData[1]} />
+                                </Col>
+                            </TouchableOpacity>
                         </Row>
                         <Row style={{ gap: 10 }}>
-                            <Col style={{ paddingHorizontal: 0 }}>
-                                <Card {...cardData[2]} />
-                            </Col>
-                            <Col style={{ paddingHorizontal: 0 }}>
-                                <Card {...cardData[3]} />
-                            </Col>
+                            <TouchableOpacity 
+                            onPress={() => navigation.navigate('CocktailsNavigator', {screen:'Cocktails', params: { id: 1, condition:'a', search:'Non_Alcoholic' }})}
+                            style={{ paddingHorizontal: 0 }}>
+                                <Col> 
+                                    <Card {...cardData[2]} />
+                                </Col>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                            onPress={() => navigation.navigate('CocktailsNavigator', {screen:'Cocktails', params: { id: 0, condition:'a', search:'Alcoholic' }})}
+                            style={{ paddingHorizontal: 0 }}>
+                                <Col>
+                                    <Card {...cardData[3]} />
+                                </Col>
+                            </TouchableOpacity>
                         </Row>
                     </View>
 
