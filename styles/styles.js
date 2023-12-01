@@ -3,6 +3,7 @@ import Constants from 'expo-constants';
 import { colors, fonts } from './style-constants'
 
 export default StyleSheet.create({
+  // HOME & APP
   container: {
     paddingTop: Constants.statusBarHeight + 20,
     backgroundColor: colors.white
@@ -53,6 +54,67 @@ export default StyleSheet.create({
   },
   map: {
     width: '100%',
-    height: '40%'
+    height: '45%'
+  },
+  alko: {
+    width: 40,
+    height: 40
+  },
+  mapView: {
+    flexDirection: 'row',
+    marginLeft: 20,
+    marginBottom: 20,
+    alignItems: "center",
+    gap: 10
+  },
+
+  // COCKTAILS & INGREDIENTS
+  searchFilterRow: {
+    alignItems: 'center',
+    gap: 20
+  },
+  searchFilterCol: {
+    flexBasis: '45%'
+  },
+  search: {
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.mainFontColour,
+    marginLeft: 30,
+    height: 35,
+    backgroundColor: 'white'
+  },
+  filterBtn: {
+    borderWidth: 1,
+    borderColor: colors.mainFontColour,
+    height: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 5,
+    backgroundColor: '#fff',
+    marginRight: 30,
+    paddingHorizontal: 5
+  },
+  drinkContainer: {
+    marginHorizontal: 5
+  },
+  cocktail: {
+    flexDirection: "row",
+    marginBottom: 10,
+    borderRadius: 10
+  },
+  drinkImg: {
+    width: 75,
+    height: 85,
+    marginLeft: 20
+  },
+  cocktailInfo: {
+    justifyContent: "center",
+    marginLeft: 20,
+    gap: 5
+  },
+  drinkText: {
+    color: colors.textColour,
+    fontFamily: fonts.text
   }
 });

@@ -2,8 +2,10 @@ import { Text, View, Image, Pressable, Button } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
-import { Container, Row, Col} from "react-native-flex-grid";
+import { Container, Row, Col } from "react-native-flex-grid";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { colors, padding, textStyles } from '../styles/style-constants';
+import styles from '../styles/styles';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const Stack = createNativeStackNavigator()
@@ -18,7 +20,7 @@ export default function Cocktails({ navigation, route}) {
   //JSON for ingredients on filter page
   const [ingredientJson, setIngredientJson] = useState([])
   //Selected category filter (11)
-  const [selectedCategory, setSelectedCategory] = 
+  const [selectedCategory, setSelectedCategory] =
     useState(new Array(11).fill(false))
   //Selected alcoholic filter (2) //fix alcoholselect / selectalcohol mixup
   const [selectedAlcohol, setSelectedAlcohol] = 
@@ -27,7 +29,7 @@ export default function Cocktails({ navigation, route}) {
   const [selectedSort, setSelectedSort] = 
     useState(new Array(2).fill(false))
   //Selected multi-ingredient filters (489)
-  const [selectedIngredients, setSelectedIngredients] = 
+  const [selectedIngredients, setSelectedIngredients] =
     useState(new Array(489).fill(false))
   //Activated multi-ingredient filters that are supposed to show
   const [activeFilters, setActiveFilters] = useState([])
@@ -38,7 +40,7 @@ export default function Cocktails({ navigation, route}) {
   const [filterView, setFilterView] = useState(false)
   const [ascendSort, setAscendSort] = useState(false)
   const [descendSort, setDescendSort] = useState(false)
-  
+
 
   //
   //useEffects
@@ -52,8 +54,8 @@ export default function Cocktails({ navigation, route}) {
   }, [activeFilters])
 
   useEffect(() => {
-    if (categoryJson.length === 0){
-      getJson("list.php?c=list" , setCategoryJson)
+    if (categoryJson.length === 0) {
+      getJson("list.php?c=list", setCategoryJson)
     }
     if (ingredientJson.length === 0) {
       getJson("list.php?i=list", setIngredientJson)
@@ -106,11 +108,11 @@ export default function Cocktails({ navigation, route}) {
         const data = json.drinks
         setJsonData(data)
       } else {
-          alert('Error retrieving recipes!');
-        }
-    } catch (err) {
-        alert(err);
+        alert('Error retrieving recipes!');
       }
+    } catch (err) {
+      alert(err);
+    }
   }
 
   async function viewFilter() {
@@ -137,11 +139,11 @@ export default function Cocktails({ navigation, route}) {
         const drinks = json.drinks;
         setRecipeData(drinks);
       } else {
-          alert('Error retrieving recipes!');
-        }
-    } catch (err) {
-        alert(err);
+        alert('Error retrieving recipes!');
       }
+    } catch (err) {
+      alert(err);
+    }
   }
 
   // Condition for what you want to filter with
@@ -239,60 +241,101 @@ export default function Cocktails({ navigation, route}) {
   }
 
   const defaultSetup = () => {
-    getDrink('search.php?s=White Russian') //White russian only for performance, 'search.php?s=' for actual app
+    getDrink('search.php?s=Coffee') //White russian only for performance, 'search.php?s=' for actual app
   }
 
   const selectFilter = (i, ingredient) => {
-        //Empty other filters
-        let alcoholic = [...selectedAlcohol]
-        let category = [...selectedCategory]
-        alcoholic.fill(false)
-        category.fill(false)
-        setSelectedAlcohol(alcoholic)
-        setSelectedCategory(category)
-        //Original
-        let filters = [...selectedIngredients]
-        filters[i] = selectedIngredients[i] ? false : true
-        setSelectedIngredients(filters)
-        if (selectedIngredients[i]) {
-          (console.log('splice'))//delete
-          setActiveFilters(oldValues => {
-            return oldValues.filter(filter => filter !== ingredient)
-          })
-        } else {
-          console.log('push')//delete
-          let filterCopy = [...activeFilters]
-          filterCopy.push(ingredient)
-          setActiveFilters(filterCopy)
-        }
+    //Empty other filters
+    let alcoholic = [...selectedAlcohol]
+    let category = [...selectedCategory]
+    alcoholic.fill(false)
+    category.fill(false)
+    setSelectedAlcohol(alcoholic)
+    setSelectedCategory(category)
+    //Original
+    let filters = [...selectedIngredients]
+    filters[i] = selectedIngredients[i] ? false : true
+    setSelectedIngredients(filters)
+    if (selectedIngredients[i]) {
+      (console.log('splice'))//delete
+      setActiveFilters(oldValues => {
+        return oldValues.filter(filter => filter !== ingredient)
+      })
+    } else {
+      console.log('push')//delete
+      let filterCopy = [...activeFilters]
+      filterCopy.push(ingredient)
+      setActiveFilters(filterCopy)
+    }
   }
 
+  const isAlcoholic = (category) => {
+    const alcoholicCategories = [
+      'Ordinary Drink',
+      'Cocktail',
+      'Shot',
+      'Homemade Liqueur',
+      'Punch / Party Drink',
+      'Beer'
+    ]
+
+    return alcoholicCategories.includes(category)
+  }
+
+  const isNotAlcoholic = (category) => {
+    const nonAlcoholicCategories = [
+      'Shake',
+      'Cocoa',
+      'Shot',
+    ]
+
+    return nonAlcoholicCategories.includes(category)
+  }
 
   const drink = activeDrinks.map((data, id) => {
+    const categoryColors = {
+      'Coffee / Tea': colors.brown,
+      'Other / Unknown': '#999',
+      'Alcoholic': colors.purple,
+      'isNotAlcoholic': colors.green
+    }
+
+    const categoryBackgroundColor = isAlcoholic(data.strCategory)
+      ? categoryColors['Alcoholic']
+      : isNotAlcoholic(data.strCategory)
+        ? categoryColors['Non-Alcoholic']
+        : categoryColors[data.strCategory] || 'gray';
+
     return (
-        <View key={id}>
-          <Image 
-          source={{uri:data.strDrinkThumb}}
-          style={{width: 100, height: 100}}/>
-          <Text>{data.strDrink}</Text>
-          {!data.strCategory ? 
-            <Text></Text>
-            :
-            <Text>Category: {data.strCategory}</Text>}
-            <Button
-            title='To recipe'
-            onPress={() => 
+      <View style={styles.drinkContainer}>
+        <View key={id} style={[styles.cocktail, { backgroundColor: categoryBackgroundColor }]}>
+          <Image
+            source={{ uri: data.strDrinkThumb }}
+            style={styles.drinkImg} />
+
+          <View style={styles.cocktailInfo}>
+            <Text style={styles.drinkText}>{data.strDrink}</Text>
+            {!data.strCategory ?
+              <Text></Text>
+              :
+              <Text style={styles.drinkText}>{data.strCategory}</Text>}
+          </View>
+          {/**
+        <Button
+          title='To recipe'
+          onPress={() =>
             navigation.navigate('Recipe'
-             , /*{
+              , /*{
                 drinkId: data.idDrink,
                 drinkName: data.strDrink,
                 image: data.strDrinkThumb,
                 category: data.strCategory,
                 glass: data.strGlass,
               instructions: data.strInstructions
-             }*/)}
-            />
+             })}
+        /> */}
         </View>
+      </View>
     )
   })
 
@@ -335,69 +378,84 @@ export default function Cocktails({ navigation, route}) {
   })
 
   return (
-    <View style={{backgroundColor:'lightgray'}}>
-      <Text style={{paddingTop: 100, paddingLeft: 120, fontSize: 28}}>Cocktails</Text>
-      <Row>
-        <Col>
-          <Searchbar
-            placeholder="Search"
-            onChangeText={(value) => {onChangeSearch(value)}}
-            value={searchQuery}/>
-        </Col>
-        <Col>
-          <Pressable
-            key={'filterbtn'}
-            onPress={() => viewFilter()}>
-            <Text>Filters</Text>
-          </Pressable>
-        </Col>
-      </Row>
-      {filterView ?    
-      <ScrollView>
-        <Text>Categories: </Text>
-        <View>
-          {categories}
-        </View>
-        
-        <View>
-          <Text>Sort</Text>
-          <Pressable
-          onPress={() => ascending(0)}>
-            <Text style={{color:sortColor(0)}}>A-Z</Text>
-          </Pressable>
-          <Pressable
-          onPress={() => descending(1)}>
-            <Text style={{color:sortColor(1)}}>Z-A</Text>
-          </Pressable>
-        </View>
-        <View>
-          <Text>Base ingredients</Text>
-          <ScrollView style={{height:200}}>
-            {ingredients}
+    <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
+      <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>Cocktails</Text>
+
+      <View style={{ marginBottom: 50 }}>
+        <Row style={styles.searchFilterRow}>
+          <Col style={[styles.searchFilterCol, padding.none]}>
+            <Searchbar
+              placeholder="Search"
+              onChangeText={(value) => { onChangeSearch(value) }}
+              value={searchQuery}
+              style={styles.search}
+              inputStyle={{ marginTop: -10 }}
+              iconColor={colors.mainFontColour}
+              placeholderTextColor={colors.mainFontColour} />
+          </Col>
+
+          <Col style={padding.none}>
+            <Pressable
+              key={'filterbtn'}
+              style={({ pressed }) => [
+                styles.filterBtn,
+                { opacity: pressed ? 0.5 : 1.0 }
+              ]}
+              onPress={() => viewFilter()}>
+              <Text style={textStyles.button}>Filters</Text>
+            </Pressable>
+          </Col>
+        </Row>
+      </View>
+
+      {
+        filterView ?
+          <ScrollView>
+            <Text>Categories: </Text>
+            <View>
+              {categories}
+            </View>
+
+            <View>
+              <Text>Sort</Text>
+              <Pressable
+                onPress={() => ascending(0)}>
+                <Text style={{color:sortColor(0)}}>A-Z</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => descending(1)}>
+                <Text style={{color:sortColor(1)}}>Z-A</Text>
+              </Pressable>
+            </View>
+            <View>
+              <Text>Base ingredients</Text>
+              <ScrollView style={{ height: 200 }}>
+                {ingredients}
+              </ScrollView>
+            </View>
+            <View>
+              <Pressable
+                onPress={() => searchFilter(0, 'a', 'Alcoholic')}>
+                <Text style={{ color: alcSelectColor(0) }}>Alcoholic</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => searchFilter(1, 'a', 'Non_Alcoholic')}>
+                <Text style={{ color: alcSelectColor(1) }}>Non-Alcoholic</Text>
+              </Pressable>
+            </View>
           </ScrollView>
-        </View>
-        <View>         
-          <Pressable
-          onPress={() => searchFilter(0, 'a', 'Alcoholic')}>
-            <Text style={{color:alcSelectColor(0)}}>Alcoholic</Text>
-          </Pressable>
-          <Pressable
-          onPress={() => searchFilter(1, 'a', 'Non_Alcoholic')}>
-            <Text style={{color:alcSelectColor(1)}}>Non-Alcoholic</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-      :
-      <ScrollView>
-        {errorStatus.trim().length === 0 ? 
-        <View>
-          {drink}
-        </View>
-        : 
-        <View>
-          <Text>{errorStatus}</Text>
-        </View>}
-      </ScrollView>}
-    </View>
+          :
+          <ScrollView>
+            {errorStatus.trim().length === 0 ?
+              <View>
+                {drink}
+              </View>
+              :
+              <View>
+                <Text>{errorStatus}</Text>
+              </View>}
+          </ScrollView>
+      }
+    </View >
   );
 }

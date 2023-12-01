@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View, Image, ImageBackground, TouchableOpacity } from 'react-native';
 import { Container, Row, Col } from "react-native-flex-grid";
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PageSlider } from '@pietile-native-kit/page-slider';
 import styles from '../styles/styles'
-import { colors, textStyles } from '../styles/style-constants';
+import { textStyles } from '../styles/style-constants';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { colors } from '../styles/style-constants'
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
-const favIcon = '../assets/defaults/favicon.png'
-const c = 'c'
+const MAPS_KEY = "AIzaSyAxr6uGD0CCuomLoT8JM3VtZM9uBFV6CvU"
+
 function Home({ navigation, route }) {
     const [selectedPage, setSelectedPage] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
@@ -21,7 +20,21 @@ function Home({ navigation, route }) {
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [places, setPlaces] = useState([]);
+
+
+    useEffect(() => {
+        if (latitude !== 0 && longitude !== 0) {
+            fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=100000&type=liquor_store&key=${MAPS_KEY}`)
+                .then(response => response.json())
+                .then(data => {
+                    setPlaces(data.results);
+                })
+                .catch(error => {
+                    console.error('Error fetching nearby places:', error);
+                });
+        }
+    }, [latitude, longitude]);
 
     useEffect(() => {
         (async () => {
@@ -50,7 +63,7 @@ function Home({ navigation, route }) {
     }
 
     const Card = ({ backgroundColor, title, text, img }) => (
-        <Col style={[styles.cardCol, { backgroundColor: `rgba(${backgroundColor}, 0.4)` }]}>
+        <Col style={[styles.cardCol, { backgroundColor: backgroundColor }]}>
             <Text style={styles.cardTitle}>{title}</Text>
             <Text style={styles.cardText}>{text}</Text>
             <Image source={img} style={styles.cardImg} />
@@ -59,50 +72,51 @@ function Home({ navigation, route }) {
 
     const cardData = [
         {
-            backgroundColor: '255, 244, 141',
+            backgroundColor: colors.yellow,
             title: 'Surprise me!',
             text: 'Discover something\n new and exciting',
             img: require('../assets/images/Carousel-cocktails-1.png')
         },
         {
-            backgroundColor: '255, 132, 63',
+            backgroundColor: colors.brown,
             title: 'Coffee & Tea',
             text: 'Brewed or steeped?',
             img: require('../assets/images/CoffeeTea-category.png')
         },
         {
-            backgroundColor: '161, 193, 156',
+            backgroundColor: colors.green,
             title: 'Alcohol free',
             text: 'Grant your liver a\n well-deserved break',
             img: require('../assets/images/Alcoholfree-category.png')
         },
         {
-            backgroundColor: '153, 151, 224',
+            backgroundColor: colors.purple,
             title: 'Alcoholic drinks',
             text: "It's Happy Hour\n somewhere",
             img: require('../assets/images/Alcoholic.png')
         },
     ];
 
-    const handleLocationSelect = (data, details) => {
+    /*const handleLocationSelect = (data, details) => {
         const { geometry } = details;
         const { location } = geometry;
         setSelectedLocation({
             latitude: location.lat,
             longitude: location.lng,
         });
-    };
+    };*/
 
-    /*if (isLoading) {
+    if (isLoading) {
         return <View style={styles.container}>
             <Text>Retrieving location...</Text>
         </View>
-    } else*/
+    } else
         return (
             <ScrollView>
 
                 <View style={styles.container}>
                     <StatusBar style='auto' />
+
 
                     <ImageBackground source={require('../assets/images/Carousel-background.png')}
                         resizeMode='contain'
@@ -144,7 +158,7 @@ function Home({ navigation, route }) {
 
                     </ImageBackground>
 
-                    <View>
+                    <View style={{ marginBottom: 40, marginLeft: 20 }}>
                         <Text style={textStyles.H1Upper}>Discover</Text>
                     </View>
 
@@ -183,25 +197,48 @@ function Home({ navigation, route }) {
                             </TouchableOpacity>
                         </Row>
                     </View>
+                </View>
 
-                    <View style={{ marginTop: 50, marginBottom: 300 }}>
-                        <Text style={textStyles.H1Upper}>Bars near me</Text>
-
-                        <MapView style={styles.map}
-                            provider={PROVIDER_GOOGLE}
-                            initialRegion={{
-                                latitude: latitude,
-                                longitude: longitude,
-                                latitudeDelta: 0.01,
-                                longitudeDelta: 0.01,
-                            }}>
-
-                            <Marker
-                                title='test'
-                                coordinate={{ latitude: latitude, longitude: longitude }} />
-                        </MapView>
-
+                <View style={{ marginTop: 50, marginBottom: 250 }}>
+                    <View style={styles.mapView}>
+                        <Image style={styles.alko} source={require('../assets/logos/small_Alko_logo.png')} />
+                        <Text style={textStyles.H1Upper}>near me</Text>
                     </View>
+
+
+                    <MapView style={styles.map}
+                        provider={PROVIDER_GOOGLE}
+                        initialRegion={{
+                            latitude: latitude,
+                            longitude: longitude,
+                            latitudeDelta: 0.03,
+                            longitudeDelta: 0.03,
+                        }}>
+
+                        {places.map(place => (
+                            <Marker
+                                key={place.place_id}
+                                title={place.name}
+                                description={place.vicinity}
+                                coordinate={{
+                                    latitude: place.geometry.location.lat,
+                                    longitude: place.geometry.location.lng
+                                }}
+                            />
+                        ))}
+
+                        <Marker
+                            title='Me'
+                            pinColor='green'
+
+                            coordinate={{
+                                latitude: latitude,
+                                longitude: longitude
+                            }}
+                        />
+
+                    </MapView>
+
                 </View>
 
             </ScrollView >
