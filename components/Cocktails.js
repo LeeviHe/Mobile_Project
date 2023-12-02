@@ -9,7 +9,7 @@ import styles from '../styles/styles';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const Stack = createNativeStackNavigator()
-export default function Cocktails({ navigation, route}) {
+export default function Cocktails({ navigation, route }) {
   const [searchQuery, setSearchQuery] = useState('');
   //Non-sorted drink data
   const [recipeData, setRecipeData] = useState([])
@@ -23,10 +23,10 @@ export default function Cocktails({ navigation, route}) {
   const [selectedCategory, setSelectedCategory] =
     useState(new Array(11).fill(false))
   //Selected alcoholic filter (2) //fix alcoholselect / selectalcohol mixup
-  const [selectedAlcohol, setSelectedAlcohol] = 
+  const [selectedAlcohol, setSelectedAlcohol] =
     useState(new Array(2).fill(false))
   //Selected Sorting
-  const [selectedSort, setSelectedSort] = 
+  const [selectedSort, setSelectedSort] =
     useState(new Array(2).fill(false))
   //Selected multi-ingredient filters (489)
   const [selectedIngredients, setSelectedIngredients] =
@@ -48,8 +48,8 @@ export default function Cocktails({ navigation, route}) {
     let string = activeFilters.toString()
     if (activeFilters.length === 0) {
       console.log('empty')
-    } else if (activeFilters.length !== 0){
-      searchFilter('','i', string, false)
+    } else if (activeFilters.length !== 0) {
+      searchFilter('', 'i', string, false)
     }
   }, [activeFilters])
 
@@ -91,7 +91,7 @@ export default function Cocktails({ navigation, route}) {
     } else if (descendSort) {
       setActiveDrinks(recipeData.sort((a, b) => b.strDrink.localeCompare(a.strDrink)))
       console.log('Descend on')
-    } else if (recipeData.length > 0){
+    } else if (recipeData.length > 0) {
       console.log('reset')
       setActiveDrinks(recipeData)
 
@@ -147,7 +147,7 @@ export default function Cocktails({ navigation, route}) {
   }
 
   // Condition for what you want to filter with
-  function searchFilter (id, condition, search, discovery) {
+  function searchFilter(id, condition, search, discovery) {
     if (condition == 'c') {
       let filters = [...selectedCategory]
       filters.fill(false)
@@ -155,7 +155,7 @@ export default function Cocktails({ navigation, route}) {
         filters[id] = true
       } else {
         filters[id] = selectedCategory[id] ? false : true
-        navigation.setParams({id: 'empty'})
+        navigation.setParams({ id: 'empty' })
       }
       setSelectedCategory(filters)
       selectedAlcohol.fill(false)
@@ -169,7 +169,7 @@ export default function Cocktails({ navigation, route}) {
         filters[id] = true
       } else {
         filters[id] = selectedAlcohol[id] ? false : true
-        navigation.setParams({id: 'empty'})
+        navigation.setParams({ id: 'empty' })
       }
       setSelectedAlcohol(filters)
       selectedCategory.fill(false)
@@ -180,7 +180,7 @@ export default function Cocktails({ navigation, route}) {
     getDrink('filter.php?' + condition + '=' + search)
   }
 
-  function ascending (i) {
+  function ascending(i) {
     let sort = [...selectedSort]
     sort.fill(false)
     sort[i] = selectedSort[i] ? false : true
@@ -196,7 +196,7 @@ export default function Cocktails({ navigation, route}) {
     }*/
   }
 
-  function descending (i) {
+  function descending(i) {
     let sort = [...selectedSort]
     sort.fill(false)
     sort[i] = selectedSort[i] ? false : true
@@ -216,15 +216,15 @@ export default function Cocktails({ navigation, route}) {
     return selectedIngredients[i] ? 'green' : 'red'
   }
   //fix alcoholselect / selectalcohol mixup
-  function alcSelectColor (i)  {
+  function alcSelectColor(i) {
     return selectedAlcohol[i] ? 'green' : 'red'
   }
 
-  function categorySelectColor (i) {
+  function categorySelectColor(i) {
     return selectedCategory[i] ? 'green' : 'red'
   }
 
-  function sortColor (i) {
+  function sortColor(i) {
     return selectedSort[i] ? 'green' : 'red'
   }
 
@@ -241,7 +241,7 @@ export default function Cocktails({ navigation, route}) {
   }
 
   const defaultSetup = () => {
-    getDrink('search.php?s=Coffee') //White russian only for performance, 'search.php?s=' for actual app
+    getDrink('search.php?s=zokse') //White russian only for performance, 'search.php ? s = ' for actual app
   }
 
   const selectFilter = (i, ingredient) => {
@@ -285,8 +285,7 @@ export default function Cocktails({ navigation, route}) {
   const isNotAlcoholic = (category) => {
     const nonAlcoholicCategories = [
       'Shake',
-      'Cocoa',
-      'Shot',
+      'Cocoa'
     ]
 
     return nonAlcoholicCategories.includes(category)
@@ -297,14 +296,16 @@ export default function Cocktails({ navigation, route}) {
       'Coffee / Tea': colors.brown,
       'Other / Unknown': '#999',
       'Alcoholic': colors.purple,
-      'isNotAlcoholic': colors.green
+      'NotAlcoholic': colors.green,
+      'Soft Drink': colors.yellow
     }
 
     const categoryBackgroundColor = isAlcoholic(data.strCategory)
       ? categoryColors['Alcoholic']
       : isNotAlcoholic(data.strCategory)
-        ? categoryColors['Non-Alcoholic']
-        : categoryColors[data.strCategory] || 'gray';
+        ? categoryColors['NotAlcoholic']
+        : categoryColors[data.strCategory] || 'pink';
+
 
     return (
       <View style={styles.drinkContainer}>
@@ -315,10 +316,10 @@ export default function Cocktails({ navigation, route}) {
 
           <View style={styles.cocktailInfo}>
             <Text style={styles.drinkText}>{data.strDrink}</Text>
-            {!data.strCategory ?
-              <Text></Text>
-              :
-              <Text style={styles.drinkText}>{data.strCategory}</Text>}
+            {data.strCategory && (
+              <Text style={styles.drinkText}>{data.strCategory}</Text>
+            )}
+
           </View>
           {/**
         <Button
@@ -341,39 +342,39 @@ export default function Cocktails({ navigation, route}) {
 
   const categories = categoryJson.map((data, id) => {
     return (
-        <View key={id}>
-          <Row>
-            <Col>
-              <Text>{data.strCategory}</Text>
-            </Col>
-            <Col>
-              <Pressable
-                key={"ctgr:" + data.strCategory}
-                onPress={() => searchFilter(id, 'c', data.strCategory, false)}>
-                <Text style={{color:categorySelectColor(id)}}>x</Text>
-              </Pressable>
-            </Col>
-          </Row>
-        </View>
+      <View key={id}>
+        <Row>
+          <Col>
+            <Text>{data.strCategory}</Text>
+          </Col>
+          <Col>
+            <Pressable
+              key={"ctgr:" + data.strCategory}
+              onPress={() => searchFilter(id, 'c', data.strCategory, false)}>
+              <Text style={{ color: categorySelectColor(id) }}>x</Text>
+            </Pressable>
+          </Col>
+        </Row>
+      </View>
     )
   })
 
   const ingredients = ingredientJson.map((data, id) => {
     return (
-        <View key={id}>
-          <Row>
-            <Col>
-              <Text>{data.strIngredient1}</Text>
-            </Col>
-            <Col>
-              <Pressable
-                key={"ingrdt:" + data.strIngredient1}
-                onPress={() => selectFilter(id, data.strIngredient1)}>
-                <Text style={{color:multiFilterSelectColor(id)}}>x</Text>
-              </Pressable>
-            </Col>
-          </Row>
-        </View>
+      <View key={id}>
+        <Row>
+          <Col>
+            <Text>{data.strIngredient1}</Text>
+          </Col>
+          <Col>
+            <Pressable
+              key={"ingrdt:" + data.strIngredient1}
+              onPress={() => selectFilter(id, data.strIngredient1)}>
+              <Text style={{ color: multiFilterSelectColor(id) }}>x</Text>
+            </Pressable>
+          </Col>
+        </Row>
+      </View>
     )
   })
 
@@ -420,11 +421,11 @@ export default function Cocktails({ navigation, route}) {
               <Text>Sort</Text>
               <Pressable
                 onPress={() => ascending(0)}>
-                <Text style={{color:sortColor(0)}}>A-Z</Text>
+                <Text style={{ color: sortColor(0) }}>A-Z</Text>
               </Pressable>
               <Pressable
                 onPress={() => descending(1)}>
-                <Text style={{color:sortColor(1)}}>Z-A</Text>
+                <Text style={{ color: sortColor(1) }}>Z-A</Text>
               </Pressable>
             </View>
             <View>

@@ -51,5 +51,5 @@ export const padding = {
     padding: 0,
     paddingHorizontal: 0,
     paddingVertical: 0
-  },
-};
+  }
+}
