@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, View, Image, ImageBackground, TouchableOpacity } from 'react-native';
+import { ScrollView, Text, View, Image, ImageBackground, TouchableOpacity, TouchableHighlight, Pressable } from 'react-native';
 import { Container, Row, Col } from "react-native-flex-grid";
 import { PageSlider } from '@pietile-native-kit/page-slider';
 import styles from '../styles/styles'
@@ -62,12 +62,14 @@ function Home({ navigation, route }) {
         return null;
     }
 
-    const Card = ({ backgroundColor, title, text, img }) => (
-        <Col style={[styles.cardCol, { backgroundColor: backgroundColor }]}>
-            <Text style={styles.cardTitle}>{title}</Text>
-            <Text style={styles.cardText}>{text}</Text>
-            <Image source={img} style={styles.cardImg} />
-        </Col>
+    const Card = ({ backgroundColor, title, text, img, onPress }) => (
+        <TouchableOpacity onPress={onPress}>
+            <Col style={[styles.cardCol, { backgroundColor: backgroundColor }]}>
+                <Text style={styles.cardTitle}>{title}</Text>
+                <Text style={styles.cardText}>{text}</Text>
+                <Image source={img} style={styles.cardImg} />
+            </Col>
+        </TouchableOpacity>
     );
 
     const cardData = [
@@ -75,25 +77,29 @@ function Home({ navigation, route }) {
             backgroundColor: colors.yellow,
             title: 'Surprise me!',
             text: 'Discover something\n new and exciting',
-            img: require('../assets/images/Carousel-cocktails-1.png')
+            img: require('../assets/images/Carousel-cocktails-1.png'),
+            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { id: '', condition: 'c', search: 'random.php' } })
         },
         {
             backgroundColor: colors.brown,
             title: 'Coffee & Tea',
-            text: 'Brewed or steeped?',
-            img: require('../assets/images/CoffeeTea-category.png')
+            text: 'Brewed or steeped?\n',
+            img: require('../assets/images/CoffeeTea-category.png'),
+            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 6, condition: 'c', search: 'Coffee_/_Tea' } })
         },
         {
             backgroundColor: colors.green,
             title: 'Alcohol free',
             text: 'Grant your liver a\n well-deserved break',
-            img: require('../assets/images/Alcoholfree-category.png')
+            img: require('../assets/images/Alcoholfree-category.png'),
+            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 1, condition: 'a', search: 'Non_Alcoholic' } })
         },
         {
             backgroundColor: colors.purple,
             title: 'Alcoholic drinks',
             text: "It's Happy Hour\n somewhere",
-            img: require('../assets/images/Alcoholic.png')
+            img: require('../assets/images/Alcoholic.png'),
+            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 0, condition: 'a', search: 'Alcoholic' } })
         },
     ];
 
@@ -116,7 +122,6 @@ function Home({ navigation, route }) {
 
                 <View style={styles.container}>
                     <StatusBar style='auto' />
-
 
                     <ImageBackground source={require('../assets/images/Carousel-background.png')}
                         resizeMode='contain'
@@ -164,37 +169,61 @@ function Home({ navigation, route }) {
 
                     <View style={{ marginHorizontal: 20, gap: 10 }}>
                         <Row style={{ gap: 10 }}>
-                            <TouchableOpacity 
-                            onPress={() => navigation.navigate('CocktailsNavigator', {screen:'Recipe', params: { id: '', condition:'c', search:'random.php' }})} //Work in progress
-                            style={{ paddingHorizontal: 0 }}>
-                                <Col> 
+
+                            <Col style={{ paddingHorizontal: 0 }}>
+                                <Card {...cardData[0]} />
+                            </Col>
+
+                            <Col style={{ paddingHorizontal: 0 }}>
+                                <Card {...cardData[1]} />
+                            </Col>
+                        </Row>
+
+                        <Row style={{ gap: 10 }}>
+
+                            <Col style={{ paddingHorizontal: 0 }}>
+                                <Card {...cardData[2]} />
+                            </Col>
+
+                            <Col style={{ paddingHorizontal: 0 }}>
+                                <Card {...cardData[3]} />
+                            </Col>
+
+
+
+
+                            {/*<TouchableOpacity
+                                onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { id: '', condition: 'c', search: 'random.php' } })} //Work in progress
+                                style={{ paddingHorizontal: 0 }}>
+                                <Col>
                                     <Card {...cardData[0]} />
                                 </Col>
                             </TouchableOpacity>
-                            <TouchableOpacity 
-                            onPress={() => {
-                                navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 6, condition:'c', search:'Coffee_/_Tea' }})}}
-                            style={{ paddingHorizontal: 0 }}>
-                                <Col> 
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 6, condition: 'c', search: 'Coffee_/_Tea' } })
+                                }}
+                                style={{ paddingHorizontal: 0 }}>
+                                <Col>
                                     <Card {...cardData[1]} />
                                 </Col>
                             </TouchableOpacity>
                         </Row>
                         <Row style={{ gap: 10 }}>
-                            <TouchableOpacity 
-                            onPress={() => navigation.navigate('CocktailsNavigator', {screen:'Cocktails', params: { id: 1, condition:'a', search:'Non_Alcoholic' }})}
-                            style={{ paddingHorizontal: 0 }}>
-                                <Col> 
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 1, condition: 'a', search: 'Non_Alcoholic' } })}
+                                style={{ paddingHorizontal: 0 }}>
+                                <Col>
                                     <Card {...cardData[2]} />
                                 </Col>
                             </TouchableOpacity>
-                            <TouchableOpacity 
-                            onPress={() => navigation.navigate('CocktailsNavigator', {screen:'Cocktails', params: { id: 0, condition:'a', search:'Alcoholic' }})}
-                            style={{ paddingHorizontal: 0 }}>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 0, condition: 'a', search: 'Alcoholic' } })}
+                                style={{ paddingHorizontal: 0 }}>
                                 <Col>
                                     <Card {...cardData[3]} />
                                 </Col>
-                            </TouchableOpacity>
+                            </TouchableOpacity>*/}
                         </Row>
                     </View>
                 </View>
