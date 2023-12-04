@@ -334,8 +334,8 @@ export default function Cocktails({ navigation, route }) {
         <View key={id} style={[styles.cocktail, { backgroundColor: categoryBackgroundColor()}]}>
           <Image
             source={{ uri: data.strDrinkThumb }}
-            style={styles.drinkImg} />
-
+            style={styles.drinkImg} 
+          />
           <View style={styles.cocktailInfo}>
             <Text style={styles.drinkText}>{data.strDrink}</Text>
             {data.strCategory && (
@@ -343,20 +343,18 @@ export default function Cocktails({ navigation, route }) {
             )}
 
           </View>
-          {/**
-        <Button
-          title='To recipe'
-          onPress={() =>
-            navigation.navigate('Recipe'
-              , /*{
-                drinkId: data.idDrink,
-                drinkName: data.strDrink,
-                image: data.strDrinkThumb,
-                category: data.strCategory,
-                glass: data.strGlass,
-              instructions: data.strInstructions
-             })}
-        /> */}
+          <Button
+            title='To recipe'
+            onPress={() =>
+              navigation.navigate('Recipe'
+                , {
+                  drinkId: data.idDrink,
+                  drinkName: data.strDrink,
+                  image: data.strDrinkThumb,
+                  category: data.strCategory,
+                  glass: data.strGlass,
+                instructions: data.strInstructions})}
+          /> 
         </View>
       </View>
     )

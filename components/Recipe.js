@@ -17,6 +17,33 @@ const Recipe = ({ navigation, route }) => {
         setHeartSelected(!isHeartSelected);
     };
 
+    useEffect(() => {
+        getJson()
+    }, [route.params.drinkId])
+
+    const drinkInfo = recipeData.map((data, id) => {
+            return (
+                <View key={id}>
+                    
+                </View>
+            )
+        })
+
+    async function getJson () {
+        try {
+            const response = await fetch(URL + 'lookup.php?i=' + route.params.drinkId)
+            if (response.ok) {
+                const json = await response.json()
+                const data = json.drinks
+                setRecipeData(data)
+              } else {
+                alert('Error retrieving recipes!');
+              }
+            } catch (err) {
+              alert(err);
+            }
+        }
+
     return (
         <ScrollView>
             <View style={styles.recipeContainer} >
