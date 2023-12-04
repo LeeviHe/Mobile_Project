@@ -103,14 +103,6 @@ function Home({ navigation, route }) {
         },
     ];
 
-    /*const handleLocationSelect = (data, details) => {
-        const { geometry } = details;
-        const { location } = geometry;
-        setSelectedLocation({
-            latitude: location.lat,
-            longitude: location.lng,
-        });
-    };*/
 
     if (isLoading) {
         return <View style={styles.container}>
@@ -189,41 +181,6 @@ function Home({ navigation, route }) {
                                 <Card {...cardData[3]} />
                             </Col>
 
-
-
-
-                            {/*<TouchableOpacity
-                                onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { id: '', condition: 'c', search: 'random.php' } })} //Work in progress
-                                style={{ paddingHorizontal: 0 }}>
-                                <Col>
-                                    <Card {...cardData[0]} />
-                                </Col>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 6, condition: 'c', search: 'Coffee_/_Tea' } })
-                                }}
-                                style={{ paddingHorizontal: 0 }}>
-                                <Col>
-                                    <Card {...cardData[1]} />
-                                </Col>
-                            </TouchableOpacity>
-                        </Row>
-                        <Row style={{ gap: 10 }}>
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 1, condition: 'a', search: 'Non_Alcoholic' } })}
-                                style={{ paddingHorizontal: 0 }}>
-                                <Col>
-                                    <Card {...cardData[2]} />
-                                </Col>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 0, condition: 'a', search: 'Alcoholic' } })}
-                                style={{ paddingHorizontal: 0 }}>
-                                <Col>
-                                    <Card {...cardData[3]} />
-                                </Col>
-                            </TouchableOpacity>*/}
                         </Row>
                     </View>
                 </View>
