@@ -54,6 +54,7 @@ function Home({ navigation, route }) {
 
     const [font] = useFonts({
         Montserrat: require('../assets/fonts/Montserrat/static/Montserrat-Regular.ttf'),
+        MontserratBold: require('../assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf'),
         Raleway: require('../assets/fonts/Raleway/static/Raleway-SemiBold.ttf'),
         RalewayReg: require('../assets/fonts/Raleway/static/Raleway-Regular.ttf')
     })
@@ -113,7 +114,7 @@ function Home({ navigation, route }) {
             <ScrollView>
 
                 <View style={styles.container}>
-                    <StatusBar style='auto' />
+                    <StatusBar style='auto' hidden={false} />
 
                     <ImageBackground source={require('../assets/images/Carousel-background.png')}
                         resizeMode='contain'
@@ -135,23 +136,23 @@ function Home({ navigation, route }) {
                                 pageMargin={-10}
                                 onCurrentPageChange={setCurrentPage}>
 
-                                <TouchableOpacity 
-                                style={styles.page}
-                                onPress={()=> navigation.navigate('CocktailsNavigator', {screen: 'Cocktails', params: { id: '', condition: 'devs', search: '' }})}> 
+                                <TouchableOpacity
+                                    style={styles.page}
+                                    onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: '', condition: 'devs', search: '' } })}>
                                     <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-1.png')} />
                                     <Text style={textStyles.H1}>Devs' Favourites</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity 
-                                style={styles.page}
-                                onPress={()=> navigation.navigate('CocktailsNavigator', {screen: 'Cocktails', params: { id: '', condition: 'popular', search: 'popular.php' }})}>
+                                <TouchableOpacity
+                                    style={styles.page}
+                                    onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: '', condition: 'popular', search: 'popular.php' } })}>
                                     <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-2.png')} />
                                     <Text style={textStyles.H1}>Most Popular</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity 
-                                style={styles.page}
-                                onPress={()=> navigation.navigate('CocktailsNavigator', {screen: 'Cocktails', params: { id: '', condition: 'latest', search: 'latest.php' }})}>
+                                <TouchableOpacity
+                                    style={styles.page}
+                                    onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: '', condition: 'latest', search: 'latest.php' } })}>
                                     <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-3.png')} />
                                     <Text style={textStyles.H1}>Latest Recipes</Text>
                                 </TouchableOpacity>

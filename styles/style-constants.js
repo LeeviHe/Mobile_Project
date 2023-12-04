@@ -3,6 +3,7 @@ export const colors = {
   mainFontColour: '#5a5a5a',
   secondaryFontColour: '#313131',
   textColour: '#333',
+  smallFontColour: '#rgba(51, 51, 51, 0.5)',
   yellow: 'rgba(255, 244, 141, 0.4)',
   brown: 'rgba(255, 132, 63, 0.4)',
   green: 'rgba(161, 193, 156, 0.4)',
@@ -12,7 +13,8 @@ export const colors = {
 export const fonts = {
   header: 'Raleway',
   secondary: 'RalewayReg',
-  text: 'Montserrat'
+  text: 'Montserrat',
+  boldText: 'MontserratBold'
 }
 
 export const textStyles = {

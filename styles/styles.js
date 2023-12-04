@@ -116,5 +116,47 @@ export default StyleSheet.create({
   drinkText: {
     color: colors.textColour,
     fontFamily: fonts.text
+  },
+
+  // RECIPE PAGE
+  recipeContainer: {
+    backgroundColor: colors.white
+  },
+  topBar: {
+    flexDirection: "row",
+    justifyContent: 'space-between',
+    marginBottom: 30,
+    alignItems: "center",
+    marginHorizontal: 20
+  },
+  drinkInfo: {
+    alignItems: 'center',
+    gap: 25,
+    marginBottom: 20,
+  },
+  drinkName: {
+    fontFamily: fonts.header,
+    color: colors.textColour,
+    fontSize: 20
+  },
+  drinkCategory: {
+    fontFamily: fonts.text,
+    color: colors.smallFontColour
+  },
+  ingredientList: {
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderRadius: 5,
+    justifyContent: 'space-between',
+    marginHorizontal: 20,
+    alignItems: "center"
+  },
+  listItem: {
+    flexDirection: 'row',
+    gap: 20,
+    marginLeft: 10
+  },
+  checkbox: {
+    backgroundColor: 'red'
   }
 });
