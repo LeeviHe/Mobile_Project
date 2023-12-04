@@ -135,20 +135,26 @@ function Home({ navigation, route }) {
                                 pageMargin={-10}
                                 onCurrentPageChange={setCurrentPage}>
 
-                                <View style={styles.page}>
+                                <TouchableOpacity 
+                                style={styles.page}
+                                onPress={()=> navigation.navigate('CocktailsNavigator', {screen: 'Cocktails', params: { id: '', condition: 'devs', search: '' }})}> 
                                     <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-1.png')} />
                                     <Text style={textStyles.H1}>Devs' Favourites</Text>
-                                </View>
+                                </TouchableOpacity>
 
-                                <View style={styles.page}>
+                                <TouchableOpacity 
+                                style={styles.page}
+                                onPress={()=> navigation.navigate('CocktailsNavigator', {screen: 'Cocktails', params: { id: '', condition: 'popular', search: 'popular.php' }})}>
                                     <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-2.png')} />
                                     <Text style={textStyles.H1}>Most Popular</Text>
-                                </View>
+                                </TouchableOpacity>
 
-                                <View style={styles.page}>
+                                <TouchableOpacity 
+                                style={styles.page}
+                                onPress={()=> navigation.navigate('CocktailsNavigator', {screen: 'Cocktails', params: { id: '', condition: 'latest', search: 'latest.php' }})}>
                                     <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-3.png')} />
                                     <Text style={textStyles.H1}>Latest Recipes</Text>
-                                </View>
+                                </TouchableOpacity>
 
                             </PageSlider>
                         </View>

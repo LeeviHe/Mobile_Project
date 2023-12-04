@@ -6,6 +6,7 @@ import { Container, Row, Col } from "react-native-flex-grid";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { colors, padding, textStyles } from '../styles/style-constants';
 import styles from '../styles/styles';
+import { DEVS_FAVOURITES } from '../reusables/Constants';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const Stack = createNativeStackNavigator()
@@ -35,6 +36,8 @@ export default function Cocktails({ navigation, route }) {
   const [activeFilters, setActiveFilters] = useState([])
   // Checking if any categories/alc/non-alc are selected
   const [activeCategory, setActiveCategory] = useState(false)
+  // Variable to replace strCategory in filtering situation
+  const [replaceCategory, setReplaceCategory] = useState('')
 
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
@@ -67,7 +70,13 @@ export default function Cocktails({ navigation, route }) {
     if (route.params !== undefined && route.params.id !== 'empty' && searchQuery.trim().length === 0) {
       console.log('Cocktails Screen Params:', route.params)
       if (route.params.condition) {
-        searchFilter(route.params.id, route.params.condition, route.params.search, true)
+        if (route.params.condition == 'popular' || route.params.condition == 'latest') {
+          getDrink(route.params.search)
+        } else if (route.params.condition == 'devs') {
+          setRecipeData(DEVS_FAVOURITES)
+        } else {
+          searchFilter(route.params.id, route.params.condition, route.params.search, true)
+        }
       }
       // Random Drink to recipe screen
       //else if (route.params.search == 'random.php') {
@@ -94,7 +103,6 @@ export default function Cocktails({ navigation, route }) {
     } else if (recipeData.length > 0) {
       console.log('reset')
       setActiveDrinks(recipeData)
-
     }
   }, [ascendSort, descendSort, recipeData])
 
@@ -123,7 +131,7 @@ export default function Cocktails({ navigation, route }) {
     }
   }
 
-  async function getDrink(method) {
+  async function getDrink(method, category) {
     try {
       const response = await fetch(URL + method);
       if (response.ok) {
@@ -138,6 +146,7 @@ export default function Cocktails({ navigation, route }) {
         console.log(method)
         const drinks = json.drinks;
         setRecipeData(drinks);
+        setReplaceCategory(category)
       } else {
         alert('Error retrieving recipes!');
       }
@@ -177,7 +186,7 @@ export default function Cocktails({ navigation, route }) {
       setActiveFilters([])
       setActiveCategory(filters[id])
     }
-    getDrink('filter.php?' + condition + '=' + search)
+    getDrink('filter.php?' + condition + '=' + search, search)
   }
 
   function ascending(i) {
@@ -292,24 +301,37 @@ export default function Cocktails({ navigation, route }) {
   }
 
   const drink = activeDrinks.map((data, id) => {
+    // Duplicates for search query issues
     const categoryColors = {
+      'Coffee_/_Tea': colors.brown,
       'Coffee / Tea': colors.brown,
       'Other / Unknown': '#999',
       'Alcoholic': colors.purple,
-      'NotAlcoholic': colors.green,
+      'Non_Alcoholic': colors.green,
+      'Non Alcoholic': colors.green,
       'Soft Drink': colors.yellow
     }
 
-    const categoryBackgroundColor = isAlcoholic(data.strCategory)
+    function categoryBackgroundColor() {
+      if (data.strCategory) {
+
+      return isAlcoholic(data.strCategory)
       ? categoryColors['Alcoholic']
       : isNotAlcoholic(data.strCategory)
-        ? categoryColors['NotAlcoholic']
+        ? categoryColors['Non_Alcoholic']
         : categoryColors[data.strCategory] || 'pink';
-
-
+      } else {
+        return isAlcoholic(replaceCategory)
+        ? categoryColors['Alcoholic']
+        : isNotAlcoholic(replaceCategory)
+          ? categoryColors['Non_Alcoholic']
+          : categoryColors[replaceCategory] || 'pink';
+      }
+    }
+    
     return (
       <View style={styles.drinkContainer}>
-        <View key={id} style={[styles.cocktail, { backgroundColor: categoryBackgroundColor }]}>
+        <View key={id} style={[styles.cocktail, { backgroundColor: categoryBackgroundColor()}]}>
           <Image
             source={{ uri: data.strDrinkThumb }}
             style={styles.drinkImg} />
