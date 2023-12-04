@@ -250,7 +250,7 @@ export default function Cocktails({ navigation, route }) {
   }
 
   const defaultSetup = () => {
-    getDrink('search.php?s=zokse') //White russian only for performance, 'search.php ? s = ' for actual app
+    getDrink('search.php?s=coffee')
   }
 
   const selectFilter = (i, ingredient) => {
@@ -315,26 +315,26 @@ export default function Cocktails({ navigation, route }) {
     function categoryBackgroundColor() {
       if (data.strCategory) {
 
-      return isAlcoholic(data.strCategory)
-      ? categoryColors['Alcoholic']
-      : isNotAlcoholic(data.strCategory)
-        ? categoryColors['Non_Alcoholic']
-        : categoryColors[data.strCategory] || 'pink';
+        return isAlcoholic(data.strCategory)
+          ? categoryColors['Alcoholic']
+          : isNotAlcoholic(data.strCategory)
+            ? categoryColors['Non_Alcoholic']
+            : categoryColors[data.strCategory] || 'pink';
       } else {
         return isAlcoholic(replaceCategory)
-        ? categoryColors['Alcoholic']
-        : isNotAlcoholic(replaceCategory)
-          ? categoryColors['Non_Alcoholic']
-          : categoryColors[replaceCategory] || 'pink';
+          ? categoryColors['Alcoholic']
+          : isNotAlcoholic(replaceCategory)
+            ? categoryColors['Non_Alcoholic']
+            : categoryColors[replaceCategory] || 'pink';
       }
     }
-    
+
     return (
       <View style={styles.drinkContainer}>
-        <View key={id} style={[styles.cocktail, { backgroundColor: categoryBackgroundColor()}]}>
+        <View key={id} style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}>
           <Image
             source={{ uri: data.strDrinkThumb }}
-            style={styles.drinkImg} 
+            style={styles.drinkImg}
           />
           <View style={styles.cocktailInfo}>
             <Text style={styles.drinkText}>{data.strDrink}</Text>
@@ -353,8 +353,9 @@ export default function Cocktails({ navigation, route }) {
                   image: data.strDrinkThumb,
                   category: data.strCategory,
                   glass: data.strGlass,
-                instructions: data.strInstructions})}
-          /> 
+                  instructions: data.strInstructions
+                })}
+          />
         </View>
       </View>
     )
