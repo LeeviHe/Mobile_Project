@@ -1,4 +1,4 @@
-import { Text, View, Image, Pressable } from 'react-native';
+import { Text, View, Image, Pressable, TouchableOpacity } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
@@ -8,7 +8,7 @@ import styles from '../styles/styles';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 
-export default function Ingredients() {
+export default function Ingredients({ navigation, route }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [ingredientData, setIngredientData] = useState([])
   const [errorStatus, setErrorStatus] = useState('')
@@ -54,10 +54,15 @@ export default function Ingredients() {
   const defaultSetup = () => {
     getIngredient('search.php?i=')
   }
+
   const ingredient = ingredientData.map((data, id) => {
     return (
       <View style={styles.drinkContainer}>
-        <View key={id} style={[styles.cocktail, { backgroundColor: 'pink' }]}>
+        <TouchableOpacity key={id} style={[styles.cocktail, { backgroundColor: 'pink' }]}
+          onPress={() => navigation.navigate('Ingredient', {
+            ingrID: data.idIngredient,
+            ingrName: data.strIngredient
+          })}>
 
           <Image
             source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png' }}
@@ -71,7 +76,7 @@ export default function Ingredients() {
 
           </View>
 
-        </View>
+        </TouchableOpacity>
       </View>
     )
 

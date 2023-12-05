@@ -9,6 +9,9 @@ import More from './components/More';
 import Recipe from './components/Recipe';
 import { colors } from './styles/style-constants';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import MyPockettinis from './components/MyPockettinis';
+import Favourites from './components/Favourites';
+import Ingredient from './components/Ingredient';
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator();
@@ -21,6 +24,25 @@ const CocktailsNavigator = () => {
     </Stack.Navigator>
   );
 };
+
+const IngredientsNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Ingredients" component={Ingredients} />
+      <Stack.Screen name="Ingredient" component={Ingredient} />
+    </Stack.Navigator>
+  );
+};
+
+const MoreNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="More" component={More} />
+      <Stack.Screen name="Favourites" component={Favourites} />
+      <Stack.Screen name="MyPockettinis" component={MyPockettinis} />
+    </Stack.Navigator>
+  )
+}
 
 export default function App() {
   return (
@@ -98,8 +120,8 @@ export default function App() {
             },
           }} />
         <Tab.Screen
-          name="Ingredients"
-          component={Ingredients}
+          name="IngredientsNavigator"
+          component={IngredientsNavigator}
           options={{
             tabBarLabel: 'Ingredients',
             tabBarIcon: ({ color, size }) => {
@@ -107,8 +129,8 @@ export default function App() {
             },
           }} />
         <Tab.Screen
-          name="More"
-          component={More}
+          name="MoreNavigator"
+          component={MoreNavigator}
           options={{
             tabBarLabel: 'More',
             tabBarIcon: ({ color, size }) => {
