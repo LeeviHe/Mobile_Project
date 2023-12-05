@@ -405,8 +405,7 @@ export default function Cocktails({ navigation, route }) {
             unfillColor={multiFilterSelectColor()}
             iconComponent={<Icon name={'check'} size={20} color='gray' />} // toggle this
             onPress={() => selectFilter(index, item.strIngredient1)}
-            // borderRadius: '50%'
-            style={{ borderWidth: 1, borderRadius: 0.5, marginLeft: 10, borderColor: colors.mainFontColour }}
+            style={{ borderWidth: 1, borderRadius: 50, marginLeft: 10, borderColor: colors.mainFontColour }}
           />
           </View>
         </TouchableOpacity>
@@ -488,8 +487,7 @@ export default function Cocktails({ navigation, route }) {
                       unfillColor='transparent'
                       iconComponent={<Icon name={'check'} size={20} color={sortColor(0)} />}
                       onPress={() => ascending(0)}
-                      // borderRadius: '50%'
-                      style={{ borderWidth: 1, borderRadius: 0.5, borderColor: colors.mainFontColour }}
+                      style={{ borderWidth: 1, borderRadius: 50, borderColor: colors.mainFontColour }}
                     />
 
                   </View>
@@ -504,8 +502,7 @@ export default function Cocktails({ navigation, route }) {
                       unfillColor='transparent'
                       iconComponent={<Icon name={'check'} size={20} color={sortColor(1)} />}
                       onPress={() => descending(1)}
-                      // borderRadius: '50%'
-                      style={{ borderWidth: 1, borderRadius: 0.5, borderColor: colors.mainFontColour }}
+                      style={{ borderWidth: 1, borderRadius: 50, borderColor: colors.mainFontColour }}
                     />
 
                   </View>
