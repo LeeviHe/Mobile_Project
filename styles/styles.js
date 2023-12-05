@@ -118,6 +118,32 @@ export default StyleSheet.create({
     fontFamily: fonts.text
   },
 
+  // FILTER
+  filterHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  filterHeading: {
+    fontFamily: fonts.header,
+    color: colors.mainFontColour,
+    fontSize: 20
+  },
+  filterContainer: {
+    marginVertical: 20,
+    gap: 10
+  },
+  filterSort: {
+    flexDirection: 'row',
+    gap: 40,
+    alignItems: 'center'
+  },
+  dropdownContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+
   // RECIPE PAGE
   recipeContainer: {
     backgroundColor: colors.white
