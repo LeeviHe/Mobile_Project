@@ -1,4 +1,4 @@
-import { Text, View, Image, Pressable, Button, TouchableOpacity } from 'react-native';
+import { Text, View, Image, Pressable, Button, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
 import { Searchbar, RadioButton } from 'react-native-paper';
 import React, { useState, useEffect, useMemo } from 'react';
 import { ScrollView } from 'react-native';
@@ -55,6 +55,7 @@ export default function Cocktails({ navigation, route }) {
     let string = activeFilters.toString()
     if (activeFilters.length === 0) {
       console.log('empty')
+      defaultSetup()
     } else if (activeFilters.length !== 0) {
       searchFilter('', 'i', string, false)
     }
@@ -82,10 +83,6 @@ export default function Cocktails({ navigation, route }) {
           searchFilter(route.params.id, route.params.condition, route.params.search, true)
         }
       }
-      // Random Drink to recipe screen
-      //else if (route.params.search == 'random.php') {
-      //getDrink
-      //}
     } else if (searchQuery.trim().length === 0 && !ascendSort && !descendSort && activeFilters.length === 0 && activeCategory == false) {
       defaultSetup()
     } else if (activeFilters.length > 0 && activeFilters !== true && activeFilters !== false && searchQuery.trim().length === 0) {
@@ -240,7 +237,7 @@ export default function Cocktails({ navigation, route }) {
   }
 
   const defaultSetup = () => {
-    getDrink('search.php?s=coffee')
+    getDrink('search.php?s=')
   }
 
   const selectFilter = (i, ingredient) => {
@@ -290,26 +287,25 @@ export default function Cocktails({ navigation, route }) {
     return nonAlcoholicCategories.includes(category)
   }
 
-  const drink = activeDrinks.map((data, id) => {
-    // Duplicates for search query issues
-    const categoryColors = {
-      'Coffee_/_Tea': colors.brown,
-      'Coffee / Tea': colors.brown,
-      'Other / Unknown': '#999',
-      'Alcoholic': colors.purple,
-      'Non_Alcoholic': colors.green,
-      'Non Alcoholic': colors.green,
-      'Soft Drink': colors.yellow
-    }
+  const renderDrinkItem = ({ item, index }) => {
+    const categoryBackgroundColor = () => {
+      // Duplicates for search query issues
+      const categoryColors = {
+        'Coffee_/_Tea': colors.brown,
+        'Coffee / Tea': colors.brown,
+        'Other / Unknown': '#999',
+        'Alcoholic': colors.purple,
+        'Non_Alcoholic': colors.green,
+        'Non Alcoholic': colors.green,
+        'Soft Drink': colors.yellow
+      }
 
-    function categoryBackgroundColor() {
-      if (data.strCategory) {
-
-        return isAlcoholic(data.strCategory)
+      if (item.strCategory) {
+        return isAlcoholic(item.strCategory)
           ? categoryColors['Alcoholic']
-          : isNotAlcoholic(data.strCategory)
+          : isNotAlcoholic(item.strCategory)
             ? categoryColors['Non_Alcoholic']
-            : categoryColors[data.strCategory] || 'pink';
+            : categoryColors[item.strCategory] || 'pink';
       } else {
         return isAlcoholic(replaceCategory)
           ? categoryColors['Alcoholic']
@@ -318,33 +314,37 @@ export default function Cocktails({ navigation, route }) {
             : categoryColors[replaceCategory] || 'pink';
       }
     }
+  ;
 
-    return (
-      <View style={styles.drinkContainer}>
-        <TouchableOpacity key={id} style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}
-          onPress={() => navigation.navigate('Recipe', {
-            drinkId: data.idDrink,
-            drinkName: data.strDrink,
-            image: data.strDrinkThumb,
-            category: data.strCategory,
-            glass: data.strGlass,
-            instructions: data.strInstructions
-          })}>
-          <Image
-            source={{ uri: data.strDrinkThumb }}
-            style={styles.drinkImg}
-          />
-          <View style={styles.cocktailInfo}>
-            <Text style={styles.drinkText}>{data.strDrink}</Text>
-            {data.strCategory && (
-              <Text style={styles.drinkText}>{data.strCategory}</Text>
-            )}
+  
 
-          </View>
-        </TouchableOpacity>
-      </View>
-    )
-  })
+  return (
+    <View style={styles.drinkContainer}>
+      <TouchableOpacity
+        key={index}
+        style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}
+        onPress={() =>
+          navigation.navigate('Recipe', {
+            drinkId: item.idDrink,
+            drinkName: item.strDrink,
+            image: item.strDrinkThumb,
+            category: item.strCategory,
+            glass: item.strGlass,
+            instructions: item.strInstructions,
+          })
+        }
+      >
+        <Image source={{ uri: item.strDrinkThumb }} style={styles.drinkImg} />
+        <View style={styles.cocktailInfo}>
+          <Text style={styles.drinkText}>{item.strDrink}</Text>
+          {item.strCategory && (
+            <Text style={styles.drinkText}>{item.strCategory}</Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+}
 
   const toggleCategoryDropdown = () => {
     setShowDropdown1(!showDropdown1);
@@ -388,34 +388,50 @@ export default function Cocktails({ navigation, route }) {
     </View>
   );
 
-  const ingredientDropdownContent = (
-    <View>
-      {showDropdown2 && (
+  const RenderIngredientDropdownContent = ({ ingredientJson, showDropdown2, selectFilter, multiFilterSelectColor, colors, fonts }) => {
+    const [visibleItems, setVisibleItems] = useState(30); // Number of initially visible items
+  
+    const renderItem = ({ item, index }) => (
+      <View>
+        <TouchableOpacity onPress={() => selectFilter(index, item.strIngredient1)}>
+          <View style={styles.dropdownContainer}>
+          <View style={{ marginBottom: 15 }}>
+            <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>{item.strIngredient1}</Text>
+          </View>
+          <BouncyCheckbox
+            size={22}
+            disableText={true}
+            fillColor={multiFilterSelectColor()}
+            unfillColor={multiFilterSelectColor()}
+            iconComponent={<Icon name={'check'} size={20} color='gray' />} // toggle this
+            onPress={() => selectFilter(index, item.strIngredient1)}
+            // borderRadius: '50%'
+            style={{ borderWidth: 1, borderRadius: 0.5, marginLeft: 10, borderColor: colors.mainFontColour }}
+          />
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  
+    return (
+      <View>
+        {showDropdown2 && (
         <View style={styles.dropdownList}>
-          {ingredientJson.map((data, id) => (
-            <TouchableOpacity key={id} onPress={() => selectFilter(id, data.strIngredient1)}>
-
-              <View style={styles.dropdownContainer}>
-                <View style={{ marginBottom: 15 }}>
-                  <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>{data.strIngredient1}</Text>
-                </View>
-
-                <BouncyCheckbox
-                  size={22}
-                  disableText={true}
-                  fillColor={multiFilterSelectColor()}
-                  unfillColor={multiFilterSelectColor()}
-                  iconComponent={<Icon name={'check'} size={20} color='gray' />} // toggle this
-                  onPress={() => selectFilter(id, data.strIngredient1)}
-                  style={{ borderWidth: 1, borderRadius: '50%', marginLeft: 10, borderColor: colors.mainFontColour }}
-                />
-              </View>
-            </TouchableOpacity>
-          ))}
+          <FlatList
+            data={ingredientJson.slice(0, visibleItems)} // Show only visibleItems
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={renderItem}
+            onEndReached={() => {
+              // Loads more items when the end of the list is reached
+              setVisibleItems((prev) => prev + 20); // Increase the number of visible items here
+            }}
+            onEndReachedThreshold={0.5} // Trigger onEndReached when 50%? of the list is scrolled
+          />
         </View>
-      )}
-    </View>
-  );
+        )}
+      </View>
+    );
+  };
 
   return (
     <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
@@ -448,11 +464,8 @@ export default function Cocktails({ navigation, route }) {
         </Row>
       </View>
 
-      {
-        filterView ?
-          <ScrollView>
+      {filterView ? (
             <View style={{ marginHorizontal: 20 }}>
-
               <View style={styles.filterHeader}>
                 <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>cancel</Text>
                 <Text style={styles.filterHeading}>Filters</Text>
@@ -475,7 +488,8 @@ export default function Cocktails({ navigation, route }) {
                       unfillColor='transparent'
                       iconComponent={<Icon name={'check'} size={20} color={sortColor(0)} />}
                       onPress={() => ascending(0)}
-                      style={{ borderWidth: 1, borderRadius: '50%', borderColor: colors.mainFontColour }}
+                      // borderRadius: '50%'
+                      style={{ borderWidth: 1, borderRadius: 0.5, borderColor: colors.mainFontColour }}
                     />
 
                   </View>
@@ -490,7 +504,8 @@ export default function Cocktails({ navigation, route }) {
                       unfillColor='transparent'
                       iconComponent={<Icon name={'check'} size={20} color={sortColor(1)} />}
                       onPress={() => descending(1)}
-                      style={{ borderWidth: 1, borderRadius: '50%', borderColor: colors.mainFontColour }}
+                      // borderRadius: '50%'
+                      style={{ borderWidth: 1, borderRadius: 0.5, borderColor: colors.mainFontColour }}
                     />
 
                   </View>
@@ -520,10 +535,14 @@ export default function Cocktails({ navigation, route }) {
                   </TouchableOpacity>
                 </View>
 
-                <ScrollView style={{ maxHeight: showDropdown2 ? 300 : 0 }}>
-                  {ingredientDropdownContent}
-                </ScrollView>
-
+                <RenderIngredientDropdownContent
+                ingredientJson={ingredientJson}
+                showDropdown2={showDropdown2}
+                selectFilter={selectFilter}
+                multiFilterSelectColor={multiFilterSelectColor}
+                colors={colors}
+                fonts={fonts}
+              />
               </View>
               <View>
                 <Pressable
@@ -536,21 +555,15 @@ export default function Cocktails({ navigation, route }) {
                 </Pressable>
               </View>
             </View>
-          </ScrollView>
+              ) : (
+                <FlatList
+                data={activeDrinks}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderDrinkItem}
+                ListEmptyComponent={<Text>{errorStatus}</Text>}
+              />
+          )}
 
-          :
-
-          <ScrollView>
-            {errorStatus.trim().length === 0 ?
-              <View>
-                {drink}
-              </View>
-              :
-              <View>
-                <Text>{errorStatus}</Text>
-              </View>}
-          </ScrollView>
-      }
     </View >
   );
 }
