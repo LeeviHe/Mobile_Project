@@ -185,7 +185,7 @@ export default StyleSheet.create({
     height: 20
   },
   measure: {
-    fontWeight: 800,
+    //fontWeight: 800,
     fontFamily: fonts.boldText,
     width: 80
   },

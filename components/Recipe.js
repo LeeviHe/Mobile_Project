@@ -18,7 +18,37 @@ const Recipe = ({ navigation, route }) => {
 
     useEffect(() => {
         getJson()
-    }, [route.params.drinkId])
+    }, [route])
+
+    async function getJson() {
+        if (route.params.drinkId) {
+        try {
+            const response = await fetch(URL + 'lookup.php?i=' + route.params.drinkId)
+            if (response.ok) {
+                const json = await response.json()
+                const data = json.drinks
+                setRecipeData(data)
+            } else {
+                alert('Error retrieving recipes!');
+            }
+        } catch (err) {
+            alert(err);
+        }}
+        else {
+            try {
+                const response = await fetch(URL + route.params.search)
+                if (response.ok) {
+                    const json = await response.json()
+                    const data = json.drinks
+                    setRecipeData(data)
+                } else {
+                    alert('Error retrieving recipes!');
+                }
+            } catch (err) {
+                alert(err);
+            }
+        }
+    }
 
     const drinkInfo = recipeData.map((data, id) => {
         const ingredients = [];
@@ -62,6 +92,9 @@ const Recipe = ({ navigation, route }) => {
     });
 
     const drinkInstructions = recipeData.map((data, id) => {
+        route.params.image = data.strDrinkThumb
+        route.params.drinkName = data.strDrink
+        route.params.category = data.strCategory
         return (
             <View key={id}>
                 <View style={styles.prepList}>
@@ -95,20 +128,7 @@ const Recipe = ({ navigation, route }) => {
         );
     });
 
-    async function getJson() {
-        try {
-            const response = await fetch(URL + 'lookup.php?i=' + route.params.drinkId)
-            if (response.ok) {
-                const json = await response.json()
-                const data = json.drinks
-                setRecipeData(data)
-            } else {
-                alert('Error retrieving recipes!');
-            }
-        } catch (err) {
-            alert(err);
-        }
-    }
+
 
     const categoryColors = {
         'Coffee / Tea': colors.brown,
