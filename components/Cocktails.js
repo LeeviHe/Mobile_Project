@@ -1,4 +1,4 @@
-import { Text, View, Image, Pressable, Button } from 'react-native';
+import { Text, View, Image, Pressable, Button, TouchableOpacity } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
@@ -331,7 +331,15 @@ export default function Cocktails({ navigation, route }) {
 
     return (
       <View style={styles.drinkContainer}>
-        <View key={id} style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}>
+        <TouchableOpacity key={id} style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}
+          onPress={() => navigation.navigate('Recipe', {
+            drinkId: data.idDrink,
+            drinkName: data.strDrink,
+            image: data.strDrinkThumb,
+            category: data.strCategory,
+            glass: data.strGlass,
+            instructions: data.strInstructions
+          })}>
           <Image
             source={{ uri: data.strDrinkThumb }}
             style={styles.drinkImg}
@@ -343,20 +351,7 @@ export default function Cocktails({ navigation, route }) {
             )}
 
           </View>
-          <Button
-            title='To recipe'
-            onPress={() =>
-              navigation.navigate('Recipe'
-                , {
-                  drinkId: data.idDrink,
-                  drinkName: data.strDrink,
-                  image: data.strDrinkThumb,
-                  category: data.strCategory,
-                  glass: data.strGlass,
-                  instructions: data.strInstructions
-                })}
-          />
-        </View>
+        </TouchableOpacity>
       </View>
     )
   })
