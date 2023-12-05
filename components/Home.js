@@ -86,14 +86,14 @@ function Home({ navigation, route }) {
             title: 'Coffee & Tea',
             text: 'Brewed or steeped?\n',
             img: require('../assets/images/CoffeeTea-category.png'),
-            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 6, condition: 'c', search: 'Coffee_/_Tea' } })
+            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 6, condition: 'c', search: 'Coffee / Tea' } })
         },
         {
             backgroundColor: colors.green,
             title: 'Alcohol free',
             text: 'Grant your liver a\n well-deserved break',
             img: require('../assets/images/Alcoholfree-category.png'),
-            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 1, condition: 'a', search: 'Non_Alcoholic' } })
+            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: 1, condition: 'a', search: 'Non Alcoholic' } })
         },
         {
             backgroundColor: colors.purple,
