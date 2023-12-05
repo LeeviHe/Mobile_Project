@@ -132,7 +132,7 @@ export default StyleSheet.create({
   drinkInfo: {
     alignItems: 'center',
     gap: 25,
-    marginBottom: 20,
+    marginBottom: 20
   },
   drinkName: {
     fontFamily: fonts.header,
@@ -145,18 +145,57 @@ export default StyleSheet.create({
   },
   ingredientList: {
     flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 10,
     justifyContent: 'space-between',
     marginHorizontal: 20,
-    alignItems: "center"
+    alignItems: "center",
+    padding: 6,
+    backgroundColor: 'white'
   },
   listItem: {
     flexDirection: 'row',
     gap: 20,
-    marginLeft: 10
+    marginLeft: 10,
+    height: 20
   },
-  checkbox: {
-    backgroundColor: 'red'
+  measure: {
+    fontWeight: 800,
+    fontFamily: fonts.boldText,
+    width: 80
+  },
+  ingredient: {
+    fontFamily: fonts.text
+  },
+  prepList: {
+    marginTop: 10,
+    gap: 5,
+    marginHorizontal: 20
+  },
+  prepItem: {
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: colors.mainFontColour,
+    justifyContent: 'space-between',
+    paddingLeft: 10,
+    flexDirection: 'row',
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: 'white'
+  },
+  step: {
+    color: colors.mainFontColour,
+    fontFamily: fonts.text,
+    fontSize: 12
+  },
+  prep: {
+    fontFamily: fonts.text,
+    width: 280
+  },
+  noteBtn: {
+    backgroundColor: 'gray',
+    alignItems: "center",
+    borderRadius: 10,
+    marginTop: 10,
+    padding: 6
   }
 });
