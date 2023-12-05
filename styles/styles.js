@@ -223,5 +223,32 @@ export default StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
     padding: 6
+  },
+
+  // MORE
+  moreContainer: {
+    gap: 10,
+    position: "absolute",
+    bottom: 20,
+    right: 0,
+    backgroundColor: colors.white,
+    padding: 20,
+    borderRadius: 10
+  },
+  moreItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: '#e0e0e0',
+    borderRadius: 10,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3
+  },
+  moreText: {
+    fontSize: 16,
+    fontFamily: fonts.text,
+    paddingHorizontal: 20
   }
 });

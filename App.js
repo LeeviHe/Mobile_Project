@@ -112,9 +112,11 @@ export default function App() {
           options={{
             tabBarLabel: 'More',
             tabBarIcon: ({ color, size }) => {
-              return <Icon name="menu" size={size} color={color} />;
+              return <Icon name="dots-horizontal" size={size} color={color} />;
             },
-          }} />
+          }}
+        />
+
       </Tab.Navigator>
     </NavigationContainer >
   );
