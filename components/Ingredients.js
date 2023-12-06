@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
 import { Row, Col } from "react-native-flex-grid";
 import { colors, padding, textStyles } from '../styles/style-constants';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/styles';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
@@ -12,6 +13,11 @@ export default function Ingredients({ navigation, route }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [ingredientData, setIngredientData] = useState([])
   const [errorStatus, setErrorStatus] = useState('')
+  const [selectStar, setSelectStar] = useState(false)
+
+  const toggleStar = () => {
+    setSelectStar(!selectStar);
+  };
 
   const onChangeSearch = query => setSearchQuery(query);
 
@@ -58,23 +64,33 @@ export default function Ingredients({ navigation, route }) {
   const ingredient = ingredientData.map((data, id) => {
     return (
       <View style={styles.drinkContainer}>
-        <TouchableOpacity key={id} style={[styles.cocktail, { backgroundColor: 'pink' }]}
-          onPress={() => navigation.navigate('Ingredient', {
-            ingrId: data.idIngredient,
-            ingrName: data.strIngredient,
-            ingrImg: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png'
-          })}>
+        <TouchableOpacity
+          key={id}
+          style={[styles.cocktail, { backgroundColor: '#999' }]}
+          onPress={() =>
+            navigation.navigate('Ingredient', {
+              ingrId: data.idIngredient,
+              ingrName: data.strIngredient,
+              ingrImg: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png'
+            })}>
 
-          <Image
-            source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png' }}
-            style={styles.drinkImg} />
+          <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
+            <Image
+              source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png' }}
+              style={styles.drinkImg} />
 
-          <View style={styles.cocktailInfo}>
-            <Text style={styles.drinkText}>{data.strIngredient}</Text>
-            {data.strType && (
-              <Text style={styles.drinkText}>{data.strType}</Text>
-            )}
+            <View style={styles.cocktailInfo}>
+              <Text style={styles.drinkText}>{data.strIngredient}</Text>
+              {data.strType && (
+                <Text style={styles.drinkText}>{data.strType}</Text>
+              )}
+            </View>
+          </View>
 
+          <View style={{ marginRight: 40 }}>
+            <TouchableOpacity onPress={toggleStar}>
+              <Icon name={selectStar ? 'star' : 'star-outline'} size={40} color="#e7c500" />
+            </TouchableOpacity>
           </View>
 
         </TouchableOpacity>

@@ -48,6 +48,7 @@ export default function Cocktails({ navigation, route }) {
   const [showDropdown1, setShowDropdown1] = useState(false);
   const [showDropdown2, setShowDropdown2] = useState(false);
 
+  const [isHeartSelected, setHeartSelected] = useState(false);
 
   //
   //useEffects
@@ -229,6 +230,10 @@ export default function Cocktails({ navigation, route }) {
 
   //
   //consts
+  const toggleHeart = () => {
+    setHeartSelected(!isHeartSelected);
+  };
+
   const onChangeSearch = query => setSearchQuery(query);
 
   const handleSearch = () => {
@@ -317,39 +322,45 @@ export default function Cocktails({ navigation, route }) {
             ? categoryColors['Non Alcoholic']
             : categoryColors[replaceCategory] || 'pink';
       }
-    }
-  ;
+    };
 
-  
+    return (
+      <View style={styles.drinkContainer}>
+        <TouchableOpacity
+          key={index}
+          style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}
+          onPress={() =>
+            navigation.navigate('Recipe', {
+              drinkId: item.idDrink,
+              drinkName: item.strDrink,
+              image: item.strDrinkThumb,
+              category: item.strCategory,
+              glass: item.strGlass,
+              instructions: item.strInstructions,
+            })
+          }>
 
-  return (
-    <View style={styles.drinkContainer}>
-      <TouchableOpacity
-        key={index}
-        style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}
-        onPress={() =>
-          navigation.navigate('Recipe', {
-            drinkId: item.idDrink,
-            drinkName: item.strDrink,
-            image: item.strDrinkThumb,
-            category: item.strCategory,
-            glass: item.strGlass,
-            instructions: item.strInstructions,
-          })
-        }
-      >
-        <Image source={{ uri: item.strDrinkThumb }} style={styles.drinkImg} />
-        <View style={styles.cocktailInfo}>
-          <Text style={styles.drinkText}>{item.strDrink}</Text>
-          {item.strCategory ? (
-            <Text style={styles.drinkText}>{item.strCategory}</Text>
-          ):
-          <Text style={styles.drinkText}>{replaceCategory}</Text>}
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
-}
+          <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
+            <Image source={{ uri: item.strDrinkThumb }} style={styles.drinkImg} />
+
+            <View style={styles.cocktailInfo}>
+              <Text style={styles.drinkText}>{item.strDrink}</Text>
+              {item.strCategory ? (
+                <Text style={styles.drinkText}>{item.strCategory}</Text>
+              ) :
+                <Text style={styles.drinkText}>{replaceCategory}</Text>}
+            </View>
+          </View>
+
+          <View style={{ marginRight: 40 }}>
+            <TouchableOpacity onPress={toggleHeart}>
+              <Icon name={isHeartSelected ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   const toggleCategoryDropdown = () => {
     setShowDropdown1(!showDropdown1);
@@ -395,43 +406,43 @@ export default function Cocktails({ navigation, route }) {
 
   const RenderIngredientDropdownContent = ({ ingredientJson, showDropdown2, selectFilter, multiFilterSelectColor, colors, fonts }) => {
     const [visibleItems, setVisibleItems] = useState(30); // Number of initially visible items
-  
+
     const renderItem = ({ item, index }) => (
       <View>
         <TouchableOpacity onPress={() => selectFilter(index, item.strIngredient1)}>
           <View style={styles.dropdownContainer}>
-          <View style={{ marginBottom: 15 }}>
-            <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>{item.strIngredient1}</Text>
-          </View>
-          <BouncyCheckbox
-            size={22}
-            disableText={true}
-            fillColor={multiFilterSelectColor()}
-            unfillColor={multiFilterSelectColor()}
-            iconComponent={<Icon name={'check'} size={20} color='gray' />} // toggle this
-            onPress={() => selectFilter(index, item.strIngredient1)}
-            style={{ borderWidth: 1, borderRadius: 50, marginLeft: 10, borderColor: colors.mainFontColour }}
-          />
+            <View style={{ marginBottom: 15 }}>
+              <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>{item.strIngredient1}</Text>
+            </View>
+            <BouncyCheckbox
+              size={22}
+              disableText={true}
+              fillColor={multiFilterSelectColor()}
+              unfillColor={multiFilterSelectColor()}
+              iconComponent={<Icon name={'check'} size={20} color='gray' />} // toggle this
+              onPress={() => selectFilter(index, item.strIngredient1)}
+              style={{ borderWidth: 1, borderRadius: 50, marginLeft: 10, borderColor: colors.mainFontColour }}
+            />
           </View>
         </TouchableOpacity>
       </View>
     );
-  
+
     return (
       <View>
         {showDropdown2 && (
-        <View style={styles.dropdownList}>
-          <FlatList
-            data={ingredientJson.slice(0, visibleItems)} // Show only visibleItems
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={renderItem}
-            onEndReached={() => {
-              // Loads more items when the end of the list is reached
-              setVisibleItems((prev) => prev + 20); // Increase the number of visible items here
-            }}
-            onEndReachedThreshold={0.5} // Trigger onEndReached when 50%? of the list is scrolled
-          />
-        </View>
+          <View style={styles.dropdownList}>
+            <FlatList
+              data={ingredientJson.slice(0, visibleItems)} // Show only visibleItems
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={renderItem}
+              onEndReached={() => {
+                // Loads more items when the end of the list is reached
+                setVisibleItems((prev) => prev + 20); // Increase the number of visible items here
+              }}
+              onEndReachedThreshold={0.5} // Trigger onEndReached when 50%? of the list is scrolled
+            />
+          </View>
         )}
       </View>
     );
@@ -469,102 +480,102 @@ export default function Cocktails({ navigation, route }) {
       </View>
 
       {filterView ? (
-            <View style={{ marginHorizontal: 20 }}>
-              <View style={styles.filterHeader}>
-                <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>cancel</Text>
-                <Text style={styles.filterHeading}>Filters</Text>
-                <TouchableOpacity>
-                  <Icon name={'restore'} size={25} color={colors.mainFontColour} />
-                </TouchableOpacity>
+        <View style={{ marginHorizontal: 20 }}>
+          <View style={styles.filterHeader}>
+            <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>cancel</Text>
+            <Text style={styles.filterHeading}>Filters</Text>
+            <TouchableOpacity>
+              <Icon name={'restore'} size={25} color={colors.mainFontColour} />
+            </TouchableOpacity>
+          </View>
+
+          <View marginTop={40}>
+            <Text style={styles.filterHeading}>Sort</Text>
+
+            <View style={styles.filterContainer}>
+              <View style={styles.filterSort}>
+                <Text style={{ fontFamily: fonts.text }}>Name A-Z</Text>
+
+                <BouncyCheckbox
+                  size={22}
+                  disableText={true}
+                  fillColor='transparent'
+                  unfillColor='transparent'
+                  iconComponent={<Icon name={'check'} size={20} color={sortColor(0)} />}
+                  onPress={() => ascending(0)}
+                  style={{ borderWidth: 1, borderRadius: 50, borderColor: colors.mainFontColour }}
+                />
+
               </View>
 
-              <View marginTop={40}>
-                <Text style={styles.filterHeading}>Sort</Text>
+              <View style={styles.filterSort}>
+                <Text style={{ fontFamily: fonts.text }}>Name Z-A</Text>
 
-                <View style={styles.filterContainer}>
-                  <View style={styles.filterSort}>
-                    <Text style={{ fontFamily: fonts.text }}>Name A-Z</Text>
+                <BouncyCheckbox
+                  size={22}
+                  disableText={true}
+                  fillColor='transparent'
+                  unfillColor='transparent'
+                  iconComponent={<Icon name={'check'} size={20} color={sortColor(1)} />}
+                  onPress={() => descending(1)}
+                  style={{ borderWidth: 1, borderRadius: 50, borderColor: colors.mainFontColour }}
+                />
 
-                    <BouncyCheckbox
-                      size={22}
-                      disableText={true}
-                      fillColor='transparent'
-                      unfillColor='transparent'
-                      iconComponent={<Icon name={'check'} size={20} color={sortColor(0)} />}
-                      onPress={() => ascending(0)}
-                      style={{ borderWidth: 1, borderRadius: 50, borderColor: colors.mainFontColour }}
-                    />
-
-                  </View>
-
-                  <View style={styles.filterSort}>
-                    <Text style={{ fontFamily: fonts.text }}>Name Z-A</Text>
-
-                    <BouncyCheckbox
-                      size={22}
-                      disableText={true}
-                      fillColor='transparent'
-                      unfillColor='transparent'
-                      iconComponent={<Icon name={'check'} size={20} color={sortColor(1)} />}
-                      onPress={() => descending(1)}
-                      style={{ borderWidth: 1, borderRadius: 50, borderColor: colors.mainFontColour }}
-                    />
-
-                  </View>
-                </View>
-              </View>
-
-              <View style={{ marginBottom: 10 }}>
-                <View style={[styles.dropdownContainer, { marginBottom: 10 }]}>
-                  <Text style={styles.filterHeading}>Categories</Text>
-
-                  <TouchableOpacity onPress={toggleCategoryDropdown} style={styles.dropdownHeader}>
-                    <Icon name={showDropdown1 ? 'minus' : 'plus'} size={40} color={colors.mainFontColour} />
-                  </TouchableOpacity>
-                </View>
-
-                <View>
-                  {categoryDropdownContent}
-                </View>
-              </View>
-
-              <View style={{ marginBottom: 10 }}>
-                <View style={[styles.dropdownContainer, { marginBottom: 10 }]}>
-                  <Text style={styles.filterHeading}>Base Ingredients</Text>
-
-                  <TouchableOpacity onPress={toggleIngredientDropdown} style={styles.dropdownHeader}>
-                    <Icon name={showDropdown2 ? 'minus' : 'plus'} size={40} color={colors.mainFontColour} />
-                  </TouchableOpacity>
-                </View>
-
-                <RenderIngredientDropdownContent
-                ingredientJson={ingredientJson}
-                showDropdown2={showDropdown2}
-                selectFilter={selectFilter}
-                multiFilterSelectColor={multiFilterSelectColor}
-                colors={colors}
-                fonts={fonts}
-              />
-              </View>
-              <View>
-                <Pressable
-                  onPress={() => searchFilter(0, 'a', 'Alcoholic')}>
-                  <Text style={{ color: alcSelectColor(0) }}>Alcoholic</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => searchFilter(1, 'a', 'Non Alcoholic')}>
-                  <Text style={{ color: alcSelectColor(1) }}>Non-Alcoholic</Text>
-                </Pressable>
               </View>
             </View>
-              ) : (
-                <FlatList
-                data={activeDrinks}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={renderDrinkItem}
-                ListEmptyComponent={<Text>{errorStatus}</Text>}
-              />
-          )}
+          </View>
+
+          <View style={{ marginBottom: 10 }}>
+            <View style={[styles.dropdownContainer, { marginBottom: 10 }]}>
+              <Text style={styles.filterHeading}>Categories</Text>
+
+              <TouchableOpacity onPress={toggleCategoryDropdown} style={styles.dropdownHeader}>
+                <Icon name={showDropdown1 ? 'minus' : 'plus'} size={40} color={colors.mainFontColour} />
+              </TouchableOpacity>
+            </View>
+
+            <View>
+              {categoryDropdownContent}
+            </View>
+          </View>
+
+          <View style={{ marginBottom: 10 }}>
+            <View style={[styles.dropdownContainer, { marginBottom: 10 }]}>
+              <Text style={styles.filterHeading}>Base Ingredients</Text>
+
+              <TouchableOpacity onPress={toggleIngredientDropdown} style={styles.dropdownHeader}>
+                <Icon name={showDropdown2 ? 'minus' : 'plus'} size={40} color={colors.mainFontColour} />
+              </TouchableOpacity>
+            </View>
+
+            <RenderIngredientDropdownContent
+              ingredientJson={ingredientJson}
+              showDropdown2={showDropdown2}
+              selectFilter={selectFilter}
+              multiFilterSelectColor={multiFilterSelectColor}
+              colors={colors}
+              fonts={fonts}
+            />
+          </View>
+          <View>
+            <Pressable
+              onPress={() => searchFilter(0, 'a', 'Alcoholic')}>
+              <Text style={{ color: alcSelectColor(0) }}>Alcoholic</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => searchFilter(1, 'a', 'Non Alcoholic')}>
+              <Text style={{ color: alcSelectColor(1) }}>Non-Alcoholic</Text>
+            </Pressable>
+          </View>
+        </View>
+      ) : (
+        <FlatList
+          data={activeDrinks}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderDrinkItem}
+          ListEmptyComponent={<Text>{errorStatus}</Text>}
+        />
+      )}
 
     </View >
   );

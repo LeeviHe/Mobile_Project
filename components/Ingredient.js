@@ -67,7 +67,7 @@ export default function Ingredient({ navigation, route }) {
               <Icon name="arrow-left" size={30} color={colors.mainFontColour} />
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleStar}>
-              <Icon name={selectStar ? 'star' : 'star-outline'} size={35} color="#e7c500" />
+              <Icon name={selectStar ? 'star' : 'star-outline'} size={40} color="#e7c500" />
             </TouchableOpacity>
           </View>
 

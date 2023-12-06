@@ -101,12 +101,13 @@ export default StyleSheet.create({
   cocktail: {
     flexDirection: "row",
     marginBottom: 10,
-    borderRadius: 10
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   drinkImg: {
     width: 75,
-    height: 85,
-    marginLeft: 20
+    height: 85
   },
   cocktailInfo: {
     justifyContent: "center",
@@ -255,7 +256,8 @@ export default StyleSheet.create({
   //my pockettinis
   btnContainer: {
     marginHorizontal: 5,
-    gap: 20
+    gap: 10,
+    marginTop: 50
   },
   addDrinkBtn: {
     flexDirection: "row",
@@ -267,5 +269,12 @@ export default StyleSheet.create({
   btnInfo: {
     paddingHorizontal: 40,
     gap: 5
-  }
+  },
+
+  //my favourites
+  favBtnContainer: {
+    marginHorizontal: 5,
+    gap: 10,
+    marginTop: 50
+  },
 });
