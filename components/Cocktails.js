@@ -55,7 +55,10 @@ export default function Cocktails({ navigation, route }) {
     let string = activeFilters.toString()
     if (activeFilters.length === 0) {
       console.log('empty')
-      defaultSetup()
+      if (route.params !== undefined && route.params.id == 'empty' && !activeCategory) {
+        console.log('problem')
+        defaultSetup()
+      }
     } else if (activeFilters.length !== 0) {
       searchFilter('', 'i', string, false)
     }
@@ -263,6 +266,7 @@ export default function Cocktails({ navigation, route }) {
       filterCopy.push(ingredient)
       setActiveFilters(filterCopy)
     }
+    navigation.setParams({ id: 'empty' })
   }
 
   const isAlcoholic = (category) => {
@@ -304,13 +308,13 @@ export default function Cocktails({ navigation, route }) {
         return isAlcoholic(item.strCategory)
           ? categoryColors['Alcoholic']
           : isNotAlcoholic(item.strCategory)
-            ? categoryColors['Non_Alcoholic']
+            ? categoryColors['Non Alcoholic']
             : categoryColors[item.strCategory] || 'pink';
       } else {
         return isAlcoholic(replaceCategory)
           ? categoryColors['Alcoholic']
           : isNotAlcoholic(replaceCategory)
-            ? categoryColors['Non_Alcoholic']
+            ? categoryColors['Non Alcoholic']
             : categoryColors[replaceCategory] || 'pink';
       }
     }
@@ -337,9 +341,10 @@ export default function Cocktails({ navigation, route }) {
         <Image source={{ uri: item.strDrinkThumb }} style={styles.drinkImg} />
         <View style={styles.cocktailInfo}>
           <Text style={styles.drinkText}>{item.strDrink}</Text>
-          {item.strCategory && (
+          {item.strCategory ? (
             <Text style={styles.drinkText}>{item.strCategory}</Text>
-          )}
+          ):
+          <Text style={styles.drinkText}>{replaceCategory}</Text>}
         </View>
       </TouchableOpacity>
     </View>
@@ -547,7 +552,7 @@ export default function Cocktails({ navigation, route }) {
                   <Text style={{ color: alcSelectColor(0) }}>Alcoholic</Text>
                 </Pressable>
                 <Pressable
-                  onPress={() => searchFilter(1, 'a', 'Non_Alcoholic')}>
+                  onPress={() => searchFilter(1, 'a', 'Non Alcoholic')}>
                   <Text style={{ color: alcSelectColor(1) }}>Non-Alcoholic</Text>
                 </Pressable>
               </View>
