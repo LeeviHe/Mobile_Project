@@ -250,5 +250,22 @@ export default StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.text,
     paddingHorizontal: 20
+  },
+
+  //my pockettinis
+  btnContainer: {
+    marginHorizontal: 5,
+    gap: 20
+  },
+  addDrinkBtn: {
+    flexDirection: "row",
+    borderRadius: 10,
+    backgroundColor: '#ffac5f50',
+    padding: 20,
+    alignItems: 'center'
+  },
+  btnInfo: {
+    paddingHorizontal: 40,
+    gap: 5
   }
 });
