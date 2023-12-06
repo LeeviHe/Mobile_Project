@@ -2,7 +2,7 @@ import { Text, View, Image, Pressable, TouchableOpacity } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
-import { Container, Row, Col } from "react-native-flex-grid";
+import { Row, Col } from "react-native-flex-grid";
 import { colors, padding, textStyles } from '../styles/style-constants';
 import styles from '../styles/styles';
 
@@ -60,8 +60,9 @@ export default function Ingredients({ navigation, route }) {
       <View style={styles.drinkContainer}>
         <TouchableOpacity key={id} style={[styles.cocktail, { backgroundColor: 'pink' }]}
           onPress={() => navigation.navigate('Ingredient', {
-            ingrID: data.idIngredient,
-            ingrName: data.strIngredient
+            ingrId: data.idIngredient,
+            ingrName: data.strIngredient,
+            ingrImg: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png'
           })}>
 
           <Image
