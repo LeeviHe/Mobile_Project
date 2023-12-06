@@ -53,14 +53,14 @@ export default function Cocktails({ navigation, route }) {
   //useEffects
   useEffect(() => {
     let string = activeFilters.toString()
+    let first = activeFilters.length > 0 ? activeFilters[0].toString() : '';
     if (activeFilters.length === 0) {
       console.log('empty')
-      if (route.params !== undefined && route.params.id == 'empty' && !activeCategory) {
-        console.log('problem')
+      if (route.params !== undefined && route.params.id == 'empty' && !activeCategory && searchQuery.trim().length === 0) {
         defaultSetup()
       }
     } else if (activeFilters.length !== 0) {
-      searchFilter('', 'i', string, false)
+      searchFilter('', 'i', string, false, first)
     }
   }, [activeFilters])
 
@@ -88,10 +88,10 @@ export default function Cocktails({ navigation, route }) {
       }
     } else if (searchQuery.trim().length === 0 && !ascendSort && !descendSort && activeFilters.length === 0 && activeCategory == false) {
       defaultSetup()
-    } else if (activeFilters.length > 0 && activeFilters !== true && activeFilters !== false && searchQuery.trim().length === 0) {
-      console.log(activeFilters)
+    } else if (activeFilters.length > 0 && searchQuery.trim().length === 0) {
+      let first = activeFilters.length > 0 ? activeFilters[0].toString() : '';
       let string = activeFilters.toString()
-      searchFilter('', 'i', string)
+      searchFilter('', 'i', string, false, first)
     } else if (searchQuery.length > 0) {
       handleSearch()
     }
@@ -139,6 +139,7 @@ export default function Cocktails({ navigation, route }) {
     try {
       const response = await fetch(URL + method);
       if (response.ok) {
+        console.log(method)
         const json = await response.json();
         if (json.drinks === undefined || json.drinks === null || json.drinks === '' || json.drinks === 0 || !json.drinks || json.drinks === "None Found") {
           setErrorStatus('No drinks found!')
@@ -147,7 +148,6 @@ export default function Cocktails({ navigation, route }) {
         } else {
           setErrorStatus('')
         }
-        console.log(method)
         const drinks = json.drinks;
         setRecipeData(drinks);
         setReplaceCategory(category)
@@ -160,7 +160,7 @@ export default function Cocktails({ navigation, route }) {
   }
 
   // Condition for what you want to filter with
-  function searchFilter(id, condition, search, discovery) {
+  function searchFilter(id, condition, search, discovery, firstFilter) {
     if (condition == 'c') {
       let filters = [...selectedCategory]
       filters.fill(false)
@@ -175,6 +175,7 @@ export default function Cocktails({ navigation, route }) {
       selectedIngredients.fill(false)
       setActiveFilters([])
       setActiveCategory(filters[id])
+      getDrink('filter.php?' + condition + '=' + search, search)
     } else if (condition == 'a') {
       let filters = [...selectedAlcohol]
       filters.fill(false)
@@ -189,8 +190,10 @@ export default function Cocktails({ navigation, route }) {
       selectedIngredients.fill(false)
       setActiveFilters([])
       setActiveCategory(filters[id])
+      getDrink('filter.php?' + condition + '=' + search, search)
+    } else if (condition == 'i') {
+      getDrink('filter.php?' + condition + '=' + search, firstFilter)
     }
-    getDrink('filter.php?' + condition + '=' + search, search)
   }
 
   function ascending(i) {
@@ -245,12 +248,8 @@ export default function Cocktails({ navigation, route }) {
 
   const selectFilter = (i, ingredient) => {
     //Empty other filters
-    let alcoholic = [...selectedAlcohol]
-    let category = [...selectedCategory]
-    alcoholic.fill(false)
-    category.fill(false)
-    setSelectedAlcohol(alcoholic)
-    setSelectedCategory(category)
+    selectedAlcohol.fill(false)
+    selectedCategory.fill(false)
     //Original
     let filters = [...selectedIngredients]
     filters[i] = selectedIngredients[i] ? false : true
@@ -322,34 +321,31 @@ export default function Cocktails({ navigation, route }) {
 
   
 
-  return (
-    <View style={styles.drinkContainer}>
-      <TouchableOpacity
-        key={index}
-        style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}
-        onPress={() =>
-          navigation.navigate('Recipe', {
-            drinkId: item.idDrink,
-            drinkName: item.strDrink,
-            image: item.strDrinkThumb,
-            category: item.strCategory,
-            glass: item.strGlass,
-            instructions: item.strInstructions,
-          })
-        }
-      >
-        <Image source={{ uri: item.strDrinkThumb }} style={styles.drinkImg} />
-        <View style={styles.cocktailInfo}>
-          <Text style={styles.drinkText}>{item.strDrink}</Text>
-          {item.strCategory ? (
-            <Text style={styles.drinkText}>{item.strCategory}</Text>
-          ):
-          <Text style={styles.drinkText}>{replaceCategory}</Text>}
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
-}
+    return (
+      <View style={styles.drinkContainer}>
+        <TouchableOpacity
+          key={index}
+          style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}
+          onPress={() =>
+            navigation.navigate('Recipe', {
+              drinkId: item.idDrink,
+              drinkName: item.strDrink,
+              image: item.strDrinkThumb,
+              category: item.strCategory,
+              glass: item.strGlass,
+              instructions: item.strInstructions})}>
+          <Image source={{ uri: item.strDrinkThumb }} style={styles.drinkImg} />
+          <View style={styles.cocktailInfo}>
+            <Text style={styles.drinkText}>{item.strDrink}</Text>
+            {item.strCategory ? (
+              <Text style={styles.drinkText}>{item.strCategory}</Text>
+            ):
+            <Text style={styles.drinkText}>{replaceCategory}</Text>}
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   const toggleCategoryDropdown = () => {
     setShowDropdown1(!showDropdown1);
@@ -362,6 +358,15 @@ export default function Cocktails({ navigation, route }) {
   const selectCategory = (id) => {
     searchFilter(id, 'c', categoryJson[id].strCategory, false);
   };
+
+  const resetFilters = () => {
+    selectedAlcohol.fill(false)
+    selectedCategory.fill(false)
+    selectedIngredients.fill(false)
+    selectedSort.fill(false)
+    setActiveFilters([])
+    setActiveCategory(false)
+  }
 
   const categoryDropdownContent = (
     <View>
@@ -473,7 +478,8 @@ export default function Cocktails({ navigation, route }) {
               <View style={styles.filterHeader}>
                 <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>cancel</Text>
                 <Text style={styles.filterHeading}>Filters</Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                onPress={resetFilters}>
                   <Icon name={'restore'} size={25} color={colors.mainFontColour} />
                 </TouchableOpacity>
               </View>
@@ -557,13 +563,20 @@ export default function Cocktails({ navigation, route }) {
                 </Pressable>
               </View>
             </View>
-              ) : (
+              ) : ( 
+                <View>
+                {errorStatus.trim().length === 0 ?
                 <FlatList
                 data={activeDrinks}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderDrinkItem}
-                ListEmptyComponent={<Text>{errorStatus}</Text>}
               />
+              : 
+              <View>
+                <Text>{errorStatus}</Text>
+              </View>    
+            }
+            </View> 
           )}
 
     </View >
