@@ -1,7 +1,7 @@
 import { Text, View, Image, Pressable, Button, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
 import { Searchbar, RadioButton } from 'react-native-paper';
 import React, { useState, useEffect, useMemo } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView } from 'react-native-virtualized-view'
 import { Container, Row, Col } from "react-native-flex-grid";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { colors, fonts, padding, textStyles } from '../styles/style-constants';
@@ -38,8 +38,14 @@ export default function Cocktails({ navigation, route }) {
   const [activeFilters, setActiveFilters] = useState([])
   // Checking if any categories/alc/non-alc are selected
   const [activeCategory, setActiveCategory] = useState(false)
-  // Variable to replace strCategory in filtering situation
+  // To replace strCategory in filtering situation
   const [replaceCategory, setReplaceCategory] = useState('')
+  // To set current filter condition for activating filter
+  const [filterCondition, setFilterCondition] = useState('')
+  // To set current filter search for activating filter
+  const [filterSearch, setFilterSearch] = useState('')
+  // TO set first of multi-filter ingredients
+  const [firstMultiFilter, setFirstMultiFilter] = useState('') 
 
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
@@ -61,7 +67,8 @@ export default function Cocktails({ navigation, route }) {
         defaultSetup()
       }
     } else if (activeFilters.length !== 0) {
-      searchFilter('', 'i', string, false, first)
+      searchFilter('', 'i', string, false)
+      setFirstMultiFilter(first)
     }
   }, [activeFilters])
 
@@ -87,7 +94,7 @@ export default function Cocktails({ navigation, route }) {
           searchFilter(route.params.id, route.params.condition, route.params.search, true)
         }
       }
-    } else if (searchQuery.trim().length === 0 && !ascendSort && !descendSort && activeFilters.length === 0 && activeCategory == false) {
+    } else if (searchQuery.trim().length === 0 && !ascendSort && !descendSort && activeFilters.length === 0 && !activeCategory) {
       defaultSetup()
     } else if (activeFilters.length > 0 && searchQuery.trim().length === 0) {
       let first = activeFilters.length > 0 ? activeFilters[0].toString() : '';
@@ -161,7 +168,7 @@ export default function Cocktails({ navigation, route }) {
   }
 
   // Condition for what you want to filter with
-  function searchFilter(id, condition, search, discovery, firstFilter) {
+  function searchFilter(id, condition, search, discovery) {
     if (condition == 'c') {
       let filters = [...selectedCategory]
       filters.fill(false)
@@ -174,9 +181,8 @@ export default function Cocktails({ navigation, route }) {
       setSelectedCategory(filters)
       selectedAlcohol.fill(false)
       selectedIngredients.fill(false)
-      setActiveFilters([])
       setActiveCategory(filters[id])
-      getDrink('filter.php?' + condition + '=' + search, search)
+      setActiveFilters([])
     } else if (condition == 'a') {
       let filters = [...selectedAlcohol]
       filters.fill(false)
@@ -189,11 +195,20 @@ export default function Cocktails({ navigation, route }) {
       setSelectedAlcohol(filters)
       selectedCategory.fill(false)
       selectedIngredients.fill(false)
-      setActiveFilters([])
       setActiveCategory(filters[id])
+      setActiveFilters([])
+    }
+    setFilterCondition(condition)
+    setFilterSearch(search)
+  }
+
+  function activate (condition, search, firstFilter) {
+    if (condition === 'c' || condition === 'a') {
       getDrink('filter.php?' + condition + '=' + search, search)
     } else if (condition == 'i') {
       getDrink('filter.php?' + condition + '=' + search, firstFilter)
+    } else {
+      console.log('error in activate')
     }
   }
 
@@ -380,6 +395,9 @@ export default function Cocktails({ navigation, route }) {
     selectedSort.fill(false)
     setActiveFilters([])
     setActiveCategory(false)
+    setFilterCondition('')
+    setFilterSearch('')
+    setFirstMultiFilter('')
   }
 
   const categoryDropdownContent = (
@@ -488,7 +506,7 @@ export default function Cocktails({ navigation, route }) {
       </View>
 
       {filterView ? (
-        <View style={{ marginHorizontal: 20 }}>
+        <ScrollView style={{ marginHorizontal: 20 }}>
           <View style={styles.filterHeader}>
             <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>cancel</Text>
             <Text style={styles.filterHeading}>Filters</Text>
@@ -529,7 +547,24 @@ export default function Cocktails({ navigation, route }) {
                   onPress={() => descending(1)}
                   style={{ borderWidth: 1, borderRadius: 50, borderColor: colors.mainFontColour }}
                 />
-
+                <View>
+                  <TouchableOpacity
+                    onPress={() => searchFilter(0, 'a', 'Alcoholic')}>
+                    <Text style={{ color: alcSelectColor(0) }}>Alcoholic</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => searchFilter(1, 'a', 'Non Alcoholic')}>
+                    <Text style={{ color: alcSelectColor(1) }}>Non-Alcoholic</Text>
+                  </TouchableOpacity>
+                </View>
+                <View>
+                  <TouchableOpacity>
+                  <RadioButton.Android
+                    style={{ alignSelf: 'flex-end' }}
+                    onPress={ () => activate(filterCondition, filterSearch, firstMultiFilter)}
+                  />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </View>
@@ -566,17 +601,8 @@ export default function Cocktails({ navigation, route }) {
               fonts={fonts}
             />
           </View>
-          <View>
-            <Pressable
-              onPress={() => searchFilter(0, 'a', 'Alcoholic')}>
-              <Text style={{ color: alcSelectColor(0) }}>Alcoholic</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => searchFilter(1, 'a', 'Non Alcoholic')}>
-              <Text style={{ color: alcSelectColor(1) }}>Non-Alcoholic</Text>
-            </Pressable>
-          </View>
-        </View>
+          
+        </ScrollView>
       ) : (
         <View>
           {errorStatus.trim().length === 0 ?
