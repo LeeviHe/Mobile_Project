@@ -6,12 +6,11 @@ import { Container, Row, Col } from "react-native-flex-grid";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { colors, fonts, padding, textStyles } from '../styles/style-constants';
 import styles from '../styles/styles';
-import { DEVS_FAVOURITES } from '../reusables/Constants';
+import { DEVS_FAVOURITES, URL } from '../reusables/Constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { getJsonDrinks } from '../reusables/Functions';
 
-const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const Stack = createNativeStackNavigator()
 export default function Cocktails({ navigation, route }) {
   const [searchQuery, setSearchQuery] = useState('');

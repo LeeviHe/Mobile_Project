@@ -6,8 +6,7 @@ import { Row, Col } from "react-native-flex-grid";
 import { colors, padding, textStyles } from '../styles/style-constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/styles';
-
-const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
+import { URL } from '../reusables/Constants';
 
 export default function Ingredients({ navigation, route }) {
   const [searchQuery, setSearchQuery] = useState('');

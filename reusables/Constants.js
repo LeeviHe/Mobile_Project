@@ -48,3 +48,7 @@ export const DEVS_FAVOURITES = [
         strDrinkThumb: "https://www.thecocktaildb.com/images/media/drink/iloasq1587661955.jpg"
     },
 ]
+
+export const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
+export const FAVOURITE_DRINKS_KEY = "@favourites"
+export const OWNED_INGR_KEY = "@owned"

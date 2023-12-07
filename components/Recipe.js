@@ -5,8 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import styles from '../styles/styles';
 import { colors, fonts, textStyles } from '../styles/style-constants';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-
-const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
+import { URL } from '../reusables/Constants';
 
 const Recipe = ({ navigation, route }) => {
     const [isHeartSelected, setHeartSelected] = useState(false);

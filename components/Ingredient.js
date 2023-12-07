@@ -6,11 +6,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors, fonts, textStyles } from '../styles/style-constants';
 import { useState, useEffect } from 'react';
 import { Col, Row } from 'react-native-flex-grid';
-import { getJsonIngredients } from '../reusables/Functions';
-import { getJsonDrinks } from '../reusables/Functions';
+import { getJsonIngredients, getJsonDrinks } from '../reusables/Functions';
 import { FlatList } from 'react-native';
-
-const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
+import { URL } from '../reusables/Constants';
 
 export default function Ingredient({ navigation, route }) {
   const [selectStar, setSelectStar] = useState(false)

@@ -9,8 +9,8 @@ import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { colors } from '../styles/style-constants'
+import { URL } from '../reusables/Constants';
 
-const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const MAPS_KEY = "AIzaSyAxr6uGD0CCuomLoT8JM3VtZM9uBFV6CvU"
 
 function Home({ navigation, route }) {
