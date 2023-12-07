@@ -101,33 +101,23 @@ export default function Ingredients({ navigation, route }) {
 
   return (
     <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
-      <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>Ingredients </Text>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>Ingredients </Text>
+        <TouchableOpacity onPress={() =>
+          navigation.navigate('MyIngredients')}>
+          <Text style={[textStyles.pageTitle, textStyles.spacingHelp, { color: '#cccccc' }]}>My Ingredients </Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={{ marginBottom: 50 }}>
-        <Row style={styles.searchFilterRow}>
-          <Col style={[styles.searchFilterCol, padding.none]}>
-            <Searchbar
-              placeholder="Search"
-              onChangeText={(value) => { onChangeSearch(value) }}
-              value={searchQuery}
-              style={styles.search}
-              inputStyle={{ marginTop: -10 }}
-              iconColor={colors.mainFontColour}
-              placeholderTextColor={colors.mainFontColour} />
-          </Col>
-
-          <Col style={padding.none}>
-            <Pressable
-              key={'filterbtn'}
-              style={({ pressed }) => [
-                styles.filterBtn,
-                { opacity: pressed ? 0.5 : 1.0 }
-              ]}
-              onPress={() => viewFilter()}>
-              <Text style={textStyles.button}>Filters</Text>
-            </Pressable>
-          </Col>
-        </Row>
+        <Searchbar
+          placeholder="Search"
+          onChangeText={(value) => { onChangeSearch(value) }}
+          value={searchQuery}
+          style={styles.ingrSearch}
+          inputStyle={{ marginTop: -10 }}
+          iconColor={colors.mainFontColour}
+          placeholderTextColor={colors.mainFontColour} />
       </View>
 
       <ScrollView>

@@ -84,6 +84,14 @@ export default StyleSheet.create({
     height: 35,
     backgroundColor: 'white'
   },
+  ingrSearch: {
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.mainFontColour,
+    marginHorizontal: 20,
+    height: 35,
+    backgroundColor: 'white'
+  },
   filterBtn: {
     borderWidth: 1,
     borderColor: colors.mainFontColour,
@@ -186,7 +194,6 @@ export default StyleSheet.create({
     height: 20
   },
   measure: {
-    //fontWeight: 800,
     fontFamily: fonts.boldText,
     width: 80
   },
@@ -220,10 +227,55 @@ export default StyleSheet.create({
   },
   noteBtn: {
     backgroundColor: 'gray',
-    alignItems: "center",
     borderRadius: 10,
     marginTop: 10,
     padding: 6
+  },
+
+  // MY INGREDIENTS
+  topIngrColActive: {
+    flexDirection: 'row',
+    gap: 20,
+    justifyContent: 'center',
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'black'
+  },
+  topIngrActiveNbr: {
+    borderRadius: 50,
+    backgroundColor: '#333',
+    paddingHorizontal: 10,
+    justifyContent: 'center'
+  },
+  topIngrNbr: {
+    borderRadius: 50,
+    backgroundColor: '#ddd',
+    paddingHorizontal: 10,
+    justifyContent: 'center'
+  },
+  topIngrCol: {
+    flexDirection: 'row',
+    gap: 20,
+    justifyContent: 'center',
+    paddingBottom: 10,
+  },
+  myRow: {
+    gap: 10,
+    marginVertical: 10
+  },
+  myCol: {
+    alignItems: "center",
+    borderRadius: 10,
+    paddingVertical: 5,
+    backgroundColor: '#ccc'
+  },
+  myBtn: {
+    borderRadius: 50,
+    backgroundColor: colors.white,
+    alignSelf: "flex-end",
+    borderWidth: 1,
+    borderColor: colors.mainFontColour,
+    padding: 2
   },
 
   // MORE
