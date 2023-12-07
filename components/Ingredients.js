@@ -63,9 +63,8 @@ export default function Ingredients({ navigation, route }) {
 
   const ingredient = ingredientData.map((data, id) => {
     return (
-      <View style={styles.drinkContainer}>
+      <View key={id} style={styles.drinkContainer}>
         <TouchableOpacity
-          key={id}
           style={[styles.cocktail, { backgroundColor: '#999' }]}
           onPress={() =>
             navigation.navigate('Ingredient', {

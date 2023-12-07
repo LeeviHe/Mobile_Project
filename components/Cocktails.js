@@ -9,6 +9,7 @@ import styles from '../styles/styles';
 import { DEVS_FAVOURITES } from '../reusables/Constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { getJsonDrinks } from '../reusables/Functions';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 const Stack = createNativeStackNavigator()
@@ -74,10 +75,10 @@ export default function Cocktails({ navigation, route }) {
 
   useEffect(() => {
     if (categoryJson.length === 0) {
-      getJson("list.php?c=list", setCategoryJson)
+      getJsonDrinks(URL, "list.php?c=list", setCategoryJson)
     }
     if (ingredientJson.length === 0) {
-      getJson("list.php?i=list", setIngredientJson)
+      getJsonDrinks(URL, "list.php?i=list", setIngredientJson)
     }
   }, [categoryJson, ingredientJson])
 

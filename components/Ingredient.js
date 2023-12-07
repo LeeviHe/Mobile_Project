@@ -1,41 +1,31 @@
-import { Text, View, TouchableOpacity, ScrollView, ImageBackground, Image, Pressable } from 'react-native';
+import { Text, View, TouchableOpacity, ImageBackground, Image, Pressable } from 'react-native';
+import { ScrollView } from 'react-native-virtualized-view'
 import styles from '../styles/styles';
 import { StatusBar } from 'expo-status-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors, fonts, textStyles } from '../styles/style-constants';
 import { useState, useEffect } from 'react';
 import { Col, Row } from 'react-native-flex-grid';
+import { getJsonIngredients } from '../reusables/Functions';
+import { getJsonDrinks } from '../reusables/Functions';
+import { FlatList } from 'react-native';
 
 const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 
 export default function Ingredient({ navigation, route }) {
   const [selectStar, setSelectStar] = useState(false)
   const [ingredientData, setIngredientData] = useState([]);
+  const [ingredientDrinks, setIngredientDrinks] = useState([])
+  const [showDropdown, setShowDropdown] = useState(false)
 
   const toggleStar = () => {
     setSelectStar(!selectStar);
   };
 
   useEffect(() => {
-    getJson()
+    getJsonIngredients(URL, 'lookup.php?iid=' + route.params.ingrId, setIngredientData)
+    getJsonDrinks(URL, 'filter.php?i=' + route.params.ingrName, setIngredientDrinks)
   }, [route])
-
-  async function getJson() {
-    if (route.params.ingrId) {
-      try {
-        const response = await fetch(URL + 'lookup.php?iid=' + route.params.ingrId)
-        if (response.ok) {
-          const json = await response.json()
-          const data = json.ingredients
-          setIngredientData(data)
-        } else {
-          alert('Error retrieving ingredients!');
-        }
-      } catch (err) {
-        alert(err);
-      }
-    }
-  }
 
   const test = ingredientData.map((data, id) => (
 
@@ -49,6 +39,55 @@ export default function Ingredient({ navigation, route }) {
       </View>
     </View>
   ));
+
+  const toggleMoreDrinks = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const RenderPossibleDrinks = ({ingredientDrinks, showDropdown, colors, fonts}) => {
+    const [visibleItems, setVisibleItems] = useState(9); // Number of initially visible items
+
+    const renderItem = ({ item, index }) => (
+
+      <Col>
+
+        <TouchableOpacity>
+          <Image style={{ width: 100, height: 100 }} source={{ uri: item.strDrinkThumb }} />
+          <Text>{item.strDrink}</Text>
+        </TouchableOpacity>
+
+      </Col>
+      
+    );
+
+    return (
+      <View>
+        <Row style={{ marginHorizontal: 10, flexDirection: 'row'}}>
+          
+            <FlatList
+            data={ingredientDrinks.slice(0, 3)} // Show only first three
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={renderItem}
+            />
+          
+        </Row>
+        {showDropdown && (
+          <View style={styles.dropdownList}>
+            <FlatList
+              data={ingredientDrinks.slice(3, visibleItems)} // Show only from fourth to visibleItems set above
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={renderItem}
+              onEndReached={() => {
+                // Loads more items when the end of the list is reached
+                setVisibleItems((prev) => prev + 6); // Increase the number of visible items here
+              }}
+              onEndReachedThreshold={0.3} // Trigger onEndReached when 30%? of the list is scrolled
+            />
+          </View>
+        )}
+      </View>
+    );
+  };
 
   return (
     <ScrollView>
@@ -75,36 +114,16 @@ export default function Ingredient({ navigation, route }) {
             {test}
           </View>
         </ImageBackground>
-
-        <View marginTop={20}>
-          <Text style={[textStyles.H1Upper, { alignSelf: 'center' }]}>Drinks made with tequila</Text>
-
-          <View>
-            <Row style={{ marginHorizontal: 10 }}>
-              <Col>
-                <Image style={{ width: 100, height: 100 }} source={require('../assets/images/CoffeeTea-category.png')} />
-                <Text>Bloody Mary</Text>
-              </Col>
-
-              <Col>
-                <Image style={{ width: 100, height: 100 }} source={require('../assets/images/CoffeeTea-category.png')} />
-                <Text>Bloody Mary</Text>
-              </Col>
-
-              <Col>
-                <Image style={{ width: 100, height: 100 }} source={require('../assets/images/CoffeeTea-category.png')} />
-                <Text>Bloody Mary</Text>
-              </Col>
-            </Row>
-          </View>
-
-          <View>
-            <Pressable style={styles.noteBtn}>
-              <Text>See All (vaihda tyyli)</Text>
-            </Pressable>
-          </View>
-
+        <View>
+          <Pressable onPress={toggleMoreDrinks} style={styles.noteBtn}>
+            <Text>See All (vaihda tyyli)</Text>
+          </Pressable>
         </View>
+        <RenderPossibleDrinks
+        ingredientDrinks={ingredientDrinks}  
+        showDropdown={showDropdown}  
+        colors={colors}  
+        fonts={fonts} />
       </View>
     </ScrollView>
   );
