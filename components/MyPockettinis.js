@@ -6,6 +6,13 @@ import { colors, fonts, padding, textStyles } from '../styles/style-constants';
 
 
 export default function MyPockettinis() {
+
+  const [isHeartSelected, setHeartSelected] = useState(false);
+
+  const toggleHeart = () => {
+    setHeartSelected(!isHeartSelected);
+  };
+
   return (
     <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>My Pockettinis</Text>
@@ -26,11 +33,18 @@ export default function MyPockettinis() {
 
         <TouchableOpacity
           style={[styles.cocktail, { backgroundColor: colors.purple }]}>
+          <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
+            <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+            <View style={styles.cocktailInfo}>
+              <Text style={styles.drinkText}>Name</Text>
+              <Text style={styles.drinkText}>Category</Text>
+            </View>
+          </View>
 
-          <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-          <View style={styles.cocktailInfo}>
-            <Text style={styles.drinkText}>Name</Text>
-            <Text style={styles.drinkText}>Category</Text>
+          <View style={{ marginRight: 40 }}>
+            <TouchableOpacity onPress={toggleHeart}>
+              <Icon name={isHeartSelected ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
       </View>
