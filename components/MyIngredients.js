@@ -72,94 +72,96 @@ export default function MyPockettinis() {
         </Row>
       </View>
 
-      <View style={{ marginBottom: 50 }}>
-        <Searchbar
-          placeholder="Search"
-          style={styles.ingrSearch}
-          inputStyle={{ marginTop: -10 }}
-          iconColor={colors.mainFontColour}
-          placeholderTextColor={colors.mainFontColour}
-        />
-      </View>
-
       {ingredientView && (
-        <View style={{ marginHorizontal: 20 }}>
-          <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Name of type</Text>
+        <View>
+          <View style={{ marginBottom: 50 }}>
+            <Searchbar
+              placeholder="Search"
+              style={styles.ingrSearch}
+              inputStyle={{ marginTop: -10 }}
+              iconColor={colors.mainFontColour}
+              placeholderTextColor={colors.mainFontColour}
+            />
+          </View>
 
-          <Row style={styles.myRow}>
-            <Col style={styles.myCol}>
-              <Pressable style={styles.myBtn} onPress={toggleCheck}>
-                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-              </Pressable>
+          <View style={{ marginHorizontal: 20 }}>
+            <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Name of type</Text>
 
-              <View style={{ alignItems: 'center', gap: 10 }}>
-                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-                <Text>Name</Text>
-              </View>
-            </Col>
+            <Row style={styles.myRow}>
+              <Col style={styles.myCol}>
+                <Pressable style={styles.myBtn} onPress={toggleCheck}>
+                  <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+                </Pressable>
 
-            <Col style={styles.myCol}>
-              <Pressable style={styles.myBtn} onPress={toggleCheck}>
-                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-              </Pressable>
+                <View style={{ alignItems: 'center', gap: 10 }}>
+                  <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                  <Text>Name</Text>
+                </View>
+              </Col>
 
-              <View style={{ alignItems: 'center', gap: 10 }}>
-                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-                <Text>Name</Text>
-              </View>
-            </Col>
+              <Col style={styles.myCol}>
+                <Pressable style={styles.myBtn} onPress={toggleCheck}>
+                  <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+                </Pressable>
 
-            <Col style={styles.myCol}>
-              <Pressable style={styles.myBtn}>
-                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-              </Pressable>
+                <View style={{ alignItems: 'center', gap: 10 }}>
+                  <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                  <Text>Name</Text>
+                </View>
+              </Col>
 
-              <View style={{ alignItems: 'center', gap: 10 }}>
-                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-                <Text>Name</Text>
-              </View>
-            </Col>
-          </Row>
+              <Col style={styles.myCol}>
+                <Pressable style={styles.myBtn}>
+                  <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+                </Pressable>
 
-          <Row style={styles.myRow}>
-            <Col style={styles.myCol}>
-              <Pressable style={styles.myBtn} onPress={toggleCheck}>
-                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-              </Pressable>
+                <View style={{ alignItems: 'center', gap: 10 }}>
+                  <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                  <Text>Name</Text>
+                </View>
+              </Col>
+            </Row>
 
-              <View style={{ alignItems: 'center', gap: 10 }}>
-                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-                <Text>Name</Text>
-              </View>
-            </Col>
+            <Row style={styles.myRow}>
+              <Col style={styles.myCol}>
+                <Pressable style={styles.myBtn} onPress={toggleCheck}>
+                  <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+                </Pressable>
 
-            <Col style={styles.myCol}>
-              <Pressable style={styles.myBtn} onPress={toggleCheck}>
-                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-              </Pressable>
+                <View style={{ alignItems: 'center', gap: 10 }}>
+                  <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                  <Text>Name</Text>
+                </View>
+              </Col>
 
-              <View style={{ alignItems: 'center', gap: 10 }}>
-                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-                <Text>Name</Text>
-              </View>
-            </Col>
+              <Col style={styles.myCol}>
+                <Pressable style={styles.myBtn} onPress={toggleCheck}>
+                  <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+                </Pressable>
 
-            <Col style={styles.myCol}>
-              <Pressable style={styles.myBtn}>
-                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-              </Pressable>
+                <View style={{ alignItems: 'center', gap: 10 }}>
+                  <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                  <Text>Name</Text>
+                </View>
+              </Col>
 
-              <View style={{ alignItems: 'center', gap: 10 }}>
-                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-                <Text>Name</Text>
-              </View>
-            </Col>
-          </Row>
+              <Col style={styles.myCol}>
+                <Pressable style={styles.myBtn}>
+                  <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+                </Pressable>
+
+                <View style={{ alignItems: 'center', gap: 10 }}>
+                  <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                  <Text>Name</Text>
+                </View>
+              </Col>
+            </Row>
+          </View>
         </View>
       )}
 
       {cocktailView && (
-        <View style={{ marginHorizontal: 10 }}>
+        <View style={{ marginHorizontal: 10, marginTop: 20 }}>
           <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Possible cocktails</Text>
 
           <View style={styles.drinkContainer}>
