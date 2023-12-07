@@ -126,6 +126,13 @@ export default StyleSheet.create({
     color: colors.textColour,
     fontFamily: fonts.text
   },
+  seeAllBtn: {
+    alignSelf: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    backgroundColor: 'skyblue',
+    borderRadius: 10
+  },
 
   // FILTER
   filterHeader: {
