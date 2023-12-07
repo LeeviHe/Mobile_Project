@@ -12,6 +12,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MyPockettinis from './components/MyPockettinis';
 import Favourites from './components/Favourites';
 import Ingredient from './components/Ingredient';
+import MyIngredients from './components/MyIngredients'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator();
@@ -30,6 +31,7 @@ const IngredientsNavigator = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Ingredients" component={Ingredients} />
       <Stack.Screen name="Ingredient" component={Ingredient} />
+      <Stack.Screen name="MyIngredients" component={MyIngredients} />
     </Stack.Navigator>
   );
 };
