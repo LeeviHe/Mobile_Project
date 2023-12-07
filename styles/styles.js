@@ -241,23 +241,16 @@ export default StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'black'
   },
-  topIngrActiveNbr: {
-    borderRadius: 50,
-    backgroundColor: '#333',
-    paddingHorizontal: 10,
-    justifyContent: 'center'
-  },
-  topIngrNbr: {
-    borderRadius: 50,
-    backgroundColor: '#ddd',
-    paddingHorizontal: 10,
-    justifyContent: 'center'
-  },
   topIngrCol: {
     flexDirection: 'row',
     gap: 20,
     justifyContent: 'center',
     paddingBottom: 10,
+  },
+  topIngrNbr: {
+    borderRadius: 50,
+    paddingHorizontal: 10,
+    justifyContent: 'center'
   },
   myRow: {
     gap: 10,

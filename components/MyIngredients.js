@@ -6,10 +6,20 @@ import { colors, fonts, padding, textStyles } from '../styles/style-constants';
 import { Row, Col } from "react-native-flex-grid";
 import { Searchbar } from 'react-native-paper';
 
-
 export default function MyPockettinis() {
+  const [check, setCheck] = useState(false);
+  const [cocktailView, setCocktailView] = useState(false);
+  const [ingredientView, setIngredientView] = useState(true);
 
-  const [check, setCheck] = useState(false)
+  const viewCocktails = () => {
+    setCocktailView(true);
+    setIngredientView(false);
+  };
+
+  const viewIngredients = () => {
+    setCocktailView(false);
+    setIngredientView(true);
+  };
 
   const toggleCheck = () => {
     setCheck(!check);
@@ -21,20 +31,43 @@ export default function MyPockettinis() {
 
       <View style={{ marginBottom: 20 }}>
         <Row>
-          <Col style={styles.topIngrColActive}>
-            <Text fontFamily={fonts.header} style={{ fontSize: 18 }}>Ingredients</Text>
+          <Col style={ingredientView ? styles.topIngrColActive : styles.topIngrCol}>
+            <TouchableOpacity
+              onPress={viewIngredients}
+              style={{ flexDirection: 'row', gap: 10 }}>
 
-            <View style={styles.topIngrActiveNbr}>
-              <Text style={{ color: colors.white }}>0</Text>
-            </View>
+              <Text fontFamily={fonts.header}
+                style={{
+                  fontSize: 16,
+                  color: ingredientView ? colors.mainFontColour : '#ccc',
+                  fontFamily: fonts.header
+                }}>Ingredients
+              </Text>
+
+              <View style={styles.topIngrNbr}
+                backgroundColor={ingredientView ? '#333' : '#ddd'}>
+                <Text style={{ color: colors.white }}>0</Text>
+              </View>
+
+            </TouchableOpacity>
           </Col>
 
-          <Col style={styles.topIngrCol}>
-            <Text fontFamily={fonts.header} style={{ fontSize: 18, color: '#ccc' }}>Cocktails</Text>
+          <Col style={cocktailView ? styles.topIngrColActive : styles.topIngrCol}>
+            <TouchableOpacity
+              onPress={viewCocktails}
+              style={{ flexDirection: 'row', gap: 10 }}>
 
-            <View style={styles.topIngrNbr}>
-              <Text style={{ color: colors.white }}>0</Text>
-            </View>
+              <Text fontFamily={fonts.header} style={{
+                fontSize: 16,
+                color: cocktailView ? colors.mainFontColour : '#ccc',
+                fontFamily: fonts.header
+              }}>Cocktails</Text>
+
+              <View style={styles.topIngrNbr}
+                backgroundColor={cocktailView ? '#333' : '#ddd'}>
+                <Text style={{ color: colors.white }}>0</Text>
+              </View>
+            </TouchableOpacity>
           </Col>
         </Row>
       </View>
@@ -42,88 +75,109 @@ export default function MyPockettinis() {
       <View style={{ marginBottom: 50 }}>
         <Searchbar
           placeholder="Search"
-          //onChangeText={(value) => { onChangeSearch(value) }}
-          //value={searchQuery}
           style={styles.ingrSearch}
           inputStyle={{ marginTop: -10 }}
           iconColor={colors.mainFontColour}
-          placeholderTextColor={colors.mainFontColour} />
+          placeholderTextColor={colors.mainFontColour}
+        />
       </View>
 
+      {ingredientView && (
+        <View style={{ marginHorizontal: 20 }}>
+          <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Name of type</Text>
 
-      <View style={{ marginHorizontal: 20 }}>
-        <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Name of type</Text>
+          <Row style={styles.myRow}>
+            <Col style={styles.myCol}>
+              <Pressable style={styles.myBtn} onPress={toggleCheck}>
+                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+              </Pressable>
 
-        <Row style={styles.myRow}>
-          <Col style={styles.myCol}>
-            <Pressable style={styles.myBtn} onPress={toggleCheck}>
-              <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-            </Pressable>
+              <View style={{ alignItems: 'center', gap: 10 }}>
+                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                <Text>Name</Text>
+              </View>
+            </Col>
 
-            <View style={{ alignItems: 'center', gap: 10 }}>
-              <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-              <Text>Name</Text>
-            </View>
-          </Col>
+            <Col style={styles.myCol}>
+              <Pressable style={styles.myBtn} onPress={toggleCheck}>
+                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+              </Pressable>
 
-          <Col style={styles.myCol}>
-            <Pressable style={styles.myBtn} onPress={toggleCheck}>
-              <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-            </Pressable>
+              <View style={{ alignItems: 'center', gap: 10 }}>
+                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                <Text>Name</Text>
+              </View>
+            </Col>
 
-            <View style={{ alignItems: 'center', gap: 10 }}>
-              <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-              <Text>Name</Text>
-            </View>
-          </Col>
+            <Col style={styles.myCol}>
+              <Pressable style={styles.myBtn}>
+                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+              </Pressable>
 
-          <Col style={styles.myCol}>
-            <Pressable style={styles.myBtn}>
-              <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-            </Pressable>
+              <View style={{ alignItems: 'center', gap: 10 }}>
+                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                <Text>Name</Text>
+              </View>
+            </Col>
+          </Row>
 
-            <View style={{ alignItems: 'center', gap: 10 }}>
-              <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-              <Text>Name</Text>
-            </View>
-          </Col>
-        </Row>
+          <Row style={styles.myRow}>
+            <Col style={styles.myCol}>
+              <Pressable style={styles.myBtn} onPress={toggleCheck}>
+                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+              </Pressable>
 
-        <Row style={styles.myRow}>
-          <Col style={styles.myCol}>
-            <Pressable style={styles.myBtn} onPress={toggleCheck}>
-              <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-            </Pressable>
+              <View style={{ alignItems: 'center', gap: 10 }}>
+                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                <Text>Name</Text>
+              </View>
+            </Col>
 
-            <View style={{ alignItems: 'center', gap: 10 }}>
-              <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-              <Text>Name</Text>
-            </View>
-          </Col>
+            <Col style={styles.myCol}>
+              <Pressable style={styles.myBtn} onPress={toggleCheck}>
+                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+              </Pressable>
 
-          <Col style={styles.myCol}>
-            <Pressable style={styles.myBtn} onPress={toggleCheck}>
-              <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-            </Pressable>
+              <View style={{ alignItems: 'center', gap: 10 }}>
+                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                <Text>Name</Text>
+              </View>
+            </Col>
 
-            <View style={{ alignItems: 'center', gap: 10 }}>
-              <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-              <Text>Name</Text>
-            </View>
-          </Col>
+            <Col style={styles.myCol}>
+              <Pressable style={styles.myBtn}>
+                <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+              </Pressable>
 
-          <Col style={styles.myCol}>
-            <Pressable style={styles.myBtn}>
-              <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-            </Pressable>
+              <View style={{ alignItems: 'center', gap: 10 }}>
+                <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                <Text>Name</Text>
+              </View>
+            </Col>
+          </Row>
+        </View>
+      )}
 
-            <View style={{ alignItems: 'center', gap: 10 }}>
-              <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-              <Text>Name</Text>
-            </View>
-          </Col>
-        </Row>
-      </View>
+      {cocktailView && (
+        <View style={{ marginHorizontal: 10 }}>
+          <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Possible cocktails</Text>
+
+          <View style={styles.drinkContainer}>
+            <TouchableOpacity
+              style={[styles.cocktail, { backgroundColor: 'lightblue' }]}>
+
+              <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
+                <Image source={require('../assets/images/CoffeeTea-category.png')} style={styles.drinkImg} />
+
+                <View style={styles.cocktailInfo}>
+                  <Text style={styles.drinkText}>drink name</Text>
+                  <Text style={styles.drinkText}>category</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
-  );
+  )
 }
