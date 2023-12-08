@@ -6,10 +6,11 @@ import { Container, Row, Col } from "react-native-flex-grid";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { colors, fonts, padding, textStyles } from '../styles/style-constants';
 import styles from '../styles/styles';
-import { DEVS_FAVOURITES, URL } from '../reusables/Constants';
+import { DEVS_FAVOURITES, FAVOURITE_DRINKS_KEY, URL } from '../reusables/Constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { getJsonDrinks } from '../reusables/Functions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator()
 export default function Cocktails({ navigation, route }) {
@@ -44,8 +45,10 @@ export default function Cocktails({ navigation, route }) {
   const [filterCondition, setFilterCondition] = useState('')
   // To set current filter search for activating filter
   const [filterSearch, setFilterSearch] = useState('')
-  // TO set first of multi-filter ingredients
+  // To set first of multi-filter ingredients
   const [firstMultiFilter, setFirstMultiFilter] = useState('') 
+  // Iteration of favourited drinks
+  const [favourites, setFavourites] = useState([])
 
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
@@ -58,6 +61,15 @@ export default function Cocktails({ navigation, route }) {
 
   //
   //useEffects
+
+  //Might not need 
+  useEffect (() => {
+      const unsubsribe = navigation.addListener('focus', () => {
+          getFavouriteData()
+      })
+      return unsubsribe
+  }, [navigation])
+
   useEffect(() => {
     let string = activeFilters.toString()
     let first = activeFilters.length > 0 ? activeFilters[0].toString() : '';
@@ -92,6 +104,7 @@ export default function Cocktails({ navigation, route }) {
           setRecipeData(DEVS_FAVOURITES)
         } else {
           searchFilter(route.params.id, route.params.condition, route.params.search, true)
+          activate(route.params.condition, route.params.search)
         }
       }
     } else if (searchQuery.trim().length === 0 && !ascendSort && !descendSort && activeFilters.length === 0 && !activeCategory) {
@@ -120,6 +133,7 @@ export default function Cocktails({ navigation, route }) {
 
   //
   //functions
+  //Maybe delete
   async function getJson(condition, setJsonData) {
     try {
       const response = await fetch(URL + condition);
@@ -248,9 +262,20 @@ export default function Cocktails({ navigation, route }) {
 
   //
   //consts
-  const toggleHeart = () => {
-    setHeartSelected(!isHeartSelected);
-  };
+
+  //Might not need
+  const getFavouriteData = async () => {
+      try {
+          const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
+          if (jsonValue !== null) {
+              let tmpScores = JSON.parse(jsonValue)
+              setFavourites(tmpScores)
+          }
+      }
+      catch (e) {
+          console.log('Read error: ' + e)
+      }
+  }
 
   const onChangeSearch = query => setSearchQuery(query);
 
@@ -311,6 +336,38 @@ export default function Cocktails({ navigation, route }) {
   }
 
   const renderDrinkItem = ({ item, index }) => {
+    const isFavourited = favourites.some((fav) => fav.drinkId === item.idDrink)
+
+    const toggleHeart = async() => {
+      try {
+        if (isFavourited) {
+          const newFavourites = favourites.filter((fav) => fav.drinkId !== item.idDrink)
+          await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
+          setFavourites(newFavourites)
+          console.log('Drink removed from favourites')
+        } else {
+          
+          const newKey = favourites.length + 1
+          const drinkInfo = {
+            key: newKey,
+            drinkId: item.idDrink,
+          }
+          const newFavourites = [...favourites, drinkInfo]
+          await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
+          setFavourites(newFavourites)
+          console.log('Favourite saved')
+        }
+      } catch(error) {
+        console.log('Error saving favourite: ' + error)
+        setFavourites((prevFavourites) => 
+        prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
+        )
+      }
+      console.log(favourites.length)
+    };
+
+    
+
     const categoryBackgroundColor = () => {
       // Duplicates for search query issues
       const categoryColors = {
@@ -368,7 +425,7 @@ export default function Cocktails({ navigation, route }) {
 
           <View style={{ marginRight: 40 }}>
             <TouchableOpacity onPress={toggleHeart}>
-              <Icon name={isHeartSelected ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
+              <Icon name={isFavourited ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
