@@ -249,7 +249,7 @@ export default StyleSheet.create({
     width: 280
   },
   noteBtn: {
-    backgroundColor: 'gray',
+    backgroundColor: colors.grayBtn,
     borderRadius: 10,
     marginTop: 10,
     padding: 6
@@ -338,6 +338,13 @@ export default StyleSheet.create({
     paddingHorizontal: 40,
     gap: 5
   },
+  // make a pockettini
+  saveBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    backgroundColor: colors.mainFontColour,
+    borderRadius: 10
+  },
 
   //my favourites
   favBtnContainer: {
@@ -345,4 +352,45 @@ export default StyleSheet.create({
     gap: 10,
     marginTop: 50
   },
+  imgContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#dfdfdf',
+    width: 200,
+    height: 200
+  },
+  editAmount: {
+    flexDirection: 'row',
+    alignItems: "center",
+    backgroundColor: '#dfdfdf',
+    flexBasis: 'auto',
+    justifyContent: "center"
+  },
+  measureView: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  editMeasure: {
+    fontFamily: fonts.boldText,
+    color: colors.mainFontColour
+  },
+  inputView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 5,
+    backgroundColor: 'white',
+    flexBasis: '40%'
+  },
+  shadow: {
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+  },
+  addBtn: {
+    color: colors.white,
+    fontFamily: fonts.text,
+    alignSelf: 'center'
+  }
 });

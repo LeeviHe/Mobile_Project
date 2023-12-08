@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { colors, fonts, padding, textStyles } from '../styles/style-constants';
 
 
-export default function MyPockettinis() {
+export default function MyPockettinis({ navigation, route }) {
 
   const [isHeartSelected, setHeartSelected] = useState(false);
 
@@ -19,7 +19,9 @@ export default function MyPockettinis() {
 
       <View style={styles.btnContainer}>
 
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('MakeAPockettini')}>
           <View style={styles.addDrinkBtn}>
             <Image source={require('../assets/images/plus.png')}
               style={{ height: 50, width: 50 }} />

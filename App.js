@@ -13,6 +13,7 @@ import MyPockettinis from './components/MyPockettinis';
 import Favourites from './components/Favourites';
 import Ingredient from './components/Ingredient';
 import MyIngredients from './components/MyIngredients'
+import MakeAPockettini from './components/MakeAPockettini';
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator();
@@ -42,6 +43,7 @@ const MoreNavigator = () => {
       <Stack.Screen name="More" component={More} />
       <Stack.Screen name="Favourites" component={Favourites} />
       <Stack.Screen name="MyPockettinis" component={MyPockettinis} />
+      <Stack.Screen name="MakeAPockettini" component={MakeAPockettini} />
     </Stack.Navigator>
   )
 }
