@@ -193,7 +193,9 @@ export default StyleSheet.create({
   drinkName: {
     fontFamily: fonts.header,
     color: colors.textColour,
-    fontSize: 20
+    fontSize: 20,
+    width: 230,
+    textAlign: 'center'
   },
   drinkCategory: {
     fontFamily: fonts.text,

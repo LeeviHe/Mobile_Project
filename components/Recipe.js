@@ -21,18 +21,19 @@ const Recipe = ({ navigation, route }) => {
 
     async function getJson() {
         if (route.params.drinkId) {
-        try {
-            const response = await fetch(URL + 'lookup.php?i=' + route.params.drinkId)
-            if (response.ok) {
-                const json = await response.json()
-                const data = json.drinks
-                setRecipeData(data)
-            } else {
-                alert('Error retrieving recipes!');
+            try {
+                const response = await fetch(URL + 'lookup.php?i=' + route.params.drinkId)
+                if (response.ok) {
+                    const json = await response.json()
+                    const data = json.drinks
+                    setRecipeData(data)
+                } else {
+                    alert('Error retrieving recipes!');
+                }
+            } catch (err) {
+                alert(err);
             }
-        } catch (err) {
-            alert(err);
-        }}
+        }
         else {
             try {
                 const response = await fetch(URL + route.params.search)
@@ -127,8 +128,6 @@ const Recipe = ({ navigation, route }) => {
         );
     });
 
-
-
     const categoryColors = {
         'Coffee / Tea': colors.brown,
         'Other / Unknown': '#999',
@@ -190,7 +189,7 @@ const Recipe = ({ navigation, route }) => {
                     <View style={{ marginTop: 30, marginHorizontal: 20 }}>
                         <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Notes</Text>
                         <Pressable style={styles.noteBtn}>
-                            <Text style={[textStyles.H1Upper, { color: colors.white, fontFamily: fonts.text }]}>Add notes</Text>
+                            <Text style={[textStyles.H1Upper, { color: colors.white, fontFamily: fonts.text, alignSelf: 'center' }]}>Add notes</Text>
                         </Pressable>
                     </View>
                 </View>
