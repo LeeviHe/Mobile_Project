@@ -1,8 +1,9 @@
-import { Text, View, Image, Pressable, Button, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
+
+import { Text, View, Image, Pressable, TouchableOpacity, FlatList } from 'react-native';
 import { Searchbar, RadioButton } from 'react-native-paper';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native-virtualized-view'
-import { Container, Row, Col } from "react-native-flex-grid";
+import { Row, Col } from "react-native-flex-grid";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { colors, fonts, padding, textStyles } from '../styles/style-constants';
 import styles from '../styles/styles';
@@ -45,7 +46,7 @@ export default function Cocktails({ navigation, route }) {
   // To set current filter search for activating filter
   const [filterSearch, setFilterSearch] = useState('')
   // TO set first of multi-filter ingredients
-  const [firstMultiFilter, setFirstMultiFilter] = useState('') 
+  const [firstMultiFilter, setFirstMultiFilter] = useState('')
 
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
@@ -202,7 +203,8 @@ export default function Cocktails({ navigation, route }) {
     setFilterSearch(search)
   }
 
-  function activate (condition, search, firstFilter) {
+
+  function activate(condition, search, firstFilter) {
     if (condition === 'c' || condition === 'a') {
       getDrink('filter.php?' + condition + '=' + search, search)
     } else if (condition == 'i') {
@@ -212,30 +214,33 @@ export default function Cocktails({ navigation, route }) {
     }
   }
 
-  function ascending(i) {
+  function setSort(direction, i) {
     let sort = [...selectedSort];
-    sort.fill(false);
-    sort[i] = true;
-    setSelectedSort(sort);
-    setAscendSort(true);
-    setDescendSort(false);
-  }
+    let newAscendSort = false;
+    let newDescendSort = false;
 
-  function descending(i) {
-    let sort = [...selectedSort];
-    sort.fill(false);
-    sort[i] = true;
+    if (sort[i]) {
+      sort[i] = false;
+    } else {
+      sort.fill(false);
+      sort[i] = true;
+
+      newAscendSort = i === 0 && direction === 'asc';
+      newDescendSort = i === 1 && direction === 'desc';
+    }
+
     setSelectedSort(sort);
-    setDescendSort(true);
-    setAscendSort(false);
+    setAscendSort(newAscendSort);
+    setDescendSort(newDescendSort);
   }
 
   function multiFilterSelectColor(i) {
     return selectedIngredients[i] ? 'green' : 'red'
   }
+
   //fix alcoholselect / selectalcohol mixup
   function alcSelectColor(i) {
-    return selectedAlcohol[i] ? 'green' : 'red'
+    return selectedAlcohol[i] ? colors.mainFontColour : 'transparent';
   }
 
   function categorySelectColor(i) {
@@ -270,10 +275,12 @@ export default function Cocktails({ navigation, route }) {
     //Empty other filters
     selectedAlcohol.fill(false)
     selectedCategory.fill(false)
+
     //Original
     let filters = [...selectedIngredients]
     filters[i] = selectedIngredients[i] ? false : true
     setSelectedIngredients(filters)
+
     if (selectedIngredients[i]) {
       (console.log('splice'))//delete
       setActiveFilters(oldValues => {
@@ -286,6 +293,7 @@ export default function Cocktails({ navigation, route }) {
       setActiveFilters(filterCopy)
     }
     navigation.setParams({ id: 'empty' })
+    activate('i', activeFilters.join(','), activeFilters[0]);
   }
 
   const isAlcoholic = (category) => {
@@ -328,13 +336,13 @@ export default function Cocktails({ navigation, route }) {
           ? categoryColors['Alcoholic']
           : isNotAlcoholic(item.strCategory)
             ? categoryColors['Non Alcoholic']
-            : categoryColors[item.strCategory] || 'pink';
+            : categoryColors[item.strCategory] || colors.purple;
       } else {
         return isAlcoholic(replaceCategory)
           ? categoryColors['Alcoholic']
           : isNotAlcoholic(replaceCategory)
             ? categoryColors['Non Alcoholic']
-            : categoryColors[replaceCategory] || 'pink';
+            : categoryColors[replaceCategory] || colors.purple;
       }
     };
 
@@ -358,12 +366,16 @@ export default function Cocktails({ navigation, route }) {
             <Image source={{ uri: item.strDrinkThumb }} style={styles.drinkImg} />
 
             <View style={styles.cocktailInfo}>
-              <Text style={styles.drinkText}>{item.strDrink}</Text>
+              <Text style={styles.drinkText} numberOfLines={1} ellipsizeMode="tail">
+                {item.strDrink}
+              </Text>
               {item.strCategory ? (
                 <Text style={styles.drinkText}>{item.strCategory}</Text>
-              ) :
-                <Text style={styles.drinkText}>{replaceCategory}</Text>}
+              ) : (
+                <Text style={styles.drinkText}>{replaceCategory}</Text>
+              )}
             </View>
+
           </View>
 
           <View style={{ marginRight: 40 }}>
@@ -430,27 +442,35 @@ export default function Cocktails({ navigation, route }) {
     </View>
   );
 
-  const RenderIngredientDropdownContent = ({ ingredientJson, showDropdown2, selectFilter, multiFilterSelectColor, colors, fonts }) => {
-    const [visibleItems, setVisibleItems] = useState(30); // Number of initially visible items
+  //EVERYTHING
+  const FilterItem = ({ label, onPress, checked, colors, fonts }) => (
+    <View style={[styles.filterSort, { justifyContent: 'space-between' }]}>
+      <Text style={{ fontFamily: fonts.text }}>{label}</Text>
+      <BouncyCheckbox
+        size={22}
+        disableText={true}
+        fillColor={colors.white}
+        unfillColor={colors.white}
+        iconComponent={<Icon name={'check'} size={20} color={checked ? colors.mainFontColour : 'transparent'} />}
+        onPress={onPress}
+        style={{ borderWidth: 1, borderRadius: 50, borderColor: colors.mainFontColour }}
+      />
+    </View>
+  );
 
+  const RenderIngredientDropdownContent = ({ ingredientJson, showDropdown2, selectFilter, multiFilterSelectColor, colors, fonts }) => {
+    const [visibleItems, setVisibleItems] = useState(30);
+
+    //BASE INGREDIENT
     const renderItem = ({ item, index }) => (
-      <View>
-        <TouchableOpacity onPress={() => selectFilter(index, item.strIngredient1)}>
-          <View style={styles.dropdownContainer}>
-            <View style={{ marginBottom: 15 }}>
-              <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>{item.strIngredient1}</Text>
-            </View>
-            <BouncyCheckbox
-              size={22}
-              disableText={true}
-              fillColor={multiFilterSelectColor()}
-              unfillColor={multiFilterSelectColor()}
-              iconComponent={<Icon name={'check'} size={20} color='gray' />} // toggle this
-              onPress={() => selectFilter(index, item.strIngredient1)}
-              style={{ borderWidth: 1, borderRadius: 50, marginLeft: 10, borderColor: colors.mainFontColour }}
-            />
-          </View>
-        </TouchableOpacity>
+      <View style={{ marginVertical: 5, marginHorizontal: 20 }}>
+        <FilterItem
+          label={item.strIngredient1}
+          onPress={() => selectFilter(index, item.strIngredient1)}
+          checked={multiFilterSelectColor(index) === 'green'}
+          colors={colors}
+          fonts={fonts}
+        />
       </View>
     );
 
@@ -459,14 +479,11 @@ export default function Cocktails({ navigation, route }) {
         {showDropdown2 && (
           <View style={styles.dropdownList}>
             <FlatList
-              data={ingredientJson.slice(0, visibleItems)} // Show only visibleItems
+              data={ingredientJson.slice(0, visibleItems)}
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderItem}
-              onEndReached={() => {
-                // Loads more items when the end of the list is reached
-                setVisibleItems((prev) => prev + 20); // Increase the number of visible items here
-              }}
-              onEndReachedThreshold={0.5} // Trigger onEndReached when 50%? of the list is scrolled
+              onEndReached={() => setVisibleItems((prev) => prev + 20)}
+              onEndReachedThreshold={0.5}
             />
           </View>
         )}
@@ -492,116 +509,130 @@ export default function Cocktails({ navigation, route }) {
           </Col>
 
           <Col style={padding.none}>
-            <Pressable
+            <TouchableOpacity
               key={'filterbtn'}
-              style={({ pressed }) => [
-                styles.filterBtn,
-                { opacity: pressed ? 0.5 : 1.0 }
-              ]}
+              style={[styles.filterBtn, { backgroundColor: filterView ? '#CEC56F' : 'transparent', borderWidth: filterView ? 0 : 1 }]}
               onPress={() => viewFilter()}>
-              <Text style={textStyles.button}>Filters</Text>
-            </Pressable>
+              <Text style={[textStyles.button, { color: filterView ? 'white' : colors.mainFontColour }]}>Filters</Text>
+            </TouchableOpacity>
           </Col>
         </Row>
       </View>
 
       {filterView ? (
-        <ScrollView style={{ marginHorizontal: 20 }}>
-          <View style={styles.filterHeader}>
-            <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>cancel</Text>
-            <Text style={styles.filterHeading}>Filters</Text>
-            <TouchableOpacity
-              onPress={resetFilters}>
-              <Icon name={'restore'} size={25} color={colors.mainFontColour} />
-            </TouchableOpacity>
+        <ScrollView style={styles.filterScrollView}>
+          <View style={{ borderBottomWidth: 1, borderBottomColor: '#CEC56F' }}>
+            <View style={[styles.filterHeader, { marginHorizontal: 20, marginVertical: 10 }]}>
+              <TouchableOpacity
+                onPress={resetFilters}>
+                <Icon name={'restore'} size={25} color={colors.mainFontColour} />
+              </TouchableOpacity>
+
+              <Text style={styles.filterHeading}>Filters</Text>
+
+              <TouchableOpacity
+                onPress={() => activate(filterCondition, filterSearch, firstMultiFilter)}
+                style={styles.applyBtn}>
+                <Text style={textStyles.button}>Apply</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
-          <View marginTop={40}>
+          <View style={{ marginHorizontal: 20, marginTop: 20 }}>
             <Text style={styles.filterHeading}>Sort</Text>
 
             <View style={styles.filterContainer}>
-              <View style={styles.filterSort}>
-                <Text style={{ fontFamily: fonts.text }}>Name A-Z</Text>
+              <View style={{ gap: 5 }}>
+                <FilterItem
+                  label="Name A-Z"
+                  onPress={() => setSort('asc', 0)}
+                  checked={sortColor(0) === colors.mainFontColour}
+                  colors={colors}
+                  fonts={fonts}
+                />
 
-                <BouncyCheckbox
-                  size={22}
-                  disableText={true}
-                  fillColor='transparent'
-                  unfillColor='transparent'
-                  iconComponent={<Icon name={'check'} size={20} color={sortColor(0)} />}
-                  onPress={() => ascending(0)}
-                  style={{ borderWidth: 1, borderRadius: 50, borderColor: colors.mainFontColour }}
+                <FilterItem
+                  label="Name Z-A"
+                  onPress={() => setSort('desc', 1)}
+                  checked={sortColor(1) === colors.mainFontColour}
+                  colors={colors}
+                  fonts={fonts}
                 />
 
               </View>
 
-              <View style={styles.filterSort}>
-                <Text style={{ fontFamily: fonts.text }}>Name Z-A</Text>
-
-                <BouncyCheckbox
-                  size={22}
-                  disableText={true}
-                  fillColor='transparent'
-                  unfillColor='transparent'
-                  iconComponent={<Icon name={'check'} size={20} color={sortColor(1)} />}
-                  onPress={() => descending(1)}
-                  style={{ borderWidth: 1, borderRadius: 50, borderColor: colors.mainFontColour }}
+              <View style={{ gap: 5 }}>
+                <FilterItem
+                  label="Alcoholic"
+                  index={0}
+                  onPress={() => {
+                    searchFilter(0, 'a', 'Alcoholic');
+                    activate('a', 'Alcoholic');
+                  }}
+                  checked={selectedAlcohol[0]}
+                  colors={colors}
+                  fonts={fonts}
                 />
-                <View>
-                  <TouchableOpacity
-                    onPress={() => searchFilter(0, 'a', 'Alcoholic')}>
-                    <Text style={{ color: alcSelectColor(0) }}>Alcoholic</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => searchFilter(1, 'a', 'Non Alcoholic')}>
-                    <Text style={{ color: alcSelectColor(1) }}>Non-Alcoholic</Text>
-                  </TouchableOpacity>
-                </View>
-                <View>
-                  <TouchableOpacity>
-                  <RadioButton.Android
-                    style={{ alignSelf: 'flex-end' }}
-                    onPress={ () => activate(filterCondition, filterSearch, firstMultiFilter)}
-                  />
-                  </TouchableOpacity>
-                </View>
+
+                <FilterItem
+                  label="Non-Alcoholic"
+                  index={1}
+                  onPress={() => {
+                    searchFilter(1, 'a', 'Non Alcoholic');
+                    activate('a', 'Non Alcoholic');
+                  }}
+                  checked={selectedAlcohol[1]}
+                  colors={colors}
+                  fonts={fonts}
+                />
+              </View>
+
+            </View>
+
+          </View>
+
+          <View style={{ borderTopWidth: 1, borderTopColor: '#CEC56F' }}>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: '#CEC56F' }}>
+              <View style={[styles.dropdownContainer, { marginVertical: 10, marginHorizontal: 20 }]}>
+                <Text style={styles.filterHeading}>Categories</Text>
+
+                <TouchableOpacity onPress={toggleCategoryDropdown} style={styles.dropdownHeader}>
+                  <Icon name={showDropdown1 ? 'minus' : 'plus'} size={40} color={colors.mainFontColour} />
+                </TouchableOpacity>
               </View>
             </View>
-          </View>
 
-          <View style={{ marginBottom: 10 }}>
-            <View style={[styles.dropdownContainer, { marginBottom: 10 }]}>
-              <Text style={styles.filterHeading}>Categories</Text>
-
-              <TouchableOpacity onPress={toggleCategoryDropdown} style={styles.dropdownHeader}>
-                <Icon name={showDropdown1 ? 'minus' : 'plus'} size={40} color={colors.mainFontColour} />
-              </TouchableOpacity>
+            <View style={{ borderBottomWidth: showDropdown1 ? 1 : 0, marginTop: showDropdown1 ? 10 : 0 }}>
+              <View style={{ marginHorizontal: 20 }}>
+                {categoryDropdownContent}
+              </View>
             </View>
 
-            <View>
-              {categoryDropdownContent}
+          </View>
+
+          <View>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: '#CEC56F' }}>
+              <View style={[styles.dropdownContainer, { marginVertical: 10, marginHorizontal: 20 }]}>
+                <Text style={styles.filterHeading}>Base Ingredients</Text>
+
+                <TouchableOpacity onPress={toggleIngredientDropdown} style={styles.dropdownHeader}>
+                  <Icon name={showDropdown2 ? 'minus' : 'plus'} size={40} color={colors.mainFontColour} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={{ borderBottomWidth: showDropdown2 ? 1 : 0, marginTop: showDropdown2 ? 10 : 0 }}>
+              <RenderIngredientDropdownContent
+                ingredientJson={ingredientJson}
+                showDropdown2={showDropdown2}
+                selectFilter={selectFilter}
+                multiFilterSelectColor={multiFilterSelectColor}
+                colors={colors}
+                fonts={fonts}
+              />
             </View>
           </View>
 
-          <View style={{ marginBottom: 10 }}>
-            <View style={[styles.dropdownContainer, { marginBottom: 10 }]}>
-              <Text style={styles.filterHeading}>Base Ingredients</Text>
-
-              <TouchableOpacity onPress={toggleIngredientDropdown} style={styles.dropdownHeader}>
-                <Icon name={showDropdown2 ? 'minus' : 'plus'} size={40} color={colors.mainFontColour} />
-              </TouchableOpacity>
-            </View>
-
-            <RenderIngredientDropdownContent
-              ingredientJson={ingredientJson}
-              showDropdown2={showDropdown2}
-              selectFilter={selectFilter}
-              multiFilterSelectColor={multiFilterSelectColor}
-              colors={colors}
-              fonts={fonts}
-            />
-          </View>
-          
         </ScrollView>
       ) : (
         <View>
@@ -610,6 +641,7 @@ export default function Cocktails({ navigation, route }) {
               data={activeDrinks}
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderDrinkItem}
+              extraData={activeDrinks}
             />
             :
             <View>
@@ -617,7 +649,8 @@ export default function Cocktails({ navigation, route }) {
             </View>
           }
         </View>
-      )}
+      )
+      }
 
     </View >
   );

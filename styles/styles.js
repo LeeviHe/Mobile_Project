@@ -124,7 +124,8 @@ export default StyleSheet.create({
   },
   drinkText: {
     color: colors.textColour,
-    fontFamily: fonts.text
+    fontFamily: fonts.text,
+    width: 200
   },
   seeAllBtn: {
     alignSelf: 'center',
@@ -135,6 +136,18 @@ export default StyleSheet.create({
   },
 
   // FILTER
+  filterScrollView: {
+    borderTopWidth: 1,
+    backgroundColor: '#FFF48D40',
+    borderTopColor: '#CEC56F',
+    height: '100%'
+  },
+  applyBtn: {
+    backgroundColor: '#dbd484',
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 10
+  },
   filterHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -147,7 +160,8 @@ export default StyleSheet.create({
   },
   filterContainer: {
     marginVertical: 20,
-    gap: 10
+    gap: 20,
+    flexDirection: 'row'
   },
   filterSort: {
     flexDirection: 'row',
