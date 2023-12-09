@@ -20,6 +20,7 @@ export default function MakeAPockettini({ navigation }) {
   const [modalType, setModalType] = useState('');
   const [ingredients, setIngredients] = useState([]);
   const [preparations, setPreparations] = useState([]);
+  const [notes, setNotes] = useState([]);
 
   const openPicker = (type) => {
     setOverlayVisible(true)
@@ -77,7 +78,7 @@ export default function MakeAPockettini({ navigation }) {
   ]
 
   const addIngredient = () => {
-    setIngredients([...ingredients, { number: 0, amount: 'ml', name: '' }]);
+    setIngredients([...ingredients, { number: 0, amount: '-', name: '' }]);
   };
 
   const removeIngredient = (index) => {
@@ -90,14 +91,31 @@ export default function MakeAPockettini({ navigation }) {
   };
 
   const removePreparation = (index) => {
-    const newPreparations = preparations.filter((_, i) => i !== index);
-    setPreparations(newPreparations);
+    const newPreparations = [...preparations]
+    newPreparations.splice(index, 1)
+    setPreparations(newPreparations)
   };
 
   const updatePreparation = (index, text) => {
     const newPreparations = [...preparations];
     newPreparations[index] = text;
     setPreparations(newPreparations);
+  };
+
+  const addNotes = () => {
+    setNotes([...notes, '']);
+  };
+
+  const removeNotes = (index) => {
+    const newNotes = [...notes]
+    newNotes.splice(index, 1)
+    setNotes(newNotes)
+  };
+
+  const updateNote = (index, text) => {
+    const newNotes = [...notes];
+    newNotes[index] = text;
+    setNotes(newNotes);
   };
 
   return (
@@ -164,7 +182,7 @@ export default function MakeAPockettini({ navigation }) {
                   </Text>
                   <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
                   <Text style={styles.editMeasure}>
-                    {amount ? amount : 'ml'}
+                    {amount ? amount : '-'}
                   </Text>
                 </TouchableOpacity>
               </Col>
@@ -250,7 +268,7 @@ export default function MakeAPockettini({ navigation }) {
                     placeholder={`Step ${index + 2}..`}
                     onChangeText={(text) => updatePreparation(index + 1, text)}
                   />
-                  <TouchableOpacity onPress={() => removePreparation(index)}>
+                  <TouchableOpacity onPress={() => removePreparation(index + 1)}>
                     <Icon name='close-circle-outline' size={30} color='#ff6161' />
                   </TouchableOpacity>
                 </View>
@@ -263,14 +281,31 @@ export default function MakeAPockettini({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/**ignore below */}
-        <View paddingVertical={20}>
-          <View style={{ marginTop: 30, marginHorizontal: 20 }}>
-            <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Notes</Text>
-            <Pressable style={styles.noteBtn}>
-              <Text style={[textStyles.H1Upper, { color: colors.white, fontFamily: fonts.text, alignSelf: 'center' }]}>Add notes</Text>
-            </Pressable>
+        <View style={[styles.partContainer, { marginTop: 50 }]}>
+          <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Notes</Text>
+
+          <View>
+            {notes.map((note, index) => (
+              <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10 }]}>
+                <View style={styles.inputViewLarge}>
+                  <TextInput
+                    style={{ color: colors.mainFontColour }}
+                    value={note}
+                    placeholder={'Write something here..'}
+                    onChangeText={(text) => updateNote(index, text)}
+                  />
+                  <TouchableOpacity onPress={() => removeNotes(index)}>
+                    <Icon name='close-circle-outline' size={30} color='#ff6161' />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
           </View>
+
+
+          <TouchableOpacity style={styles.noteBtn} onPress={addNotes}>
+            <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Notes</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
