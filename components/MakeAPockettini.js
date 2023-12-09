@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { StatusBar } from 'expo-status-bar';
 import { Picker } from '@react-native-picker/picker';
@@ -9,7 +9,8 @@ import { colors, fonts, textStyles } from '../styles/style-constants';
 import { usePockettini } from './PockettiniContext';
 
 export default function MakeAPockettini({ navigation, route }) {
-  const { pockettini } = route.params ?? {}
+  const { index, pockettini } = route.params ?? {}
+  const { addPockettini, removePockettini } = usePockettini()
   const [drinkName, setDrinkName] = useState(pockettini?.drinkName || '')
   const [category, setCategory] = useState(pockettini?.drinkCategory || '')
 
@@ -23,6 +24,8 @@ export default function MakeAPockettini({ navigation, route }) {
   const [ingredients, setIngredients] = useState([]);
   const [preparations, setPreparations] = useState([]);
   const [notes, setNotes] = useState([]);
+
+  const isEmpty = !drinkName;
 
   const openPicker = (type) => {
     setOverlayVisible(true)
@@ -120,9 +123,7 @@ export default function MakeAPockettini({ navigation, route }) {
     setNotes(newNotes);
   };
 
-  //info saving
-  const { addPockettini } = usePockettini()
-
+  //info saving and deleting
   const handleSave = () => {
     const newPockettini = {
       drinkName: drinkName,
@@ -138,6 +139,27 @@ export default function MakeAPockettini({ navigation, route }) {
     navigation.navigate('MyPockettinis')
   }
 
+  const deletePockettini = (index) => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this Pockettini?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "OK",
+          onPress: () => {
+            removePockettini(index)
+            navigation.navigate('MyPockettinis')
+          }
+        }
+      ]
+    );
+  }
+
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -150,8 +172,15 @@ export default function MakeAPockettini({ navigation, route }) {
             </TouchableOpacity>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <TouchableOpacity>
-                <Icon name="trash-can-outline" size={30} color={'#ff6161'} />
+              <TouchableOpacity
+                onPress={isEmpty ? null : () => deletePockettini(index)}
+                disabled={isEmpty}
+              >
+                <Icon
+                  name="trash-can-outline"
+                  size={30}
+                  color={isEmpty ? '#C0C0C0' : '#ff6161'}
+                />
               </TouchableOpacity>
 
               <TouchableOpacity

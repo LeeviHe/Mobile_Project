@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
+import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect } from 'react';
 
@@ -31,7 +32,6 @@ export const PockettiniProvider = ({ children }) => {
     setPockettinis(newPockettinis);
     await AsyncStorage.setItem('pockettinis', JSON.stringify(newPockettinis));
   };
-
 
   return (
     <PockettiniContext.Provider value={{ pockettinis, addPockettini, removePockettini }}>
