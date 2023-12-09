@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, ImageBackground, Image, Pressable } from 'react-native';
+import { Text, View, TouchableOpacity, ImageBackground, Image, Pressable, FlatList } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
 import styles from '../styles/styles';
 import { StatusBar } from 'expo-status-bar';
@@ -7,7 +7,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors, fonts } from '../styles/style-constants';
 import { Col, Row } from 'react-native-flex-grid';
 import { getJsonIngredients, getJsonDrinks } from '../reusables/Functions';
-import { FlatList } from 'react-native';
 import { URL } from '../reusables/Constants';
 
 const Ingredient = ({ navigation, route }) => {
@@ -37,13 +36,17 @@ const Ingredient = ({ navigation, route }) => {
     </Col>
   );
 
-  const renderRow = ({ item }) => (
-    <Row style={{ justifyContent: 'space-around' }}>
-      {item.map((drink) => (
-        <React.Fragment key={drink.idDrink}>{renderDrinkItem({ item: drink })}</React.Fragment>
-      ))}
-    </Row>
-  );
+  const renderRow = ({ item }) => {
+    return (
+      <FlatList
+        data={item}
+        keyExtractor={(drink) => drink.idDrink}
+        renderItem={({ item: drink }) => renderDrinkItem({ item: drink })}
+        horizontal
+        contentContainerStyle={{ justifyContent: 'space-around' }}
+      />
+    );
+  };
 
   const renderRows = () => {
     const drinksToRender = showDropdown
@@ -101,20 +104,6 @@ const Ingredient = ({ navigation, route }) => {
 
         <View style={{ marginVertical: 10 }}>
           <View style={{ marginHorizontal: 10 }}>{renderRows()}</View>
-
-          {showDropdown && (
-            <View style={styles.dropdownList}>
-              <FlatList
-                data={ingredientDrinks.slice(3, visibleItems)}
-                keyExtractor={(item) => item.idDrink}
-                renderItem={renderDrinkItem}
-                onEndReached={() => {
-                  setVisibleItems((prev) => prev + 6);
-                }}
-                onEndReachedThreshold={0.3}
-              />
-            </View>
-          )}
         </View>
 
         <View>

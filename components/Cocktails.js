@@ -369,8 +369,9 @@ export default function Cocktails({ navigation, route }) {
         prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
         )
       }
+      //
       console.log(favourites.length)
-    };
+    }
 
     
 

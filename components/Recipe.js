@@ -1,19 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, ScrollView, ImageBackground, Image, TouchableOpacity, Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { StatusBar } from 'expo-status-bar';
 import styles from '../styles/styles';
 import { colors, fonts, textStyles } from '../styles/style-constants';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { URL } from '../reusables/Constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { URL, FAVOURITE_DRINKS_KEY } from '../reusables/Constants';
 
 const Recipe = ({ navigation, route }) => {
-    const [isHeartSelected, setHeartSelected] = useState(false);
     const [recipeData, setRecipeData] = useState([]);
-
-    const toggleHeart = () => {
-        setHeartSelected(!isHeartSelected);
-    };
+      // Iteration of favourited drinks
+    const [favourites, setFavourites] = useState([])
 
     useEffect(() => {
         getJson()
@@ -48,6 +46,55 @@ const Recipe = ({ navigation, route }) => {
                 alert(err);
             }
         }
+    }
+
+    useEffect (() => {
+        const unsubsribe = navigation.addListener('focus', () => {
+            getFavouriteData()
+        })
+        return unsubsribe
+    }, [navigation])
+
+    const getFavouriteData = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
+            if (jsonValue !== null) {
+                let tmpScores = JSON.parse(jsonValue)
+                setFavourites(tmpScores)
+            }
+        }
+        catch (e) {
+            console.log('Read error: ' + e)
+        }
+    }
+
+    const isFavourited = favourites.some(fav => fav.drinkId === route.params.drinkId)
+    
+    const toggleHeart = async() => {
+        try {
+            if (isFavourited) {
+                const newFavourites = favourites.filter((fav) => fav.drinkId !== recipeData[0].idDrink)
+                await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
+                setFavourites(newFavourites)
+                alert('Drink removed from favourites')
+            } else {
+                const newKey = favourites.length + 1
+                const drinkInfo = {
+                    key: newKey,
+                    drinkId: recipeData[0].idDrink,
+                }
+                const newFavourites = [...favourites, drinkInfo]
+                await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
+                setFavourites(newFavourites)
+                alert('Favourite saved')
+            }
+        } catch(error) {
+            console.log('Error saving favourite: ' + error)
+            setFavourites((prevFavourites) => 
+             prevFavourites.filter((fav) => fav.drinkId !== recipeData[0].idDrink))
+        }
+        //
+        console.log(favourites.length)
     }
 
     const drinkInfo = recipeData.map((data, id) => {
@@ -159,7 +206,7 @@ const Recipe = ({ navigation, route }) => {
                             <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={toggleHeart}>
-                            <Icon name={isHeartSelected ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
+                            <Icon name={isFavourited ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
                         </TouchableOpacity>
                     </View>
 
