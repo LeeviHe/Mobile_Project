@@ -1,6 +1,7 @@
 export const colors = {
   white: '#f5f5f5',
   mainFontColour: '#5a5a5a',
+  grayBtn: '#757575',
   secondaryFontColour: '#313131',
   textColour: '#333',
   smallFontColour: '#rgba(51, 51, 51, 0.5)',

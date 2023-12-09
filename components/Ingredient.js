@@ -75,7 +75,7 @@ const Ingredient = ({ navigation, route }) => {
           style={{ paddingVertical: 30 }}>
           <View style={styles.topBar}>
             <TouchableOpacity onPress={() => navigation.navigate('Ingredients')}>
-              <Icon name="arrow-left" size={30} color={colors.mainFontColour} />
+              <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleStar}>
               <Icon name={selectStar ? 'star' : 'star-outline'} size={40} color="#e7c500" />

@@ -156,7 +156,7 @@ const Recipe = ({ navigation, route }) => {
 
                     <View style={styles.topBar}>
                         <TouchableOpacity onPress={() => navigation.navigate('Cocktails')}>
-                            <Icon name="arrow-left" size={30} color={colors.mainFontColour} />
+                            <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={toggleHeart}>
                             <Icon name={isHeartSelected ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
