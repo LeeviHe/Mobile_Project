@@ -1,22 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, StyleSheet, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { StatusBar } from 'expo-status-bar';
 import { Picker } from '@react-native-picker/picker';
 import { Col, Row } from 'react-native-flex-grid';
 import styles from '../styles/styles';
 import { colors, fonts, textStyles } from '../styles/style-constants';
-import { LinearGradient } from 'expo-linear-gradient';
+import { usePockettini } from './PockettiniContext';
 
-export default function MakeAPockettini({ navigation }) {
+export default function MakeAPockettini({ navigation, route }) {
+  const { pockettini } = route.params ?? {}
+  const [drinkName, setDrinkName] = useState(pockettini?.drinkName || '')
+  const [category, setCategory] = useState(pockettini?.drinkCategory || '')
 
   const [text, setText] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
   const [isOverlayVisible, setOverlayVisible] = useState(false);
-  const [drinkName, setDrinkName] = useState("");
   const [number, setNumber] = useState();
   const [amount, setAmount] = useState();
-  const [category, setCategory] = useState(null);
+
   const [modalType, setModalType] = useState('');
   const [ingredients, setIngredients] = useState([]);
   const [preparations, setPreparations] = useState([]);
@@ -118,6 +120,24 @@ export default function MakeAPockettini({ navigation }) {
     setNotes(newNotes);
   };
 
+  //info saving
+  const { addPockettini } = usePockettini()
+
+  const handleSave = () => {
+    const newPockettini = {
+      drinkName: drinkName,
+      drinkCategory: category,
+      number: number,
+      amount: amount,
+      ingrName: text,
+      steps: preparations,
+      notes
+    }
+
+    addPockettini(newPockettini)
+    navigation.navigate('MyPockettinis')
+  }
+
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -134,7 +154,9 @@ export default function MakeAPockettini({ navigation }) {
                 <Icon name="trash-can-outline" size={30} color={'#ff6161'} />
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.saveBtn}>
+              <TouchableOpacity
+                onPress={handleSave}
+                style={styles.saveBtn}>
                 <Text style={{ color: colors.white, fontFamily: fonts.text }}>save</Text>
               </TouchableOpacity>
             </View>
