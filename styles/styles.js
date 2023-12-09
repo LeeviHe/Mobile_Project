@@ -338,19 +338,18 @@ export default StyleSheet.create({
     paddingHorizontal: 40,
     gap: 5
   },
+
   // make a pockettini
+  partContainer: {
+    marginTop: 20,
+    marginHorizontal: 20,
+    gap: 10
+  },
   saveBtn: {
     paddingVertical: 6,
     paddingHorizontal: 14,
     backgroundColor: colors.mainFontColour,
     borderRadius: 10
-  },
-
-  //my favourites
-  favBtnContainer: {
-    marginHorizontal: 5,
-    gap: 10,
-    marginTop: 50
   },
   imgContainer: {
     justifyContent: 'center',
@@ -364,7 +363,9 @@ export default StyleSheet.create({
     alignItems: "center",
     backgroundColor: '#dfdfdf',
     flexBasis: 'auto',
-    justifyContent: "center"
+    justifyContent: "center",
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5
   },
   measureView: {
     flexDirection: 'row',
@@ -380,18 +381,39 @@ export default StyleSheet.create({
     paddingVertical: 5,
     backgroundColor: 'white',
     flexBasis: '40%',
-    height: 40
+    height: 40,
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5
+  },
+  inputViewLarge: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 5,
+    backgroundColor: 'white',
+    flexBasis: '40%',
+    height: 60,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: colors.mainFontColour,
+    alignItems: "center",
+    paddingHorizontal: 10
   },
   shadow: {
-    backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 1,
   },
   addBtn: {
     color: colors.white,
     fontFamily: fonts.text,
     alignSelf: 'center'
-  }
+  },
+
+  //my favourites
+  favBtnContainer: {
+    marginHorizontal: 5,
+    gap: 10,
+    marginTop: 50
+  },
 });
