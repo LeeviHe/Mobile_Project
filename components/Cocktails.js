@@ -58,8 +58,6 @@ export default function Cocktails({ navigation, route }) {
   const [showDropdown1, setShowDropdown1] = useState(false);
   const [showDropdown2, setShowDropdown2] = useState(false);
 
-  const [isHeartSelected, setHeartSelected] = useState(false);
-
   //
   //useEffects
 
@@ -352,7 +350,7 @@ export default function Cocktails({ navigation, route }) {
           const newFavourites = favourites.filter((fav) => fav.drinkId !== item.idDrink)
           await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
           setFavourites(newFavourites)
-          console.log('Drink removed from favourites')
+          alert('Drink removed from favourites')
         } else {
           
           const newKey = favourites.length + 1
@@ -363,7 +361,7 @@ export default function Cocktails({ navigation, route }) {
           const newFavourites = [...favourites, drinkInfo]
           await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
           setFavourites(newFavourites)
-          console.log('Favourite saved')
+          alert('Favourite saved')
         }
       } catch(error) {
         console.log('Error saving favourite: ' + error)

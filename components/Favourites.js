@@ -112,7 +112,7 @@ export default function Favourites({ navigation, route}) {
           const newFavouritesIds = favouritesIds.filter((fav) => fav.drinkId !== item.idDrink);
           setFavouritesIds(newFavouritesIds);
           await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavouritesIds))
-          console.log('Drink removed from favourites')
+          alert('Drink removed')
         }
       } catch(error) {
         console.log('Error saving favourite: ' + error)
