@@ -13,6 +13,7 @@ import MyPockettinis from './components/MyPockettinis';
 import Favourites from './components/Favourites';
 import Ingredient from './components/Ingredient';
 import MyIngredients from './components/MyIngredients'
+import GlobalProvider from './reusables/Functions';
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator();
@@ -48,6 +49,7 @@ const MoreNavigator = () => {
 
 export default function App() {
   return (
+    <GlobalProvider>
     <NavigationContainer>
       <Tab.Navigator
         initialRouteName='Home'
@@ -143,5 +145,6 @@ export default function App() {
 
       </Tab.Navigator>
     </NavigationContainer >
+    </GlobalProvider>
   );
 }
