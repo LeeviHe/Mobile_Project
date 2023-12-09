@@ -13,11 +13,13 @@ export default function MakeAPockettini({ navigation }) {
   const [text, setText] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
   const [isOverlayVisible, setOverlayVisible] = useState(false);
+  const [drinkName, setDrinkName] = useState("");
   const [number, setNumber] = useState();
   const [amount, setAmount] = useState();
   const [category, setCategory] = useState(null);
   const [modalType, setModalType] = useState('');
   const [ingredients, setIngredients] = useState([]);
+  const [preparations, setPreparations] = useState([]);
 
   const openPicker = (type) => {
     setOverlayVisible(true)
@@ -83,6 +85,20 @@ export default function MakeAPockettini({ navigation }) {
     setIngredients(newIngredients);
   };
 
+  const addPreparation = () => {
+    setPreparations([...preparations, '']);
+  };
+
+  const removePreparation = (index) => {
+    const newPreparations = preparations.filter((_, i) => i !== index);
+    setPreparations(newPreparations);
+  };
+
+  const updatePreparation = (index, text) => {
+    const newPreparations = [...preparations];
+    newPreparations[index] = text;
+    setPreparations(newPreparations);
+  };
 
   return (
     <ScrollView>
@@ -111,9 +127,9 @@ export default function MakeAPockettini({ navigation }) {
           <View style={{ alignItems: 'center', gap: 5 }}>
             <TextInput
               style={[styles.drinkName, { borderBottomWidth: 1, borderBottomColor: colors.mainFontColour }]}
-              value={text}
+              value={drinkName}
               placeholder='Drink name..'
-              onChangeText={setText}
+              onChangeText={setDrinkName}
             />
 
             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}
@@ -133,12 +149,12 @@ export default function MakeAPockettini({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <View style={{ marginTop: 20, marginHorizontal: 20, gap: 10 }}>
+        <View style={styles.partContainer}>
           <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Ingredients</Text>
 
           <View>
-            <Row style={[styles.shadow, { borderRadius: 5 }]}>
-              <Col style={styles.editAmount}>
+            <Row style={{ borderRadius: 5 }}>
+              <Col style={[styles.editAmount, styles.shadow]}>
                 <TouchableOpacity
                   onPress={() => openPicker('numberAmount')}
                   style={styles.measureView}>
@@ -150,11 +166,10 @@ export default function MakeAPockettini({ navigation }) {
                   <Text style={styles.editMeasure}>
                     {amount ? amount : 'ml'}
                   </Text>
-
                 </TouchableOpacity>
               </Col>
 
-              <Col style={styles.inputView}>
+              <Col style={[styles.inputView, styles.shadow]}>
                 <TextInput
                   style={{ color: colors.mainFontColour }}
                   value={text}
@@ -170,17 +185,18 @@ export default function MakeAPockettini({ navigation }) {
               <Row key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10 }]}>
                 <Col style={styles.editAmount}>
                   <TouchableOpacity
-                    onPress={() => openPicker('numberAmount')}
+                    onPress={() => openPicker('numberAmount', index)}
                     style={styles.measureView}>
 
                     <Text style={styles.editMeasure}>
                       {number ? number : '0'}
                     </Text>
-                    <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
-                    <Text style={styles.editMeasure}>
-                      {amount ? amount : 'ml'}
-                    </Text>
 
+                    <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
+
+                    <Text style={styles.editMeasure}>
+                      {amount ? amount : '-'}
+                    </Text>
                   </TouchableOpacity>
                 </Col>
 
@@ -200,7 +216,8 @@ export default function MakeAPockettini({ navigation }) {
                   </TouchableOpacity>
                 </Col>
               </Row>
-            ))}
+            ))
+            }
           </View>
 
           <View>
@@ -211,15 +228,43 @@ export default function MakeAPockettini({ navigation }) {
         </View>
 
 
-        <View paddingVertical={20}>
+        <View style={[styles.partContainer, { marginTop: 50 }]}>
+          <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Preparation</Text>
 
-          <View style={{ marginTop: 30, marginHorizontal: 20 }}>
-            <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Preparation</Text>
-            <Pressable style={styles.noteBtn}>
-              <Text style={[textStyles.H1Upper, { color: colors.white, fontFamily: fonts.text, alignSelf: 'center' }]}>Add preparations</Text>
-            </Pressable>
+          <View style={[styles.inputViewLarge, styles.shadow]}>
+            <TextInput
+              style={{ color: colors.mainFontColour }}
+              value={preparations[0]}
+              placeholder='Step 1..'
+              onChangeText={(text) => updatePreparation(0, text)}
+            />
           </View>
 
+          <View>
+            {preparations.slice(1).map((preparation, index) => (
+              <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10 }]}>
+                <View style={styles.inputViewLarge}>
+                  <TextInput
+                    style={{ color: colors.mainFontColour }}
+                    value={preparation}
+                    placeholder={`Step ${index + 2}..`}
+                    onChangeText={(text) => updatePreparation(index + 1, text)}
+                  />
+                  <TouchableOpacity onPress={() => removePreparation(index)}>
+                    <Icon name='close-circle-outline' size={30} color='#ff6161' />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          <TouchableOpacity style={styles.noteBtn} onPress={addPreparation}>
+            <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Preparations</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/**ignore below */}
+        <View paddingVertical={20}>
           <View style={{ marginTop: 30, marginHorizontal: 20 }}>
             <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Notes</Text>
             <Pressable style={styles.noteBtn}>
@@ -229,62 +274,64 @@ export default function MakeAPockettini({ navigation }) {
         </View>
       </View>
 
-      {isOverlayVisible && isModalVisible && (
-        <View style={{
-          ...StyleSheet.absoluteFillObject,
-          backgroundColor: '#ffffffef'
-        }}>
+      {
+        isOverlayVisible && isModalVisible && (
+          <View style={{
+            ...StyleSheet.absoluteFillObject,
+            backgroundColor: '#ffffffef'
+          }}>
 
-          <Modal
-            transparent={true}
-            animationType="fade"
-            visible={isModalVisible}
-            onRequestClose={closePicker}>
+            <Modal
+              transparent={true}
+              animationType="fade"
+              visible={isModalVisible}
+              onRequestClose={closePicker}>
 
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
-              {isModalVisible && modalType === 'category' && (
-                <View style={{ width: '100%' }}>
-                  <Picker
-                    selectedValue={category}
-                    onValueChange={(itemValue) => setCategory(itemValue)}>
-                    {categories.map((category, index) => (
-                      <Picker.Item key={index} label={category} value={category} />
-                    ))}
-                  </Picker>
-                </View>
-              )}
-
-              {modalType === 'numberAmount' && (
-                <Row>
-                  <Col>
+                {isModalVisible && modalType === 'category' && (
+                  <View style={{ width: '100%' }}>
                     <Picker
-                      selectedValue={number}
-                      onValueChange={(itemValue) => setNumber(itemValue)}>
-                      {numbers.map((number, index) => (
-                        <Picker.Item key={index} label={number.toString()} value={number} />
+                      selectedValue={category}
+                      onValueChange={(itemValue) => setCategory(itemValue)}>
+                      {categories.map((category, index) => (
+                        <Picker.Item key={index} label={category} value={category} />
                       ))}
                     </Picker>
-                  </Col>
+                  </View>
+                )}
 
-                  <Col>
-                    <Picker
-                      selectedValue={amount}
-                      onValueChange={(itemValue) => setAmount(itemValue)}>
-                      {amounts.map((amount, index) => (
-                        <Picker.Item key={index} label={amount} value={amount} />
-                      ))}
-                    </Picker>
-                  </Col>
-                </Row>
-              )}
-              <TouchableOpacity onPress={closePicker}>
-                <Text>Done</Text>
-              </TouchableOpacity>
-            </View>
-          </Modal>
-        </View>
-      )}
+                {modalType === 'numberAmount' && (
+                  <Row>
+                    <Col>
+                      <Picker
+                        selectedValue={number}
+                        onValueChange={(itemValue) => setNumber(itemValue)}>
+                        {numbers.map((number, index) => (
+                          <Picker.Item key={index} label={number.toString()} value={number} />
+                        ))}
+                      </Picker>
+                    </Col>
+
+                    <Col>
+                      <Picker
+                        selectedValue={amount}
+                        onValueChange={(itemValue) => setAmount(itemValue)}>
+                        {amounts.map((amount, index) => (
+                          <Picker.Item key={index} label={amount} value={amount} />
+                        ))}
+                      </Picker>
+                    </Col>
+                  </Row>
+                )}
+                <TouchableOpacity onPress={closePicker}>
+                  <Text>Done</Text>
+                </TouchableOpacity>
+              </View>
+            </Modal>
+          </View>
+        )
+      }
     </ScrollView >
   );
 }
