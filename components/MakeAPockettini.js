@@ -9,6 +9,7 @@ import { colors, fonts, textStyles } from '../styles/style-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function MakeAPockettini({ navigation }) {
+
   const [text, setText] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
   const [isOverlayVisible, setOverlayVisible] = useState(false);
@@ -16,6 +17,7 @@ export default function MakeAPockettini({ navigation }) {
   const [amount, setAmount] = useState();
   const [category, setCategory] = useState(null);
   const [modalType, setModalType] = useState('');
+  const [ingredients, setIngredients] = useState([]);
 
   const openPicker = (type) => {
     setOverlayVisible(true)
@@ -72,6 +74,15 @@ export default function MakeAPockettini({ navigation }) {
     'pint'
   ]
 
+  const addIngredient = () => {
+    setIngredients([...ingredients, { number: 0, amount: 'ml', name: '' }]);
+  };
+
+  const removeIngredient = (index) => {
+    const newIngredients = ingredients.filter((_, i) => i !== index);
+    setIngredients(newIngredients);
+  };
+
 
   return (
     <ScrollView>
@@ -125,43 +136,80 @@ export default function MakeAPockettini({ navigation }) {
         <View style={{ marginTop: 20, marginHorizontal: 20, gap: 10 }}>
           <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Ingredients</Text>
 
-          <Row style={[styles.shadow, { borderRadius: 5 }]}>
-            <Col style={styles.editAmount}>
-              <TouchableOpacity
-                onPress={() => openPicker('numberAmount')}
-                style={styles.measureView}>
+          <View>
+            <Row style={[styles.shadow, { borderRadius: 5 }]}>
+              <Col style={styles.editAmount}>
+                <TouchableOpacity
+                  onPress={() => openPicker('numberAmount')}
+                  style={styles.measureView}>
 
-                <Text style={styles.editMeasure}>
-                  {number ? number : '0'}
-                </Text>
-                <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
-                <Text style={styles.editMeasure}>
-                  {amount ? amount : 'ml'}
-                </Text>
+                  <Text style={styles.editMeasure}>
+                    {number ? number : '0'}
+                  </Text>
+                  <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
+                  <Text style={styles.editMeasure}>
+                    {amount ? amount : 'ml'}
+                  </Text>
 
-              </TouchableOpacity>
-            </Col>
+                </TouchableOpacity>
+              </Col>
 
-            <Col style={styles.inputView}>
-              <TextInput
-                style={{ color: colors.mainFontColour }}
-                value={text}
-                placeholder='Ingredient name..'
-                onChangeText={setText}
-              />
-
-              <View>
-                <Icon name='close-circle-outline' size={30} color='#ff6161' />
-              </View>
-            </Col>
-          </Row>
+              <Col style={styles.inputView}>
+                <TextInput
+                  style={{ color: colors.mainFontColour }}
+                  value={text}
+                  placeholder='Ingredient name..'
+                  onChangeText={setText}
+                />
+              </Col>
+            </Row>
+          </View>
 
           <View>
-            <TouchableOpacity style={styles.noteBtn}>
+            {ingredients.map((ingredient, index) => (
+              <Row key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10 }]}>
+                <Col style={styles.editAmount}>
+                  <TouchableOpacity
+                    onPress={() => openPicker('numberAmount')}
+                    style={styles.measureView}>
+
+                    <Text style={styles.editMeasure}>
+                      {number ? number : '0'}
+                    </Text>
+                    <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
+                    <Text style={styles.editMeasure}>
+                      {amount ? amount : 'ml'}
+                    </Text>
+
+                  </TouchableOpacity>
+                </Col>
+
+                <Col style={styles.inputView}>
+                  <TextInput
+                    style={{ color: colors.mainFontColour }}
+                    value={ingredient.name}
+                    placeholder='Ingredient name..'
+                    onChangeText={(text) => {
+                      const newIngredients = [...ingredients];
+                      newIngredients[index].name = text;
+                      setIngredients(newIngredients);
+                    }}
+                  />
+                  <TouchableOpacity onPress={() => removeIngredient(index)}>
+                    <Icon name='close-circle-outline' size={30} color='#ff6161' />
+                  </TouchableOpacity>
+                </Col>
+              </Row>
+            ))}
+          </View>
+
+          <View>
+            <TouchableOpacity style={styles.noteBtn} onPress={addIngredient}>
               <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Ingredients</Text>
             </TouchableOpacity>
           </View>
         </View>
+
 
         <View paddingVertical={20}>
 

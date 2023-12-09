@@ -379,7 +379,8 @@ export default StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 5,
     backgroundColor: 'white',
-    flexBasis: '40%'
+    flexBasis: '40%',
+    height: 40
   },
   shadow: {
     backgroundColor: 'white',
