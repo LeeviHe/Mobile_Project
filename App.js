@@ -15,6 +15,7 @@ import Ingredient from './components/Ingredient';
 import MyIngredients from './components/MyIngredients'
 import MakeAPockettini from './components/MakeAPockettini';
 import GlobalProvider from './reusables/Functions';
+import { PockettiniProvider } from './components/PockettiniContext';
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator();
@@ -52,101 +53,103 @@ const MoreNavigator = () => {
 export default function App() {
   return (
     <GlobalProvider>
-    <NavigationContainer>
-      <Tab.Navigator
-        initialRouteName='Home'
-        screenOptions={{
-          headerShown: false
-        }}
-        tabBar={({ navigation, state, descriptors, insets }) => (
-          <BottomNavigation.Bar
-            navigationState={state}
-            safeAreaInsets={insets}
-            style={{ backgroundColor: colors.white }} // Set background color for the tab bar
-            activeColor='#313131'
-            inactiveColor='#c0c0c0'
-            onTabPress={({ route, preventDefault }) => {
-              const event = navigation.emit({
-                type: 'tabPress',
-                target: route.key,
-                canPreventDefault: true,
-              });
-
-              if (event.defaultPrevented) {
-                preventDefault();
-              } else {
-                navigation.dispatch({
-                  ...CommonActions.navigate(route.name, route.params),
-                  target: state.key,
-                });
-              }
+      <PockettiniProvider>
+        <NavigationContainer>
+          <Tab.Navigator
+            initialRouteName='Home'
+            screenOptions={{
+              headerShown: false
             }}
-            renderIcon={({ route, focused }) => {
-              const { options } = descriptors[route.key];
-              const iconColor = focused ? colors.secondaryFontColour : '#c0c0c0' // Set colors for active/inactive icons
+            tabBar={({ navigation, state, descriptors, insets }) => (
+              <BottomNavigation.Bar
+                navigationState={state}
+                safeAreaInsets={insets}
+                style={{ backgroundColor: colors.white }} // Set background color for the tab bar
+                activeColor='#313131'
+                inactiveColor='#c0c0c0'
+                onTabPress={({ route, preventDefault }) => {
+                  const event = navigation.emit({
+                    type: 'tabPress',
+                    target: route.key,
+                    canPreventDefault: true,
+                  });
 
-              if (options.tabBarIcon) {
-                return (
-                  options.tabBarIcon({ focused, color: iconColor, size: 30, })
-                )
-              }
+                  if (event.defaultPrevented) {
+                    preventDefault();
+                  } else {
+                    navigation.dispatch({
+                      ...CommonActions.navigate(route.name, route.params),
+                      target: state.key,
+                    });
+                  }
+                }}
+                renderIcon={({ route, focused }) => {
+                  const { options } = descriptors[route.key];
+                  const iconColor = focused ? colors.secondaryFontColour : '#c0c0c0' // Set colors for active/inactive icons
 
-              return null;
-            }}
-            getLabelText={({ route }) => {
-              const { options } = descriptors[route.key];
-              const label =
-                options.tabBarLabel !== undefined
-                  ? options.tabBarLabel
-                  : options.title !== undefined
-                    ? options.title
-                    : route.title;
+                  if (options.tabBarIcon) {
+                    return (
+                      options.tabBarIcon({ focused, color: iconColor, size: 30, })
+                    )
+                  }
 
-              return label;
-            }}
-          />
-        )}>
+                  return null;
+                }}
+                getLabelText={({ route }) => {
+                  const { options } = descriptors[route.key];
+                  const label =
+                    options.tabBarLabel !== undefined
+                      ? options.tabBarLabel
+                      : options.title !== undefined
+                        ? options.title
+                        : route.title;
 
-        <Tab.Screen
-          name="Home"
-          component={Home}
-          options={{
-            tabBarLabel: 'Home',
-            tabBarIcon: ({ color, size }) => {
-              return <Icon name="home" size={size} color={color} />;
-            },
-          }} />
-        <Tab.Screen
-          name="CocktailsNavigator"
-          component={CocktailsNavigator}
-          options={{
-            tabBarLabel: 'Cocktails',
-            tabBarIcon: ({ color, size }) => {
-              return <Icon name="glass-cocktail" size={size} color={color} />;
-            },
-          }} />
-        <Tab.Screen
-          name="IngredientsNavigator"
-          component={IngredientsNavigator}
-          options={{
-            tabBarLabel: 'Ingredients',
-            tabBarIcon: ({ color, size }) => {
-              return <Icon name="bottle-tonic" size={size} color={color} />;
-            },
-          }} />
-        <Tab.Screen
-          name="MoreNavigator"
-          component={MoreNavigator}
-          options={{
-            tabBarLabel: 'More',
-            tabBarIcon: ({ color, size }) => {
-              return <Icon name="dots-horizontal" size={size} color={color} />;
-            },
-          }}
-        />
+                  return label;
+                }}
+              />
+            )}>
 
-      </Tab.Navigator>
-    </NavigationContainer >
+            <Tab.Screen
+              name="Home"
+              component={Home}
+              options={{
+                tabBarLabel: 'Home',
+                tabBarIcon: ({ color, size }) => {
+                  return <Icon name="home" size={size} color={color} />;
+                },
+              }} />
+            <Tab.Screen
+              name="CocktailsNavigator"
+              component={CocktailsNavigator}
+              options={{
+                tabBarLabel: 'Cocktails',
+                tabBarIcon: ({ color, size }) => {
+                  return <Icon name="glass-cocktail" size={size} color={color} />;
+                },
+              }} />
+            <Tab.Screen
+              name="IngredientsNavigator"
+              component={IngredientsNavigator}
+              options={{
+                tabBarLabel: 'Ingredients',
+                tabBarIcon: ({ color, size }) => {
+                  return <Icon name="bottle-tonic" size={size} color={color} />;
+                },
+              }} />
+            <Tab.Screen
+              name="MoreNavigator"
+              component={MoreNavigator}
+              options={{
+                tabBarLabel: 'More',
+                tabBarIcon: ({ color, size }) => {
+                  return <Icon name="dots-horizontal" size={size} color={color} />;
+                },
+              }}
+            />
+
+          </Tab.Navigator>
+        </NavigationContainer>
+      </PockettiniProvider>
     </GlobalProvider>
   );
 }

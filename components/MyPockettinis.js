@@ -1,17 +1,17 @@
 import { Text, View, TouchableOpacity, Image } from 'react-native';
 import styles from '../styles/styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useState, useEffect } from 'react';
-import { colors, fonts, padding, textStyles } from '../styles/style-constants';
-
+import { colors, fonts, textStyles } from '../styles/style-constants';
+import { usePockettini } from './PockettiniContext';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function MyPockettinis({ navigation, route }) {
+  const { pockettinis, removePockettini } = usePockettini();
 
-  const [isHeartSelected, setHeartSelected] = useState(false);
-
-  const toggleHeart = () => {
-    setHeartSelected(!isHeartSelected);
-  };
+  const deletePockettini = (index) => {
+    removePockettini(index)
+  }
 
   return (
     <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
@@ -33,17 +33,53 @@ export default function MyPockettinis({ navigation, route }) {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.cocktail, { backgroundColor: colors.purple }]}>
-          <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
-            <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-            <View style={styles.cocktailInfo}>
-              <Text style={styles.drinkText}>Name</Text>
-              <Text style={styles.drinkText}>Category</Text>
-            </View>
-          </View>
+        {
+          pockettinis.map((pockettini, index) => (
+            <GestureHandlerRootView>
+              <Swipeable
+                key={index}
+                renderRightActions={() => (
+                  <View style={{ alignItems: 'center', justifyContent: 'space-between', marginVertical: 10 }}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('MakeAPockettini',
+                          { pockettini: pockettinis[index] })}
+                      style={{ justifyContent: 'center' }}>
 
-        </TouchableOpacity>
+                      <Icon
+                        name='pencil'
+                        size={30}
+                        color={colors.mainFontColour} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => deletePockettini(index)}
+                      style={{ justifyContent: 'center' }}>
+                      <Icon
+                        name='close'
+                        size={40}
+                        color='#ff6161' />
+                    </TouchableOpacity>
+                  </View>)}>
+
+
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.cocktail, { backgroundColor: colors.purple }]}>
+
+                  <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
+                    <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+                    <View style={styles.cocktailInfo}>
+                      <Text style={styles.drinkText}>{pockettini.drinkName}</Text>
+                      <Text style={styles.drinkText}>{pockettini.drinkCategory}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </Swipeable>
+            </GestureHandlerRootView>
+          ))
+        }
+
       </View>
 
     </View>
