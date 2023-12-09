@@ -30,7 +30,7 @@ export async function getJsonIngredients (url, condition, setJsonData) {
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FAVOURITE_DRINKS_KEY } from './Constants';
+import { FAVOURITE_DRINKS_KEY, OWNED_INGR_KEY } from './Constants';
 
 // Create a context to share the global state
 const GlobalContext = createContext();
@@ -39,17 +39,19 @@ const GlobalContext = createContext();
 export const useGlobalState = () => useContext(GlobalContext);
 
 const GlobalProvider = ({ children }) => {
-  const [favouritesData, setFavouritesData] = useState([/* Initial data */]);
+  const [favouritesData, setFavouritesData] = useState([]);
+  const [ownedData, setOwnedData] = useState([])
 
   // useEffect to fetch data from AsyncStorage when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch data from AsyncStorage
-        const dataFromStorage = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY);
-        
+        const favDataFromStorage = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY);
+        const ownedDataFromStorage = await AsyncStorage.getItem(OWNED_INGR_KEY)
         // Update the global state with the data
-        setFavouritesData(dataFromStorage);
+        setFavouritesData(favDataFromStorage);
+        setOwnedData(ownedDataFromStorage)
       } catch (error) {
         console.error('Error fetching data from AsyncStorage:', error);
       }
@@ -61,7 +63,7 @@ const GlobalProvider = ({ children }) => {
 
   // Context provider to make the global state available to the components
   return (
-    <GlobalContext.Provider value={{ favouritesData, setFavouritesData }}>
+    <GlobalContext.Provider value={{ favouritesData, setFavouritesData, ownedData, setOwnedData }}>
       {children}
     </GlobalContext.Provider>
   );

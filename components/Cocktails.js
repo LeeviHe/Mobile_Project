@@ -271,8 +271,8 @@ export default function Cocktails({ navigation, route }) {
       try {
           const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
           if (jsonValue !== null) {
-              let tmpScores = JSON.parse(jsonValue)
-              setFavourites(tmpScores)
+              let tmp = JSON.parse(jsonValue)
+              setFavourites(tmp)
           }
       }
       catch (e) {
