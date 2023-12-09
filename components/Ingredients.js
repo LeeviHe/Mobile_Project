@@ -87,12 +87,12 @@ const getOwnedData = async () => {
 
   const renderItem = ({ item, index }) => {
 
-    const isOwned = owned.some(own => own.ingrId === item.idIngredient)
+    const isOwned = owned.some(own => own.idIngredient === item.idIngredient)
     
     const toggleStar = async() => {
         try {
             if (isOwned) {
-                const newOwned = owned.filter((own) => own.ingrId !== item.idIngredient)
+                const newOwned = owned.filter((own) => own.idIngredient !== item.idIngredient)
                 await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
                 setOwned(newOwned)
                 alert('Ingredient removed from owned')
@@ -100,7 +100,7 @@ const getOwnedData = async () => {
                 const newKey = owned.length + 1
                 const ingrInfo = {
                     key: newKey,
-                    ingrId: item.idIngredient,
+                    idIngredient: item.idIngredient,
                 }
                 const newOwned = [...owned, ingrInfo]
                 await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
@@ -110,7 +110,7 @@ const getOwnedData = async () => {
         } catch(error) {
             console.log('Error saving ingredient: ' + error)
             setOwned((prevOwned) => 
-            prevOwned.filter((own) => own.ingrId !== item.idIngredient))
+            prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
         }
         //
         console.log(owned.length)
@@ -119,14 +119,15 @@ const getOwnedData = async () => {
     return (
     <View  style={styles.drinkContainer}>
         <TouchableOpacity
-        key={index}
-            style={[styles.cocktail, { backgroundColor: '#999' }]}
-            onPress={() =>
-                navigation.navigate('Ingredient', {
-                    ingrId: item.idIngredient,
-                    ingrName: item.strIngredient,
-                    ingrImg: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png'
-                })}>
+          key={index}
+          style={[styles.cocktail, { backgroundColor: '#999' }]}
+          onPress={() =>
+              navigation.navigate('Ingredient', {
+                  idIngredient: item.idIngredient,
+                  ingrName: item.strIngredient,
+                  ingrImg: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png'
+              })
+          }>
 
             <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
                 <Image

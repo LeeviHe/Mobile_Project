@@ -11,7 +11,7 @@ import { Button } from 'react-native-paper';
 import { ScrollView } from 'react-native-virtualized-view';
 import { useGlobalState } from '../reusables/Functions';
 
-export default function Favourites({ navigation, route}) {
+export default function Favourites({ navigation , route }) {
   const [favouritesIds, setFavouritesIds] = useState([])
   const [favourites, setFavourites] = useState([])
   const [temp, setTemp] = useState([])
@@ -41,7 +41,6 @@ export default function Favourites({ navigation, route}) {
     const fetchData = async () => {
       let tempData = []
       for (let i = 0; i < favouritesIds.length; i++) {
-        console.log(favouritesIds)
         try {
           const result = await getJsonDrinks(URL, 'lookup.php?i=' + favouritesIds[i].drinkId, setTemp)
           tempData = [...tempData, ...result]
@@ -50,7 +49,7 @@ export default function Favourites({ navigation, route}) {
         }
       }
       if (tempData) {
-      setNewInfo(tempData)
+        setNewInfo(tempData)
       } else {
         console.log('No tempData')
       }

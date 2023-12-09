@@ -18,7 +18,7 @@ const Ingredient = ({ navigation, route }) => {
   const [owned, setOwned] = useState([])
 
   useEffect(() => {
-    getJsonIngredients(URL, 'lookup.php?iid=' + route.params.ingrId, setIngredientData);
+    getJsonIngredients(URL, 'lookup.php?iid=' + route.params.idIngredient, setIngredientData);
     getJsonDrinks(URL, 'filter.php?i=' + route.params.ingrName, setIngredientDrinks);
   }, [route]);
 
@@ -42,13 +42,13 @@ const getOwnedData = async () => {
     }
 }
 
-  const isOwned = owned.some(own => own.ingrId === route.params.ingrId)
+  const isOwned = owned.some(own => own.idIngredient === route.params.idIngredient)
     
   const toggleStar = async() => {
       try {
         console.log(ingredientData[0].idIngredient)
           if (isOwned) {
-              const newOwned = owned.filter((own) => own.ingrId !== ingredientData[0].idIngredient)
+              const newOwned = owned.filter((own) => own.idIngredient !== ingredientData[0].idIngredient)
               await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
               setOwned(newOwned)
               alert('Ingredient removed from owned')
@@ -56,7 +56,7 @@ const getOwnedData = async () => {
               const newKey = owned.length + 1
               const ingrInfo = {
                   key: newKey,
-                  ingrId: ingredientData[0].idIngredient,
+                  idIngredient: ingredientData[0].idIngredient,
               }
               const newOwned = [...owned, ingrInfo]
               await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
@@ -66,7 +66,7 @@ const getOwnedData = async () => {
       } catch(error) {
           console.log('Error saving ingredient: ' + error)
           setOwned((prevOwned) => 
-          prevOwned.filter((own) => own.ingrId !== ingredientData[0].idIngredient))
+          prevOwned.filter((own) => own.idIngredient !== ingredientData[0].idIngredient))
       }
       //
       console.log(owned.length)
