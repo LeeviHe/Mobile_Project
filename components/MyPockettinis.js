@@ -43,11 +43,6 @@ export default function MyPockettinis({ navigation, route }) {
             </View>
           </View>
 
-          <View style={{ marginRight: 40 }}>
-            <TouchableOpacity onPress={toggleHeart}>
-              <Icon name={isHeartSelected ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
-            </TouchableOpacity>
-          </View>
         </TouchableOpacity>
       </View>
 
