@@ -76,14 +76,17 @@ export default function MyPockettinis({ navigation, route }) {
                     </TouchableOpacity>
                   </View>)}>
 
-
                 <TouchableOpacity
                   key={index}
                   style={[styles.cocktail, { backgroundColor: colors.purple }]}>
 
                   <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
 
-                    <Image source={{ uri: pockettini.drinkImg }} style={styles.drinkImg} />
+                    {pockettini.drinkImg ? (
+                      <Image source={{ uri: pockettini.drinkImg }} style={styles.drinkImg} />
+                    ) : (
+                      <Image source={require('../assets/images/img-placeholder.jpg')} style={styles.drinkImg} />
+                    )}
 
                     <View style={styles.cocktailInfo}>
                       <Text style={styles.drinkText}>{pockettini.drinkName}</Text>
