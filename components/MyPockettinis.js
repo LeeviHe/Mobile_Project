@@ -82,7 +82,9 @@ export default function MyPockettinis({ navigation, route }) {
                   style={[styles.cocktail, { backgroundColor: colors.purple }]}>
 
                   <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
-                    <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
+
+                    <Image source={{ uri: pockettini.drinkImg }} style={styles.drinkImg} />
+
                     <View style={styles.cocktailInfo}>
                       <Text style={styles.drinkText}>{pockettini.drinkName}</Text>
                       <Text style={styles.drinkText}>{pockettini.drinkCategory}</Text>

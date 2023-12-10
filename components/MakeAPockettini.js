@@ -7,12 +7,12 @@ import { Col, Row } from 'react-native-flex-grid';
 import styles from '../styles/styles';
 import { colors, fonts, textStyles } from '../styles/style-constants';
 import { usePockettini } from './PockettiniContext';
-import { launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function MakeAPockettini({ navigation, route }) {
   const { index, pockettini } = route.params ?? {}
   const { addPockettini, removePockettini } = usePockettini()
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [image, setImage] = useState(null);
 
   const [drinkName, setDrinkName] = useState(pockettini?.drinkName || '')
   const [category, setCategory] = useState(pockettini?.drinkCategory || '')
@@ -27,8 +27,7 @@ export default function MakeAPockettini({ navigation, route }) {
   const [isModalVisible, setModalVisible] = useState(false)
   const [isOverlayVisible, setOverlayVisible] = useState(false)
 
-
-  const isEmpty = !drinkName || !category || !ingrName || preparations.length === 0;
+  const isEmpty = !drinkName || !category || !number || !amount || preparations.length === 0;
 
   const togglePicker = (type) => {
     const isVisible = isModalVisible;
@@ -80,45 +79,57 @@ export default function MakeAPockettini({ navigation, route }) {
     'pint'
   ]
 
-  const updateList = (type, action, value, index) => {
-    let newList;
-    switch (type) {
-      case 'ingredients':
-        newList = action === 'update' ?
-          ingredients.map((item, i) => i === index ? { ...item, ...value } : item) :
-          action === 'add' ?
-            [...ingredients, { number: 0, amount: '-', name: '' }] :
-            ingredients.filter((_, i) => i !== index);
-        setIngredients(newList);
-        break;
-      case 'preparations':
-        newList = action === 'update' ?
-          preparations.map((item, i) => i === index ? value : item) :
-          action === 'add' ?
-            [...preparations, ''] :
-            preparations.filter((_, i) => i !== index);
-        setPreparations(newList);
-        break;
-      case 'notes':
-        newList = action === 'update' ?
-          notes.map((item, i) => i === index ? value : item) :
-          action === 'add' ?
-            [...notes, ''] :
-            notes.filter((_, i) => i !== index);
-        setNotes(newList);
-        break;
-    }
+  const addIngredient = () => {
+    setIngredients([...ingredients, { number: 0, amount: '-', name: '' }]);
   };
+
+  const removeIngredient = (index) => {
+    const newIngredients = ingredients.filter((_, i) => i !== index);
+    setIngredients(newIngredients);
+  };
+
+  const addPreparation = () => {
+    setPreparations([...preparations, '']);
+  };
+
+  const removePreparation = (index) => {
+    const newPreparations = [...preparations]
+    newPreparations.splice(index, 1)
+    setPreparations(newPreparations)
+  };
+
+  const updatePreparation = (index, text) => {
+    const newPreparations = [...preparations];
+    newPreparations[index] = text;
+    setPreparations(newPreparations);
+  };
+
+  const addNotes = () => {
+    setNotes([...notes, '']);
+  };
+
+  const removeNotes = (index) => {
+    const newNotes = [...notes]
+    newNotes.splice(index, 1)
+    setNotes(newNotes)
+  };
+
+  const updateNote = (index, text) => {
+    const newNotes = [...notes];
+    newNotes[index] = text;
+    setNotes(newNotes);
+  }
 
   const handleSave = () => {
     const newPockettini = {
       drinkName: drinkName,
+      drinkImg: image,
       drinkCategory: category,
       number: number,
       amount: amount,
       ingrName: ingrName,
       steps: preparations,
-      notes
+      notes: notes
     }
 
     addPockettini(newPockettini)
@@ -146,47 +157,18 @@ export default function MakeAPockettini({ navigation, route }) {
     );
   }
 
-  const openImagePicker = () => {
-    const options = {
-      mediaType: 'photo',
-      includeBase64: false,
-      maxHeight: 2000,
-      maxWidth: 2000,
-    };
-
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('Image picker error: ', response.error);
-      } else {
-        let imageUri = response.uri || response.assets?.[0]?.uri;
-        setSelectedImage(imageUri);
-      }
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
   };
-
-  /*const selectImage = () => {
-    const options = {
-      title: 'Select Image',
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        const source = { uri: response.uri };
-        setImg(source.uri);
-      }
-    });
-  };*/
-
 
   return (
     <ScrollView>
@@ -211,6 +193,7 @@ export default function MakeAPockettini({ navigation, route }) {
               </TouchableOpacity>
 
               <TouchableOpacity onPress={handleSave}
+                disabled={isEmpty}
                 style={[styles.saveBtn,
                 { backgroundColor: isEmpty ? '#C0C0C0' : colors.mainFontColour }]}>
 
@@ -241,27 +224,13 @@ export default function MakeAPockettini({ navigation, route }) {
             </TouchableOpacity>
           </View>
 
-
-          {selectedImage && (
-            <Image
-              source={{ uri: selectedImage }}
-              style={{ flex: 1 }}
-              resizeMode="contain"
-            />
-          )}
-
-          <TouchableOpacity onPress={openImagePicker}>
-            <Text>Pick an Image</Text>
-          </TouchableOpacity>
-
-          {/*<TouchableOpacity onPress={selectImage} style={styles.imgContainer}>
-            {img ? (
-              <Image source={{ uri: img }} style={{ width: 100, height: 100 }} />
+          <TouchableOpacity onPress={pickImage} style={styles.imgContainer}>
+            {image ? (
+              <Image source={{ uri: image }} style={{ width: '100%', height: '100%' }} />
             ) : (
               <Icon name="image-multiple-outline" size={100} color={colors.mainFontColour} />
             )}
-            </TouchableOpacity>*/}
-
+          </TouchableOpacity>
 
         </View>
 
@@ -298,7 +267,7 @@ export default function MakeAPockettini({ navigation, route }) {
 
           <View>
             {ingredients.map((ingredient, index) => (
-              <Row key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10 }]}>
+              <Row key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
                 <Col style={styles.editAmount}>
                   <TouchableOpacity
                     onPress={() => togglePicker('numberAmount', index)}
@@ -327,7 +296,7 @@ export default function MakeAPockettini({ navigation, route }) {
                       setIngredients(newIngredients);
                     }}
                   />
-                  <TouchableOpacity onPress={() => updateList('ingredients', 'remove', null, index)}>
+                  <TouchableOpacity onPress={() => removeIngredient(index)}>
                     <Icon name='close-circle-outline' size={30} color='#ff6161' />
                   </TouchableOpacity>
                 </Col>
@@ -337,12 +306,11 @@ export default function MakeAPockettini({ navigation, route }) {
           </View>
 
           <View>
-            <TouchableOpacity style={styles.noteBtn} onPress={() => updateList('ingredients', 'add')}>
+            <TouchableOpacity style={styles.noteBtn} onPress={addIngredient}>
               <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Ingredients</Text>
             </TouchableOpacity>
           </View>
         </View>
-
 
         <View style={[styles.partContainer, { marginTop: 50 }]}>
           <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Preparation</Text>
@@ -352,21 +320,22 @@ export default function MakeAPockettini({ navigation, route }) {
               style={{ color: colors.mainFontColour }}
               value={preparations[0]}
               placeholder='Step 1..'
-              onChangeText={(text) => updateList(0, text)}
+              onChangeText={(text) => updatePreparation(0, text)}
             />
+
           </View>
 
           <View>
             {preparations.slice(1).map((preparation, index) => (
-              <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10 }]}>
+              <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
                 <View style={styles.inputViewLarge}>
                   <TextInput
                     style={{ color: colors.mainFontColour }}
                     value={preparation}
                     placeholder={`Step ${index + 2}..`}
-                    onChangeText={(text) => updateList('preparations', 'update', text, index + 1)}
-                  />
-                  <TouchableOpacity onPress={() => updateList('preparations', 'remove', null, index + 1)}>
+                    onChangeText={(text) => updatePreparation(index + 1, text)} />
+
+                  <TouchableOpacity onPress={() => removePreparation(index + 1)}>
                     <Icon name='close-circle-outline' size={30} color='#ff6161' />
                   </TouchableOpacity>
                 </View>
@@ -374,7 +343,7 @@ export default function MakeAPockettini({ navigation, route }) {
             ))}
           </View>
 
-          <TouchableOpacity style={styles.noteBtn} onPress={() => updateList('preparations', 'add')}>
+          <TouchableOpacity style={styles.noteBtn} onPress={addPreparation}>
             <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Preparations</Text>
           </TouchableOpacity>
         </View>
@@ -384,15 +353,15 @@ export default function MakeAPockettini({ navigation, route }) {
 
           <View>
             {notes.map((note, index) => (
-              <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10 }]}>
+              <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
                 <View style={styles.inputViewLarge}>
                   <TextInput
                     style={{ color: colors.mainFontColour }}
                     value={note}
                     placeholder={'Write something here..'}
-                    onChangeText={(text) => updateList('notes', 'update', text, index)}
+                    onChangeText={(text) => updateNote(index, text)}
                   />
-                  <TouchableOpacity onPress={() => updateList('notes', 'remove', null, index)}>
+                  <TouchableOpacity onPress={() => removeNotes(index)}>
                     <Icon name='close-circle-outline' size={30} color='#ff6161' />
                   </TouchableOpacity>
                 </View>
@@ -401,7 +370,7 @@ export default function MakeAPockettini({ navigation, route }) {
           </View>
 
 
-          <TouchableOpacity style={styles.noteBtn} onPress={() => updateList('notes', 'add')}>
+          <TouchableOpacity style={styles.noteBtn} onPress={addNotes}>
             <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Notes</Text>
           </TouchableOpacity>
         </View>
