@@ -11,17 +11,17 @@ import * as ImagePicker from 'expo-image-picker';
 
 export default function MakeAPockettini({ navigation, route }) {
   const { index, pockettini } = route.params ?? {}
-  const { addPockettini, removePockettini } = usePockettini()
-  const [image, setImage] = useState(null);
+  const { addPockettini, removePockettini, updatePockettini } = usePockettini()
+  const [image, setImage] = useState(pockettini?.drinkImg || null);
 
   const [drinkName, setDrinkName] = useState(pockettini?.drinkName || '')
   const [category, setCategory] = useState(pockettini?.drinkCategory || '')
-  const [number, setNumber] = useState()
-  const [amount, setAmount] = useState()
-  const [ingrName, setIngrName] = useState("")
+  const [number, setNumber] = useState(pockettini?.number || '')
+  const [amount, setAmount] = useState(pockettini?.amount || '')
+  const [ingrName, setIngrName] = useState(pockettini?.ingrName || '')
   const [ingredients, setIngredients] = useState([])
-  const [preparations, setPreparations] = useState([])
-  const [notes, setNotes] = useState([])
+  const [preparations, setPreparations] = useState(pockettini?.steps || [])
+  const [notes, setNotes] = useState(pockettini?.notes || [])
 
   const [modalType, setModalType] = useState('')
   const [isModalVisible, setModalVisible] = useState(false)
@@ -132,7 +132,12 @@ export default function MakeAPockettini({ navigation, route }) {
       notes: notes
     }
 
-    addPockettini(newPockettini)
+    if (index !== undefined) {
+      updatePockettini(index, newPockettini)
+    } else {
+      addPockettini(newPockettini)
+    }
+
     navigation.navigate('MyPockettinis')
   }
 
