@@ -32,7 +32,6 @@ export const PockettiniProvider = ({ children }) => {
     await AsyncStorage.setItem('pockettinis', JSON.stringify(newPockettinis));
   };
 
-
   return (
     <PockettiniContext.Provider value={{ pockettinis, addPockettini, removePockettini }}>
       {children}

@@ -348,7 +348,6 @@ export default StyleSheet.create({
   saveBtn: {
     paddingVertical: 6,
     paddingHorizontal: 14,
-    backgroundColor: colors.mainFontColour,
     borderRadius: 10
   },
   imgContainer: {

@@ -1,4 +1,4 @@
-import { Text, View, TouchableOpacity, Image } from 'react-native';
+import { Text, View, TouchableOpacity, Image, Alert } from 'react-native';
 import styles from '../styles/styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors, fonts, textStyles } from '../styles/style-constants';
@@ -10,7 +10,21 @@ export default function MyPockettinis({ navigation, route }) {
   const { pockettinis, removePockettini } = usePockettini();
 
   const deletePockettini = (index) => {
-    removePockettini(index)
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this Pockettini?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "OK",
+          onPress: () => removePockettini(index)
+        }
+      ]
+    );
   }
 
   return (
@@ -43,7 +57,7 @@ export default function MyPockettinis({ navigation, route }) {
                     <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('MakeAPockettini',
-                          { pockettini: pockettinis[index] })}
+                          { pockettini: pockettinis[index], index })}
                       style={{ justifyContent: 'center' }}>
 
                       <Icon
