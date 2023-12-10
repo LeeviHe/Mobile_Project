@@ -5,13 +5,13 @@ import { useState, useEffect } from 'react';
 import { colors, fonts, padding, textStyles } from '../styles/style-constants';
 import { Row, Col } from "react-native-flex-grid";
 import { Searchbar } from 'react-native-paper';
-import { URL, OWNED_INGR_KEY } from '../reusables/Constants';
+import { URL, OWNED_INGR_KEY, FAVOURITE_DRINKS_KEY } from '../reusables/Constants';
 import { getJsonIngredients } from '../reusables/Functions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-virtualized-view'
 import { useGlobalState } from '../reusables/Functions';
 
-export default function MyPockettinis( { navigation } ) {
+export default function MyPockettinis( { navigation, route } ) {
   const [check, setCheck] = useState(false);
   const [cocktailView, setCocktailView] = useState(false);
   const [ingredientView, setIngredientView] = useState(true);
@@ -20,6 +20,16 @@ export default function MyPockettinis( { navigation } ) {
   const [temp, setTemp] = useState([])
   const [newInfo, setNewInfo] = useState([])
   const { asyncStorageData } = useGlobalState()
+  const [errorStatus, setErrorStatus] = useState(null)
+
+    // Iteration of favourited drinks
+    const [favourites, setFavourites] = useState([])
+  //Selected ingredients index
+  const [selectedItemsIndex, setSelectedItemsIndex] = useState([])
+  //Selected ingredients names
+  const [selectedItems, setSelectedItems] = useState([])
+  // Drinks available with selectedItems
+  const [availableRecipes, setAvailableRecipes] = useState([])
 
   useEffect (() => {
     const unsubsribe = navigation.addListener('focus', () => {
@@ -27,6 +37,17 @@ export default function MyPockettinis( { navigation } ) {
     })
     return () => {unsubsribe()}
   }, [asyncStorageData])
+
+  useEffect(() => {
+    let string = selectedItems.toString()
+    if (selectedItems.length === 0) {
+      console.log('Non selected')
+      setErrorStatus('No ingredients selected')
+      setAvailableRecipes([])
+    } else {
+      getDrinks('filter.php?i=' + string)
+    }
+  }, [selectedItems])
 
   useEffect (() => {
       console.log(ownedId.length)
@@ -52,8 +73,52 @@ export default function MyPockettinis( { navigation } ) {
   useEffect (() => {
     if (newInfo.length > 0) {
       setOwned(newInfo)
+      setSelectedItemsIndex(new Array(newInfo.length).fill(false))
     }
   }, [newInfo])
+
+  useEffect (() => {
+    const unsubsribe = navigation.addListener('focus', () => {
+        getFavouriteData()
+    })
+    return unsubsribe
+}, [navigation])
+
+const getFavouriteData = async () => {
+    try {
+        const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
+        if (jsonValue !== null) {
+            let tmp = JSON.parse(jsonValue)
+            setFavourites(tmp)
+        }
+    }
+    catch (e) {
+        console.log('Read error: ' + e)
+    }
+}
+
+  async function getDrinks(method) {
+    try {
+      const response = await fetch(URL + method);
+      if (response.ok) {
+        console.log(method)
+        const json = await response.json();
+        if (json.drinks === undefined || json.drinks === null || json.drinks === '' || json.drinks === 0 || !json.drinks || json.drinks === "None Found") {
+          setErrorStatus('No drinks found!')
+          setAvailableRecipes([])
+          return
+        } else {
+          setErrorStatus(null)
+        }
+        const drinks = json.drinks;
+        setAvailableRecipes(drinks);
+      } else {
+        alert('Error retrieving recipes!');
+      }
+    } catch (err) {
+      alert(err);
+    }
+  }
 
   const getOwnedData = async () => {
       try {
@@ -68,7 +133,7 @@ export default function MyPockettinis( { navigation } ) {
       }
   }
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item, index }) => {
     const isOwned = true
     
     const toggleStar = async() => {
@@ -93,7 +158,7 @@ export default function MyPockettinis( { navigation } ) {
       <TouchableOpacity onPress={toggleStar}>
         <Icon name={isOwned ? 'star' : 'star-outline'} size={30} color="#e7c500" />
       </TouchableOpacity>
-      <Pressable style={styles.myBtn} onPress={toggleCheck}>
+      <Pressable style={styles.myBtn} onPress={() => selectItems(index, item.strIngredient)}>
         <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
       </Pressable>
 
@@ -103,7 +168,26 @@ export default function MyPockettinis( { navigation } ) {
       </View>
     </View>
     )
-  };
+  }
+
+  const selectItems = (index, item) => {
+    let selected = [...selectedItemsIndex]
+    selected[index] = selectedItemsIndex[index] ? false : true
+    setSelectedItemsIndex(selected)
+
+    if (selectedItemsIndex[index]) {
+      console.log('splice')
+      setSelectedItems(oldValues => {
+        return oldValues.filter(checked => checked !== item)
+      })
+    } else {
+      console.log('push')
+      let ItemCopy = [...selectedItems]
+      ItemCopy.push(item)
+      setSelectedItems(ItemCopy)
+    }
+    console.log(selectedItems)
+  }
 
   const viewCocktails = () => {
     setCocktailView(true);
@@ -118,6 +202,91 @@ export default function MyPockettinis( { navigation } ) {
   const toggleCheck = () => {
     setCheck(!check);
   };
+
+  const renderDrinkItem = ({ item, index }) => {
+    
+    const isFavourited = favourites.some((fav) => fav.drinkId === item.idDrink)
+
+    const toggleHeart = async() => {
+      try {
+        if (isFavourited) {
+          const newFavourites = favourites.filter((fav) => fav.drinkId !== item.idDrink)
+          await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
+          setFavourites(newFavourites)
+          alert('Drink removed from favourites')
+        } else {
+          
+          const newKey = favourites.length + 1
+          const drinkInfo = {
+            key: newKey,
+            drinkId: item.idDrink,
+          }
+          const newFavourites = [...favourites, drinkInfo]
+          await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
+          setFavourites(newFavourites)
+          alert('Favourite saved')
+        }
+      } catch(error) {
+        console.log('Error saving favourite: ' + error)
+        setFavourites((prevFavourites) => 
+        prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
+        )
+      }
+    }
+
+    
+
+    const categoryBackgroundColor = () => {
+      // Duplicates for search query issues
+      const categoryColors = {
+        'Coffee_/_Tea': colors.brown,
+        'Coffee / Tea': colors.brown,
+        'Other / Unknown': '#999',
+        'Alcoholic': colors.purple,
+        'Non_Alcoholic': colors.green,
+        'Non Alcoholic': colors.green,
+        'Soft Drink': colors.yellow
+      }
+    };
+
+    return (
+      <View style={styles.drinkContainer}>
+        <TouchableOpacity
+          key={index}
+          style={[styles.cocktail, { backgroundColor: 'pink' }]}
+          onPress={() =>
+            navigation.navigate('Recipe', {
+              drinkId: item.idDrink,
+              drinkName: item.strDrink,
+              image: item.strDrinkThumb,
+              category: item.strCategory,
+              glass: item.strGlass,
+              instructions: item.strInstructions,
+              screen: 'MyIngredients'
+            })
+          }>
+
+          <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
+            <Image source={{ uri: item.strDrinkThumb }} style={styles.drinkImg} />
+
+            <View style={styles.cocktailInfo}>
+              <Text style={styles.drinkText} numberOfLines={1} ellipsizeMode="tail">
+                {item.strDrink}
+              </Text>
+                <Text style={styles.drinkText}>{item.strCategory}</Text>
+            </View>
+
+          </View>
+
+          <View style={{ marginRight: 40 }}>
+            <TouchableOpacity onPress={toggleHeart}>
+              <Icon name={isFavourited ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
@@ -140,7 +309,7 @@ export default function MyPockettinis( { navigation } ) {
 
               <View style={styles.topIngrNbr}
                 backgroundColor={ingredientView ? '#333' : '#ddd'}>
-                <Text style={{ color: colors.white }}>0</Text>
+                <Text style={{ color: colors.white }}>{selectedItems.length}</Text>
               </View>
 
             </TouchableOpacity>
@@ -159,7 +328,7 @@ export default function MyPockettinis( { navigation } ) {
 
               <View style={styles.topIngrNbr}
                 backgroundColor={cocktailView ? '#333' : '#ddd'}>
-                <Text style={{ color: colors.white }}>0</Text>
+                <Text style={{ color: colors.white }}>{availableRecipes.length}</Text>
               </View>
             </TouchableOpacity>
           </Col>
@@ -229,26 +398,23 @@ export default function MyPockettinis( { navigation } ) {
         </ScrollView>
       )}
 
-      {cocktailView && (
-        <ScrollView style={{ marginHorizontal: 10, marginTop: 20 }}>
+      {cocktailView && 
+        <View>
           <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Possible cocktails</Text>
-
+          { errorStatus ? 
+          <Text>{errorStatus}</Text>
+          :
           <View style={styles.drinkContainer}>
-            <TouchableOpacity
-              style={[styles.cocktail, { backgroundColor: 'lightblue' }]}>
-
-              <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
-                <Image source={require('../assets/images/CoffeeTea-category.png')} style={styles.drinkImg} />
-
-                <View style={styles.cocktailInfo}>
-                  <Text style={styles.drinkText}>drink name</Text>
-                  <Text style={styles.drinkText}>category</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
+            <FlatList
+            data={availableRecipes}
+            renderItem={renderDrinkItem}
+            keyExtractor={(item, index) => index.toString()}
+            extraData={availableRecipes}
+            />
           </View>
-        </ScrollView>
-      )}
+        }
+        </View>
+      }
     </View>
   )
 }

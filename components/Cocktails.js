@@ -305,7 +305,7 @@ export default function Cocktails({ navigation, route }) {
     setSelectedIngredients(filters)
 
     if (selectedIngredients[i]) {
-      (console.log('splice'))//delete
+      console.log('splice')//delete
       setActiveFilters(oldValues => {
         return oldValues.filter(filter => filter !== ingredient)
       })
@@ -316,7 +316,6 @@ export default function Cocktails({ navigation, route }) {
       setActiveFilters(filterCopy)
     }
     navigation.setParams({ id: 'empty' })
-    activate('i', activeFilters.join(','), activeFilters[0]);
   }
 
   const isAlcoholic = (category) => {
@@ -415,6 +414,7 @@ export default function Cocktails({ navigation, route }) {
               category: item.strCategory,
               glass: item.strGlass,
               instructions: item.strInstructions,
+              screen: 'Cocktails'
             })
           }>
 
@@ -515,7 +515,7 @@ export default function Cocktails({ navigation, route }) {
   );
 
   const RenderIngredientDropdownContent = ({ ingredientJson, showDropdown2, selectFilter, multiFilterSelectColor, colors, fonts }) => {
-    const [visibleItems, setVisibleItems] = useState(30);
+    const [visibleItems, setVisibleItems] = useState(50);
 
     //BASE INGREDIENT
     const renderItem = ({ item, index }) => (
@@ -623,7 +623,6 @@ export default function Cocktails({ navigation, route }) {
                   index={0}
                   onPress={() => {
                     searchFilter(0, 'a', 'Alcoholic');
-                    activate('a', 'Alcoholic');
                   }}
                   checked={selectedAlcohol[0]}
                   colors={colors}
@@ -635,7 +634,6 @@ export default function Cocktails({ navigation, route }) {
                   index={1}
                   onPress={() => {
                     searchFilter(1, 'a', 'Non Alcoholic');
-                    activate('a', 'Non Alcoholic');
                   }}
                   checked={selectedAlcohol[1]}
                   colors={colors}

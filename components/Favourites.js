@@ -155,6 +155,7 @@ export default function Favourites({ navigation , route }) {
               category: item.strCategory,
               glass: item.strGlass,
               instructions: item.strInstructions,
+              screen: 'Favourites'
             })
           }>
 
