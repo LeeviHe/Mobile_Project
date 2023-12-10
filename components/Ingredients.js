@@ -16,11 +16,11 @@ export default function Ingredients({ navigation, route }) {
 
   const onChangeSearch = query => setSearchQuery(query);
   async function clear() {
-    try { 
+    try {
       await AsyncStorage.removeItem(OWNED_INGR_KEY)
       setOwned([])
     } catch (e) {
-        console.log('Clear error: ' + e)
+      console.log('Clear error: ' + e)
     }
   }
   useEffect(() => {
@@ -35,25 +35,25 @@ export default function Ingredients({ navigation, route }) {
     clear()
   }, [])
 
-  useEffect (() => {
+  useEffect(() => {
     const unsubsribe = navigation.addListener('focus', () => {
-        getOwnedData()
+      getOwnedData()
     })
     return unsubsribe
-}, [navigation])
+  }, [navigation])
 
-const getOwnedData = async () => {
+  const getOwnedData = async () => {
     try {
-        const jsonValue = await AsyncStorage.getItem(OWNED_INGR_KEY)
-        if (jsonValue !== null) {
-            let tmp = JSON.parse(jsonValue)
-            setOwned(tmp)
-        }
+      const jsonValue = await AsyncStorage.getItem(OWNED_INGR_KEY)
+      if (jsonValue !== null) {
+        let tmp = JSON.parse(jsonValue)
+        setOwned(tmp)
+      }
     }
     catch (e) {
-        console.log('Read error: ' + e)
+      console.log('Read error: ' + e)
     }
-}
+  }
 
   async function getIngredient(method) {
     try {
@@ -88,69 +88,69 @@ const getOwnedData = async () => {
   const renderItem = ({ item, index }) => {
 
     const isOwned = owned.some(own => own.idIngredient === item.idIngredient)
-    
-    const toggleStar = async() => {
-        try {
-            if (isOwned) {
-                const newOwned = owned.filter((own) => own.idIngredient !== item.idIngredient)
-                await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
-                setOwned(newOwned)
-                alert('Ingredient removed from owned')
-            } else {
-                const newKey = owned.length + 1
-                const ingrInfo = {
-                    key: newKey,
-                    idIngredient: item.idIngredient,
-                }
-                const newOwned = [...owned, ingrInfo]
-                await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
-                setOwned(newOwned)
-                alert('Ingredient saved')
-            }
-        } catch(error) {
-            console.log('Error saving ingredient: ' + error)
-            setOwned((prevOwned) => 
-            prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
+
+    const toggleStar = async () => {
+      try {
+        if (isOwned) {
+          const newOwned = owned.filter((own) => own.idIngredient !== item.idIngredient)
+          await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
+          setOwned(newOwned)
+          alert('Ingredient removed from owned')
+        } else {
+          const newKey = owned.length + 1
+          const ingrInfo = {
+            key: newKey,
+            idIngredient: item.idIngredient,
+          }
+          const newOwned = [...owned, ingrInfo]
+          await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
+          setOwned(newOwned)
+          alert('Ingredient saved')
         }
-        //
-        console.log(owned.length)
+      } catch (error) {
+        console.log('Error saving ingredient: ' + error)
+        setOwned((prevOwned) =>
+          prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
+      }
+      //
+      console.log(owned.length)
     }
 
     return (
-    <View  style={styles.drinkContainer}>
+      <View style={styles.drinkContainer}>
         <TouchableOpacity
           key={index}
-          style={[styles.cocktail, { backgroundColor: '#999' }]}
+          style={[styles.cocktail, { backgroundColor: '#b5c7b0' }]}
           onPress={() =>
-              navigation.navigate('Ingredient', {
-                  idIngredient: item.idIngredient,
-                  ingrName: item.strIngredient,
-                  ingrImg: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png'
-              })
+            navigation.navigate('Ingredient', {
+              idIngredient: item.idIngredient,
+              ingrName: item.strIngredient,
+              ingrImg: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png'
+            })
           }>
 
-            <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
-                <Image
-                    source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png' }}
-                    style={styles.drinkImg} />
+          <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
+            <Image
+              source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png' }}
+              style={styles.drinkImg} />
 
-                <View style={styles.cocktailInfo}>
-                    <Text style={styles.drinkText}>{item.strIngredient}</Text>
-                    {item.strType && (
-                        <Text style={styles.drinkText}>{item.strType}</Text>
-                    )}
-                </View>
+            <View style={styles.cocktailInfo}>
+              <Text style={styles.drinkText}>{item.strIngredient}</Text>
+              {item.strType && (
+                <Text style={styles.drinkText}>{item.strType}</Text>
+              )}
             </View>
+          </View>
 
-            <View style={{ marginRight: 40 }}>
-                <TouchableOpacity onPress={toggleStar}>
-                    <Icon name={isOwned ? 'star' : 'star-outline'} size={40} color="#e7c500" />
-                </TouchableOpacity>
-            </View>
+          <View style={{ marginRight: 40 }}>
+            <TouchableOpacity onPress={toggleStar}>
+              <Icon name={isOwned ? 'star' : 'star-outline'} size={40} color="#ffd900" />
+            </TouchableOpacity>
+          </View>
         </TouchableOpacity>
-    </View>
-)}
-
+      </View>
+    )
+  }
 
   return (
     <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
@@ -172,16 +172,16 @@ const getOwnedData = async () => {
           iconColor={colors.mainFontColour}
           placeholderTextColor={colors.mainFontColour} />
       </View>
-        {errorStatus.trim().length === 0 ?
-          <FlatList
+      {errorStatus.trim().length === 0 ?
+        <FlatList
           data={ingredientData} // Assuming ingredientData is your data array
           renderItem={renderItem}
           keyExtractor={item => item.idIngredient.toString()}
-          />
-          :
-          <View>
-            <Text>{errorStatus}</Text>
-          </View>}
+        />
+        :
+        <View>
+          <Text>{errorStatus}</Text>
+        </View>}
     </View>
   );
 }

@@ -127,12 +127,11 @@ export default StyleSheet.create({
     fontFamily: fonts.text,
     width: 200
   },
-  seeAllBtn: {
-    alignSelf: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    backgroundColor: 'skyblue',
-    borderRadius: 10
+  imgShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
 
   // FILTER
