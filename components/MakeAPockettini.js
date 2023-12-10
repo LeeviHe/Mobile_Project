@@ -84,12 +84,8 @@ export default function MakeAPockettini({ navigation, route }) {
   ]
 
   const addIngredient = () => {
-    const newIngredient = {
-      name: ingrName,
-      number: 0,
-      amount: '-'
-    };
-    setIngredients([...ingredients, newIngredient]);
+    const newIngredient = { name: '', number: 0, amount: '-' };
+    setIngredients([...ingredients, newIngredient])
   };
 
   const updateNumber = (index, newNumber) => {
