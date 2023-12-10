@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, StyleSheet, Alert, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { StatusBar } from 'expo-status-bar';
 import { Picker } from '@react-native-picker/picker';
@@ -193,283 +193,289 @@ export default function MakeAPockettini({ navigation, route }) {
   };
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <StatusBar hidden={true} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 32 : 0}
+      style={{ flex: 1, backgroundColor: 'transparent' }}>
 
-        <View>
-          <View style={styles.topBar}>
-            <TouchableOpacity onPress={() => navigation.navigate('MyPockettinis')}>
-              <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
-            </TouchableOpacity>
+      <ScrollView>
+        <View style={[styles.container, { marginBottom: 30 }]}>
+          <StatusBar hidden={true} />
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <TouchableOpacity
-                onPress={() => deletePockettini(index)}>
-
-                <Icon
-                  name="trash-can-outline"
-                  size={30}
-                  color='#ff6161'
-                />
+          <View>
+            <View style={styles.topBar}>
+              <TouchableOpacity onPress={() => navigation.navigate('MyPockettinis')}>
+                <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={handleSave}
-                disabled={isEmpty}
-                style={[styles.saveBtn,
-                { backgroundColor: isEmpty ? '#C0C0C0' : colors.mainFontColour }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <TouchableOpacity
+                  onPress={() => deletePockettini(index)}>
 
-                <Text style={{ color: colors.white, fontFamily: fonts.text }}>save</Text>
-              </TouchableOpacity>
+                  <Icon
+                    name="trash-can-outline"
+                    size={30}
+                    color='#ff6161'
+                  />
+                </TouchableOpacity>
 
+                <TouchableOpacity onPress={handleSave}
+                  disabled={isEmpty}
+                  style={[styles.saveBtn,
+                  { backgroundColor: isEmpty ? '#C0C0C0' : colors.mainFontColour }]}>
+
+                  <Text style={{ color: colors.white, fontFamily: fonts.text }}>save</Text>
+                </TouchableOpacity>
+
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.drinkInfo}>
-          <View style={{ alignItems: 'center', gap: 5 }}>
-            <TextInput
-              style={[styles.drinkName, { borderBottomWidth: 1, borderBottomColor: colors.mainFontColour }]}
-              value={drinkName}
-              placeholder='Drink name..'
-              onChangeText={setDrinkName}
-            />
+          <View style={styles.drinkInfo}>
+            <View style={{ alignItems: 'center', gap: 5 }}>
+              <TextInput
+                style={[styles.drinkName, { borderBottomWidth: 1, borderBottomColor: colors.mainFontColour }]}
+                value={drinkName}
+                placeholder='Drink name..'
+                onChangeText={setDrinkName}
+              />
 
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}
-              onPress={() => togglePicker('category')}>
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}
+                onPress={() => togglePicker('category')}>
 
-              <Text style={styles.drinkCategory}>
-                {category ? category : 'category'}
-              </Text>
+                <Text style={styles.drinkCategory}>
+                  {category ? category : 'category'}
+                </Text>
 
-              <Icon name='chevron-down' size={20} color={colors.mainFontColour} />
+                <Icon name='chevron-down' size={20} color={colors.mainFontColour} />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity onPress={pickImage} style={styles.imgContainer}>
+              {image ? (
+                <Image source={{ uri: image }} style={{ width: '100%', height: '100%' }} />
+              ) : (
+                <Icon name="image-multiple-outline" size={100} color={colors.mainFontColour} />
+              )}
             </TouchableOpacity>
+
           </View>
 
-          <TouchableOpacity onPress={pickImage} style={styles.imgContainer}>
-            {image ? (
-              <Image source={{ uri: image }} style={{ width: '100%', height: '100%' }} />
-            ) : (
-              <Icon name="image-multiple-outline" size={100} color={colors.mainFontColour} />
-            )}
-          </TouchableOpacity>
+          <View style={styles.partContainer}>
+            <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Ingredients</Text>
 
-        </View>
-
-        <View style={styles.partContainer}>
-          <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Ingredients</Text>
-
-          <View>
-            <Row style={{ borderRadius: 5 }}>
-              <Col style={[styles.editAmount, styles.shadow]}>
-                <TouchableOpacity
-                  onPress={() => togglePicker('numberAmount')}
-                  style={styles.measureView}>
-
-                  <Text style={styles.editMeasure}>
-                    {number ? number : '0'}
-                  </Text>
-
-                  <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
-
-                  <Text style={styles.editMeasure}>
-                    {amount ? amount : '-'}
-                  </Text>
-                </TouchableOpacity>
-              </Col>
-
-              <Col style={[styles.inputView, styles.shadow]}>
-                <TextInput
-                  style={{ color: colors.mainFontColour }}
-                  value={ingrName}
-                  placeholder='Ingredient name..'
-                  onChangeText={setIngrName}
-                />
-              </Col>
-            </Row>
-          </View>
-
-          <View>
-            {ingredients.map((ingredient, index) => (
-              <Row key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
-                <Col style={styles.editAmount}>
+            <View>
+              <Row style={{ borderRadius: 5 }}>
+                <Col style={[styles.editAmount, styles.shadow]}>
                   <TouchableOpacity
-                    onPress={() => togglePicker('numberAmount', index)}
+                    onPress={() => togglePicker('numberAmount')}
                     style={styles.measureView}>
 
                     <Text style={styles.editMeasure}>
-                      {ingredient.number}
+                      {number ? number : '0'}
                     </Text>
 
                     <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
 
                     <Text style={styles.editMeasure}>
-                      {ingredient.amount}
+                      {amount ? amount : '-'}
                     </Text>
                   </TouchableOpacity>
                 </Col>
 
-                <Col style={styles.inputView}>
+                <Col style={[styles.inputView, styles.shadow]}>
                   <TextInput
                     style={{ color: colors.mainFontColour }}
-                    value={ingredient.name}
+                    value={ingrName}
                     placeholder='Ingredient name..'
-                    onChangeText={(ingrName) => {
-                      const newIngredients = [...ingredients];
-                      newIngredients[index].name = ingrName;
-                      setIngredients(newIngredients);
-                    }}
+                    onChangeText={setIngrName}
                   />
-                  <TouchableOpacity onPress={() => removeIngredient(index)}>
-                    <Icon name='close-circle-outline' size={30} color='#ff6161' />
-                  </TouchableOpacity>
                 </Col>
               </Row>
-            ))
-            }
+            </View>
+
+            <View>
+              {ingredients.map((ingredient, index) => (
+                <Row key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
+                  <Col style={styles.editAmount}>
+                    <TouchableOpacity
+                      onPress={() => togglePicker('numberAmount', index)}
+                      style={styles.measureView}>
+
+                      <Text style={styles.editMeasure}>
+                        {ingredient.number}
+                      </Text>
+
+                      <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
+
+                      <Text style={styles.editMeasure}>
+                        {ingredient.amount}
+                      </Text>
+                    </TouchableOpacity>
+                  </Col>
+
+                  <Col style={styles.inputView}>
+                    <TextInput
+                      style={{ color: colors.mainFontColour }}
+                      value={ingredient.name}
+                      placeholder='Ingredient name..'
+                      onChangeText={(ingrName) => {
+                        const newIngredients = [...ingredients];
+                        newIngredients[index].name = ingrName;
+                        setIngredients(newIngredients);
+                      }}
+                    />
+                    <TouchableOpacity onPress={() => removeIngredient(index)}>
+                      <Icon name='close-circle-outline' size={30} color='#ff6161' />
+                    </TouchableOpacity>
+                  </Col>
+                </Row>
+              ))
+              }
+            </View>
+
+            <View>
+              <TouchableOpacity style={styles.noteBtn} onPress={addIngredient}>
+                <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Ingredients</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
-          <View>
-            <TouchableOpacity style={styles.noteBtn} onPress={addIngredient}>
-              <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Ingredients</Text>
+          <View style={[styles.partContainer, { marginTop: 50 }]}>
+            <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Preparation</Text>
+
+            <View style={[styles.inputViewLarge, styles.shadow]}>
+              <TextInput
+                style={{ color: colors.mainFontColour }}
+                value={preparations[0]}
+                placeholder='Step 1..'
+                onChangeText={(text) => updatePreparation(0, text)}
+              />
+
+            </View>
+
+            <View>
+              {preparations.slice(1).map((preparation, index) => (
+                <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
+                  <View style={styles.inputViewLarge}>
+                    <TextInput
+                      style={{ color: colors.mainFontColour }}
+                      value={preparation}
+                      placeholder={`Step ${index + 2}..`}
+                      onChangeText={(text) => updatePreparation(index + 1, text)} />
+
+                    <TouchableOpacity onPress={() => removePreparation(index + 1)}>
+                      <Icon name='close-circle-outline' size={30} color='#ff6161' />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            <TouchableOpacity style={styles.noteBtn} onPress={addPreparation}>
+              <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Preparations</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={[styles.partContainer, { marginTop: 50 }]}>
+            <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Notes</Text>
+
+            <View>
+              {notes.map((note, index) => (
+                <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
+                  <View style={styles.inputViewLarge}>
+                    <TextInput
+                      style={{ color: colors.mainFontColour }}
+                      value={note}
+                      placeholder={'Write something here..'}
+                      onChangeText={(text) => updateNote(index, text)}
+                    />
+                    <TouchableOpacity onPress={() => removeNotes(index)}>
+                      <Icon name='close-circle-outline' size={30} color='#ff6161' />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+
+            <TouchableOpacity style={styles.noteBtn} onPress={addNotes}>
+              <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Notes</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        <View style={[styles.partContainer, { marginTop: 50 }]}>
-          <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Preparation</Text>
+        {
+          isOverlayVisible && isModalVisible && (
+            <View style={{
+              ...StyleSheet.absoluteFillObject,
+              backgroundColor: '#ffffffef'
+            }}>
 
-          <View style={[styles.inputViewLarge, styles.shadow]}>
-            <TextInput
-              style={{ color: colors.mainFontColour }}
-              value={preparations[0]}
-              placeholder='Step 1..'
-              onChangeText={(text) => updatePreparation(0, text)}
-            />
+              <Modal
+                transparent={true}
+                animationType="fade"
+                visible={isModalVisible}
+                onRequestClose={togglePicker}>
 
-          </View>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
-          <View>
-            {preparations.slice(1).map((preparation, index) => (
-              <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
-                <View style={styles.inputViewLarge}>
-                  <TextInput
-                    style={{ color: colors.mainFontColour }}
-                    value={preparation}
-                    placeholder={`Step ${index + 2}..`}
-                    onChangeText={(text) => updatePreparation(index + 1, text)} />
-
-                  <TouchableOpacity onPress={() => removePreparation(index + 1)}>
-                    <Icon name='close-circle-outline' size={30} color='#ff6161' />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-          </View>
-
-          <TouchableOpacity style={styles.noteBtn} onPress={addPreparation}>
-            <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Preparations</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={[styles.partContainer, { marginTop: 50 }]}>
-          <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Notes</Text>
-
-          <View>
-            {notes.map((note, index) => (
-              <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
-                <View style={styles.inputViewLarge}>
-                  <TextInput
-                    style={{ color: colors.mainFontColour }}
-                    value={note}
-                    placeholder={'Write something here..'}
-                    onChangeText={(text) => updateNote(index, text)}
-                  />
-                  <TouchableOpacity onPress={() => removeNotes(index)}>
-                    <Icon name='close-circle-outline' size={30} color='#ff6161' />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-          </View>
-
-
-          <TouchableOpacity style={styles.noteBtn} onPress={addNotes}>
-            <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Notes</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {
-        isOverlayVisible && isModalVisible && (
-          <View style={{
-            ...StyleSheet.absoluteFillObject,
-            backgroundColor: '#ffffffef'
-          }}>
-
-            <Modal
-              transparent={true}
-              animationType="fade"
-              visible={isModalVisible}
-              onRequestClose={togglePicker}>
-
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-
-                {isModalVisible && modalType === 'category' && (
-                  <View style={{ width: '100%' }}>
-                    <Picker
-                      selectedValue={category}
-                      onValueChange={(itemValue) => setCategory(itemValue)}>
-                      {categories.map((category, index) => (
-                        <Picker.Item key={index} label={category} value={category} />
-                      ))}
-                    </Picker>
-                  </View>
-                )}
-
-                {modalType === 'numberAmount' && (
-                  <Row>
-                    <Col>
+                  {isModalVisible && modalType === 'category' && (
+                    <View style={{ width: '100%' }}>
                       <Picker
-                        selectedValue={currentIngredientIndex === null ? number : ingredients[currentIngredientIndex]?.number}
-                        onValueChange={(itemValue) => {
-                          if (currentIngredientIndex === null) {
-                            setNumber(itemValue);
-                          } else {
-                            updateNumber(currentIngredientIndex, itemValue);
-                          }
-                        }}>
-                        {numbers.map((number, index) => (
-                          <Picker.Item key={index} label={number.toString()} value={number} />
+                        selectedValue={category}
+                        onValueChange={(itemValue) => setCategory(itemValue)}>
+                        {categories.map((category, index) => (
+                          <Picker.Item key={index} label={category} value={category} />
                         ))}
                       </Picker>
-                    </Col>
+                    </View>
+                  )}
 
-                    <Col>
-                      <Picker
-                        selectedValue={currentIngredientIndex === null ? amount : ingredients[currentIngredientIndex]?.amount}
-                        onValueChange={(itemValue) => {
-                          if (currentIngredientIndex === null) {
-                            setAmount(itemValue);
-                          } else {
-                            updateAmount(currentIngredientIndex, itemValue);
-                          }
-                        }}>
-                        {amounts.map((amount, index) => (
-                          <Picker.Item key={index} label={amount} value={amount} />
-                        ))}
-                      </Picker>
-                    </Col>
-                  </Row>
-                )}
-                <TouchableOpacity onPress={togglePicker}>
-                  <Text>Done</Text>
-                </TouchableOpacity>
-              </View>
-            </Modal>
-          </View>
-        )
-      }
-    </ScrollView >
+                  {modalType === 'numberAmount' && (
+                    <Row>
+                      <Col>
+                        <Picker
+                          selectedValue={currentIngredientIndex === null ? number : ingredients[currentIngredientIndex]?.number}
+                          onValueChange={(itemValue) => {
+                            if (currentIngredientIndex === null) {
+                              setNumber(itemValue);
+                            } else {
+                              updateNumber(currentIngredientIndex, itemValue);
+                            }
+                          }}>
+                          {numbers.map((number, index) => (
+                            <Picker.Item key={index} label={number.toString()} value={number} />
+                          ))}
+                        </Picker>
+                      </Col>
+
+                      <Col>
+                        <Picker
+                          selectedValue={currentIngredientIndex === null ? amount : ingredients[currentIngredientIndex]?.amount}
+                          onValueChange={(itemValue) => {
+                            if (currentIngredientIndex === null) {
+                              setAmount(itemValue);
+                            } else {
+                              updateAmount(currentIngredientIndex, itemValue);
+                            }
+                          }}>
+                          {amounts.map((amount, index) => (
+                            <Picker.Item key={index} label={amount} value={amount} />
+                          ))}
+                        </Picker>
+                      </Col>
+                    </Row>
+                  )}
+                  <TouchableOpacity onPress={togglePicker}>
+                    <Text>Done</Text>
+                  </TouchableOpacity>
+                </View>
+              </Modal>
+            </View>
+          )
+        }
+      </ScrollView >
+    </KeyboardAvoidingView>
   );
 }
