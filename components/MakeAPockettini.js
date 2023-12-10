@@ -29,11 +29,15 @@ export default function MakeAPockettini({ navigation, route }) {
 
   const isEmpty = !drinkName || !category || !number || !amount || preparations.length === 0;
 
-  const togglePicker = (type) => {
+  const [currentIngredientIndex, setCurrentIngredientIndex] = useState(null);
+
+  const togglePicker = (type, index = null) => {
     const isVisible = isModalVisible;
     setOverlayVisible(!isVisible);
     setModalVisible(!isVisible);
     setModalType(type || '');
+
+    setCurrentIngredientIndex(index)
   };
 
   const categories = [
@@ -80,7 +84,24 @@ export default function MakeAPockettini({ navigation, route }) {
   ]
 
   const addIngredient = () => {
-    setIngredients([...ingredients, { number: 0, amount: '-', name: '' }]);
+    const newIngredient = {
+      name: ingrName,
+      number: 0,
+      amount: '-'
+    };
+    setIngredients([...ingredients, newIngredient]);
+  };
+
+  const updateNumber = (index, newNumber) => {
+    const newIngredients = [...ingredients];
+    newIngredients[index].number = newNumber;
+    setIngredients(newIngredients);
+  };
+
+  const updateAmount = (index, newAmount) => {
+    const newIngredients = [...ingredients];
+    newIngredients[index].amount = newAmount;
+    setIngredients(newIngredients);
   };
 
   const removeIngredient = (index) => {
@@ -252,7 +273,9 @@ export default function MakeAPockettini({ navigation, route }) {
                   <Text style={styles.editMeasure}>
                     {number ? number : '0'}
                   </Text>
+
                   <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
+
                   <Text style={styles.editMeasure}>
                     {amount ? amount : '-'}
                   </Text>
@@ -279,13 +302,13 @@ export default function MakeAPockettini({ navigation, route }) {
                     style={styles.measureView}>
 
                     <Text style={styles.editMeasure}>
-                      {number ? number : '0'}
+                      {ingredient.number}
                     </Text>
 
                     <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
 
                     <Text style={styles.editMeasure}>
-                      {amount ? amount : '-'}
+                      {ingredient.amount}
                     </Text>
                   </TouchableOpacity>
                 </Col>
@@ -412,8 +435,14 @@ export default function MakeAPockettini({ navigation, route }) {
                   <Row>
                     <Col>
                       <Picker
-                        selectedValue={number}
-                        onValueChange={(itemValue) => setNumber(itemValue)}>
+                        selectedValue={currentIngredientIndex === null ? number : ingredients[currentIngredientIndex]?.number}
+                        onValueChange={(itemValue) => {
+                          if (currentIngredientIndex === null) {
+                            setNumber(itemValue);
+                          } else {
+                            updateNumber(currentIngredientIndex, itemValue);
+                          }
+                        }}>
                         {numbers.map((number, index) => (
                           <Picker.Item key={index} label={number.toString()} value={number} />
                         ))}
@@ -422,8 +451,14 @@ export default function MakeAPockettini({ navigation, route }) {
 
                     <Col>
                       <Picker
-                        selectedValue={amount}
-                        onValueChange={(itemValue) => setAmount(itemValue)}>
+                        selectedValue={currentIngredientIndex === null ? amount : ingredients[currentIngredientIndex]?.amount}
+                        onValueChange={(itemValue) => {
+                          if (currentIngredientIndex === null) {
+                            setAmount(itemValue);
+                          } else {
+                            updateAmount(currentIngredientIndex, itemValue);
+                          }
+                        }}>
                         {amounts.map((amount, index) => (
                           <Picker.Item key={index} label={amount} value={amount} />
                         ))}
