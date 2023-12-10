@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity, ImageBackground, Image, Pressable, FlatList } from 'react-native';
-import { ScrollView } from 'react-native-virtualized-view';
 import styles from '../styles/styles';
 import { StatusBar } from 'expo-status-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -14,10 +13,11 @@ const Ingredient = ({ navigation, route }) => {
   const [ingredientData, setIngredientData] = useState([]);
   const [ingredientDrinks, setIngredientDrinks] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [visibleItems, setVisibleItems] = useState(9);
+  const [visibleItems, setVisibleItems] = useState(15);
   const [owned, setOwned] = useState([])
 
   useEffect(() => {
+    console.log('route change: ' + route.params.idIngredient + " " + route.params.ingrName)
     getJsonIngredients(URL, 'lookup.php?iid=' + route.params.idIngredient, setIngredientData);
     getJsonDrinks(URL, 'filter.php?i=' + route.params.ingrName, setIngredientDrinks);
   }, [route]);
@@ -27,7 +27,7 @@ const Ingredient = ({ navigation, route }) => {
         getOwnedData()
     })
     return unsubsribe
-}, [navigation])
+}, [route.params, navigation])
 
 const getOwnedData = async () => {
     try {
@@ -72,96 +72,79 @@ const getOwnedData = async () => {
       console.log(owned.length)
   }  
 
-  const renderDrinkItem = ({ item }) => (
-    <Col key={item.idDrink}>
-      <TouchableOpacity>
-        <Image style={{ width: 100, height: 100 }} source={{ uri: item.strDrinkThumb }} />
-        <Text>
-          {item.strDrink.length > 12 ? item.strDrink.substring(0, 12) + '..' : item.strDrink}
-        </Text>
-      </TouchableOpacity>
-    </Col>
-  );
-
-  const renderRow = ({ item }) => {
+  const renderDrinkItem = ({ item, index }) => {
     return (
-      <FlatList
-        data={item}
-        keyExtractor={(drink) => drink.idDrink}
-        renderItem={({ item: drink }) => renderDrinkItem({ item: drink })}
-        horizontal
-        contentContainerStyle={{ justifyContent: 'space-around' }}
-      />
-    );
-  };
-
-  const renderRows = () => {
-    const drinksToRender = showDropdown
-      ? ingredientDrinks.slice(3, visibleItems)
-      : ingredientDrinks.slice(0, 6);
-
-    const rows = [];
-    for (let i = 0; i < drinksToRender.length; i += 3) {
-      const rowItems = drinksToRender.slice(i, i + 3);
-      rows.push(<React.Fragment key={i}>{renderRow({ item: rowItems })}</React.Fragment>);
-    }
-    return rows;
-  };
-
-  const toggleMoreDrinks = () => {
-    setShowDropdown(!showDropdown);
+      <Col style={styles.drinkContainer}>
+        <TouchableOpacity 
+        key={index}
+        onPress={() =>
+          navigation.navigate('CocktailsNavigator',
+            { screen: 'Recipe',
+            params: { drinkId: item.idDrink, 
+              drinkName: item.strDrink, 
+              image: item.strDrinkThumb, 
+              navigator: 'IngredientsNavigator',
+              screen:'Ingredients', }
+            }
+          )
+          }>
+          <Image style={{ width: 150, height: 150 }} source={{ uri: item.strDrinkThumb }} />
+          <Text style={{textAlign: 'center'}}>
+            {item.strDrink.length > 10 ? item.strDrink.substring(0, 10) + '..' : item.strDrink}
+          </Text>
+        </TouchableOpacity>
+      </Col>
+    )
   };
 
   return (
-    <ScrollView>
       <View style={styles.recipeContainer}>
         <StatusBar hidden={true} />
-
-        <ImageBackground
-          source={{ uri: route.params.ingrImg }}
-          resizeMode="cover"
-          opacity={0.5}
-          blurRadius={20}
-          style={{ paddingVertical: 30 }}>
-          <View style={styles.topBar}>
-            <TouchableOpacity onPress={() => navigation.navigate('Ingredients')}>
-              <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={toggleStar}>
-              <Icon name={isOwned ? 'star' : 'star-outline'} size={40} color="#e7c500" />
-            </TouchableOpacity>
-          </View>
-          <View>
-            {ingredientData.map((data, id) => (
-              <View key={id} style={styles.drinkInfo}>
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={styles.drinkName}>{data.strIngredient}</Text>
-                  <Text style={styles.drinkCategory}>{data.strType}</Text>
+        {ingredientData.map((data, id) => (
+        <View key={id} >
+          <ImageBackground
+            source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png' }}
+            resizeMode="cover"
+            opacity={0.5}
+            blurRadius={20}
+            style={{ paddingVertical: 30 }}>
+            <View style={styles.topBar}>
+              <TouchableOpacity onPress={() => navigation.navigate('Ingredients')}>
+                <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={toggleStar}>
+                <Icon name={isOwned ? 'star' : 'star-outline'} size={40} color="#e7c500" />
+              </TouchableOpacity>
+            </View>
+            <View>
+              
+                <View style={styles.drinkInfo}>
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={styles.drinkName}>{data.strIngredient}</Text>
+                    <Text style={styles.drinkCategory}>{data.strType}</Text>
+                  </View>
+                  <View>
+                    <Image
+                      style={{ width: 200, height: 200 }}
+                      source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png' }}
+                    />
+                  </View>
                 </View>
-                <View>
-                  <Image
-                    style={{ width: 200, height: 200 }}
-                    source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png' }}
-                  />
-                </View>
-              </View>
-            ))}
-          </View>
-        </ImageBackground>
-
+              
+            </View>
+          </ImageBackground>
+        </View>))}
         <View style={{ marginVertical: 10 }}>
-          <View style={{ marginHorizontal: 10 }}>{renderRows()}</View>
+          <FlatList
+            data={ingredientDrinks}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={renderDrinkItem}
+            horizontal
+            contentContainerStyle={{ justifyContent: 'space-around' }}
+          />
         </View>
-
-        <View>
-          <Pressable onPress={toggleMoreDrinks} style={styles.seeAllBtn}>
-            <Text style={{ color: colors.white, fontSize: 16, fontFamily: fonts.header }}>
-              See All
-            </Text>
-          </Pressable>
-        </View>
+        
       </View>
-    </ScrollView>
   );
 };
 

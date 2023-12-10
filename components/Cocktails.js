@@ -414,6 +414,7 @@ export default function Cocktails({ navigation, route }) {
               category: item.strCategory,
               glass: item.strGlass,
               instructions: item.strInstructions,
+              navigator: 'CocktailsNavigator',
               screen: 'Cocktails'
             })
           }>

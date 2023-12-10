@@ -202,7 +202,7 @@ const Recipe = ({ navigation, route }) => {
                     style={{ paddingVertical: 30 }}>
 
                     <View style={styles.topBar}>
-                        <TouchableOpacity onPress={() => navigation.navigate(route.params.screen)}>
+                        <TouchableOpacity onPress={() => navigation.navigate(route.params.navigator, {screen: route.params.screen})}>
                             <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={toggleHeart}>

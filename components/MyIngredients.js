@@ -234,21 +234,6 @@ const getFavouriteData = async () => {
       }
     }
 
-    
-
-    const categoryBackgroundColor = () => {
-      // Duplicates for search query issues
-      const categoryColors = {
-        'Coffee_/_Tea': colors.brown,
-        'Coffee / Tea': colors.brown,
-        'Other / Unknown': '#999',
-        'Alcoholic': colors.purple,
-        'Non_Alcoholic': colors.green,
-        'Non Alcoholic': colors.green,
-        'Soft Drink': colors.yellow
-      }
-    };
-
     return (
       <View style={styles.drinkContainer}>
         <TouchableOpacity
@@ -262,6 +247,7 @@ const getFavouriteData = async () => {
               category: item.strCategory,
               glass: item.strGlass,
               instructions: item.strInstructions,
+              navigator: 'IngredientsNavigator',
               screen: 'MyIngredients'
             })
           }>
