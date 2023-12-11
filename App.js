@@ -50,6 +50,14 @@ const MoreNavigator = () => {
   )
 }
 
+const HomeNavigator= () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Home" component={Home} />
+    </Stack.Navigator>
+  )
+}
+
 export default function App() {
   return (
     <GlobalProvider>
@@ -110,14 +118,22 @@ export default function App() {
             )}>
 
             <Tab.Screen
-              name="Home"
-              component={Home}
+              name="HomeNavigator"
+              component={HomeNavigator}
               options={{
                 tabBarLabel: 'Home',
                 tabBarIcon: ({ color, size }) => {
                   return <Icon name="home" size={size} color={color} />;
                 },
-              }} />
+              }} 
+              listeners={({ navigation }) => ({
+                tabPress: (e) => {
+                  // Prevent default action
+                  e.preventDefault();
+                  // Navigate to the initial route of CocktailsNavigator
+                  navigation.navigate('HomeNavigator', { screen: 'Home' });
+                },
+              })}/>
             <Tab.Screen
               name="CocktailsNavigator"
               component={CocktailsNavigator}
@@ -126,7 +142,15 @@ export default function App() {
                 tabBarIcon: ({ color, size }) => {
                   return <Icon name="glass-cocktail" size={size} color={color} />;
                 },
-              }} />
+              }} 
+              listeners={({ navigation }) => ({
+                tabPress: (e) => {
+                  // Prevent default action
+                  e.preventDefault();
+                  // Navigate to the initial route of CocktailsNavigator
+                  navigation.navigate('CocktailsNavigator', { screen: 'Cocktails' });
+                },
+              })}/>
             <Tab.Screen
               name="IngredientsNavigator"
               component={IngredientsNavigator}
@@ -135,7 +159,15 @@ export default function App() {
                 tabBarIcon: ({ color, size }) => {
                   return <Icon name="bottle-tonic" size={size} color={color} />;
                 },
-              }} />
+              }} 
+              listeners={({ navigation }) => ({
+                tabPress: (e) => {
+                  // Prevent default action
+                  e.preventDefault();
+                  // Navigate to the initial route of CocktailsNavigator
+                  navigation.navigate('IngredientsNavigator', { screen: 'Ingredients' });
+                },
+              })}/>
             <Tab.Screen
               name="MoreNavigator"
               component={MoreNavigator}
@@ -145,8 +177,14 @@ export default function App() {
                   return <Icon name="dots-horizontal" size={size} color={color} />;
                 },
               }}
-            />
-
+              listeners={({ navigation }) => ({
+                tabPress: (e) => {
+                  // Prevent default action
+                  e.preventDefault();
+                  // Navigate to the initial route of CocktailsNavigator
+                  navigation.navigate('MoreNavigator', { screen: 'More' });
+                },
+              })}/>
           </Tab.Navigator>
         </NavigationContainer>
       </PockettiniProvider>

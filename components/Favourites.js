@@ -148,7 +148,7 @@ export default function Favourites({ navigation , route }) {
           key={index}
           style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}
           onPress={() =>
-            navigation.navigate('Recipe', {
+            navigation.navigate('CocktailsNavigator', {screen: 'Recipe', params: {
               drinkId: item.idDrink,
               drinkName: item.strDrink,
               image: item.strDrinkThumb,
@@ -157,7 +157,7 @@ export default function Favourites({ navigation , route }) {
               instructions: item.strInstructions,
               navigator: 'MoreNavigator',
               screen: 'Favourites'
-            })
+            }})
           }>
 
           <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>

@@ -1,5 +1,5 @@
 
-import { Text, View, Image, Pressable, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 import { Searchbar, RadioButton } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native-virtualized-view'
@@ -467,6 +467,7 @@ export default function Cocktails({ navigation, route }) {
     setFilterCondition('')
     setFilterSearch('')
     setFirstMultiFilter('')
+    defaultSetup()
   }
 
   const categoryDropdownContent = (

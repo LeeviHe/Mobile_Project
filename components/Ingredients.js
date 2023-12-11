@@ -1,8 +1,7 @@
-import { Text, View, Image, Pressable, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
-import { Row, Col } from "react-native-flex-grid";
-import { colors, padding, textStyles } from '../styles/style-constants';
+import { colors, textStyles } from '../styles/style-constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/styles';
 import { OWNED_INGR_KEY, URL } from '../reusables/Constants';
