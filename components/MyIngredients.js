@@ -1,4 +1,4 @@
-import { Text, View, TouchableOpacity, Image, Pressable, FlatList } from 'react-native';
+import { Text, View, TouchableOpacity, Image, Pressable, FlatList, ActivityIndicator } from 'react-native';
 import styles from '../styles/styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useState, useEffect } from 'react';
@@ -11,7 +11,6 @@ import { ScrollView } from 'react-native-virtualized-view'
 import { useGlobalState } from '../reusables/Functions';
 
 export default function MyPockettinis({ navigation, route }) {
-  const [check, setCheck] = useState(false);
   const [cocktailView, setCocktailView] = useState(false);
   const [ingredientView, setIngredientView] = useState(true);
   const [ownedId, setOwnedId] = useState([])
@@ -20,11 +19,12 @@ export default function MyPockettinis({ navigation, route }) {
   const [newInfo, setNewInfo] = useState([])
   const { asyncStorageData } = useGlobalState()
   const [errorStatus, setErrorStatus] = useState(null)
+  const [isAsyncbusy, setAsyncBusy] = useState(false)
 
   // Iteration of favourited drinks
   const [favourites, setFavourites] = useState([])
   //Selected ingredients index
-  const [selectedItemsIndex, setSelectedItemsIndex] = useState([])
+  const [selectedItemsIndex, setSelectedItemsIndex] = useState(new Array(newInfo.length).fill(false))
   //Selected ingredients names
   const [selectedItems, setSelectedItems] = useState([])
   // Drinks available with selectedItems
@@ -49,31 +49,34 @@ export default function MyPockettinis({ navigation, route }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      let tempData = []
-      for (let i = 0; i < ownedId.length; i++) {
+      if (ownedId) {
+        setAsyncBusy(true)
+        const fetchPromises = ownedId.map(own => 
+          getJsonIngredients(URL, 'lookup.php?iid=' + own.idIngredient, setTemp)
+        )
         try {
-          const result = await getJsonIngredients(URL, 'lookup.php?iid=' + ownedId[i].idIngredient, setTemp)
-          tempData = [...tempData, ...result]
+          const results = await Promise.all(fetchPromises)
+          const tempData = results.flat()
+          if (tempData) {
+            setNewInfo(tempData)
+          } else {
+            console.log('No tempData')
+          }
         } catch (e) {
           console.log('error fetching and updating')
         }
       }
-      if (tempData) {
-        setNewInfo(tempData)
-      } else {
-        console.log('No tempData')
-      }
+      setAsyncBusy(false)
     }
-    fetchData()
+    fetchData();
   }, [ownedId])
 
   useEffect(() => {
     if (newInfo.length > 0) {
       setOwned(newInfo)
-      setSelectedItemsIndex(new Array(newInfo.length).fill(false))
     }
   }, [newInfo])
-
+  
   useEffect(() => {
     const unsubsribe = navigation.addListener('focus', () => {
       getFavouriteData()
@@ -123,6 +126,9 @@ export default function MyPockettinis({ navigation, route }) {
       if (jsonValue !== null) {
         let data = JSON.parse(jsonValue)
         setOwnedId(data)
+      } else {
+        console.log('No data found in Async')
+        setOwnedId([])
       }
     }
     catch (e) {
@@ -145,6 +151,7 @@ export default function MyPockettinis({ navigation, route }) {
           setOwned(newOwned)
           const newOwnedId = ownedId.filter((own) => own.idIngredient !== item.idIngredient);
           setOwnedId(newOwnedId);
+          selectItems(index, item.strIngredient)
           await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
           alert('Ingredient removed from owned')
         }
@@ -209,10 +216,6 @@ export default function MyPockettinis({ navigation, route }) {
   const viewIngredients = () => {
     setCocktailView(false);
     setIngredientView(true);
-  };
-
-  const toggleCheck = () => {
-    setCheck(!check);
   };
 
   const renderDrinkItem = ({ item, index }) => {
@@ -336,22 +339,22 @@ export default function MyPockettinis({ navigation, route }) {
         </Row>
       </View>
 
-      {ingredientView && (
+      
         <ScrollView style={{ height: '100%' }}>
 
           <View style={{ marginHorizontal: 20, marginTop: 20 }}>
             <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Owned ingredients</Text>
-
-            <FlatList
-              data={owned}
-              style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
-              renderItem={renderItem}
-              keyExtractor={(item, index) => index.toString()}
-            />
-
+              {!isAsyncbusy ? (
+                <FlatList
+                  data={owned}
+                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
+                  renderItem={renderItem}
+                  keyExtractor={(item, index) => index.toString()}
+                />
+              ) : (<ActivityIndicator size={250} color={"#c0c0c0"}/>)}
           </View>
         </ScrollView>
-      )}
+      
 
       {cocktailView &&
         <View style={{ marginTop: 20, height: '100%', backgroundColor: colors.white }}>

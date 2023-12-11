@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, ImageBackground, Image, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, ScrollView, ImageBackground, Image, TouchableOpacity, Pressable, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { StatusBar } from 'expo-status-bar';
 import styles from '../styles/styles';
@@ -12,6 +12,7 @@ const Recipe = ({ navigation, route }) => {
     const [recipeData, setRecipeData] = useState([]);
     // Iteration of favourited drinks
     const [favourites, setFavourites] = useState([])
+    const [isAPIbusy, setAPIBusy] = useState(false)
 
     useEffect(() => {
         getJson()
@@ -19,6 +20,7 @@ const Recipe = ({ navigation, route }) => {
 
     async function getJson() {
         if (route.params.drinkId) {
+            setAPIBusy(true)
             try {
                 const response = await fetch(URL + 'lookup.php?i=' + route.params.drinkId)
                 if (response.ok) {
@@ -31,8 +33,10 @@ const Recipe = ({ navigation, route }) => {
             } catch (err) {
                 alert(err);
             }
+            setAPIBusy(false)
         }
         else {
+            setAPIBusy(true)
             try {
                 const response = await fetch(URL + route.params.search)
                 if (response.ok) {
@@ -45,6 +49,7 @@ const Recipe = ({ navigation, route }) => {
             } catch (err) {
                 alert(err);
             }
+            setAPIBusy(false)
         }
     }
 
@@ -230,7 +235,7 @@ const Recipe = ({ navigation, route }) => {
 
                     <View marginTop={30}>
                         <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Preparation</Text>
-                        {drinkInstructions}
+                        {!isAPIbusy ? <>{drinkInstructions}</> : (<ActivityIndicator size={250} color={"#c0c0c0"}/>)}
                     </View>
 
                     <View style={{ marginTop: 30, marginHorizontal: 20 }}>

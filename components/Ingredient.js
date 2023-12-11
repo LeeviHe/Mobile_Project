@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, ImageBackground, Image, Pressable, FlatList } from 'react-native';
+import { Text, View, TouchableOpacity, ImageBackground, Image, Pressable, FlatList, ActivityIndicator } from 'react-native';
 import styles from '../styles/styles';
 import { StatusBar } from 'expo-status-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -71,6 +71,7 @@ const Ingredient = ({ navigation, route }) => {
   }
 
   const renderDrinkItem = ({ item, index }) => {
+    
     return (
       <Col style={{ gap: 5 }}>
         <TouchableOpacity
@@ -95,9 +96,11 @@ const Ingredient = ({ navigation, route }) => {
             style={{ width: 150, height: 150, borderRadius: 5 }} source={{ uri: item.strDrinkThumb }} />
 
         </TouchableOpacity>
+        { item.strDrink ?
         <Text style={{ textAlign: 'center', fontFamily: fonts.secondary }}>
           {item.strDrink.length > 16 ? item.strDrink.substring(0, 16) + '..' : item.strDrink}
         </Text>
+        : <Text>No drinks include this ingredient</Text>}
       </Col>
     )
   };

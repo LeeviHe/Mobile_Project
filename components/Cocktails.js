@@ -1,5 +1,5 @@
 
-import { Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Searchbar, RadioButton } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native-virtualized-view'
@@ -57,6 +57,7 @@ export default function Cocktails({ navigation, route }) {
   const [descendSort, setDescendSort] = useState(false)
   const [showDropdown1, setShowDropdown1] = useState(false);
   const [showDropdown2, setShowDropdown2] = useState(false);
+  const [isAPIbusy, setAPIBusy] = useState(false)
 
   //
   //useEffects
@@ -132,21 +133,6 @@ export default function Cocktails({ navigation, route }) {
 
   //
   //functions
-  //Maybe delete
-  async function getJson(condition, setJsonData) {
-    try {
-      const response = await fetch(URL + condition);
-      if (response.ok) {
-        const json = await response.json()
-        const data = json.drinks
-        setJsonData(data)
-      } else {
-        alert('Error retrieving recipes!');
-      }
-    } catch (err) {
-      alert(err);
-    }
-  }
 
   async function viewFilter() {
     if (!filterView) {
@@ -157,6 +143,7 @@ export default function Cocktails({ navigation, route }) {
   }
 
   async function getDrink(method, category) {
+    setAPIBusy(true)
     try {
       const response = await fetch(URL + method);
       if (response.ok) {
@@ -165,6 +152,7 @@ export default function Cocktails({ navigation, route }) {
         if (json.drinks === undefined || json.drinks === null || json.drinks === '' || json.drinks === 0 || !json.drinks || json.drinks === "None Found") {
           setErrorStatus('No drinks found!')
           setRecipeData([])
+          setAPIBusy(false)
           return
         } else {
           setErrorStatus('')
@@ -178,6 +166,7 @@ export default function Cocktails({ navigation, route }) {
     } catch (err) {
       alert(err);
     }
+    setAPIBusy(false)
   }
 
   // Condition for what you want to filter with
@@ -224,6 +213,7 @@ export default function Cocktails({ navigation, route }) {
     } else {
       console.log('error in activate')
     }
+    setFilterView(false)
   }
 
   function setSort(direction, i) {
@@ -690,24 +680,26 @@ export default function Cocktails({ navigation, route }) {
           </View>
 
         </ScrollView>
-      ) : (
-        <View>
-          {errorStatus.trim().length === 0 ?
-            <FlatList
-              data={activeDrinks}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={renderDrinkItem}
-              extraData={activeDrinks}
-            />
-            :
-            <View>
-              <Text>{errorStatus}</Text>
-            </View>
-          }
-        </View>
-      )
+      ) : 
+      <View>
+        {!isAPIbusy ? (
+          <>
+            {errorStatus.trim().length === 0 ? (
+              <FlatList
+                data={activeDrinks}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderDrinkItem}
+                extraData={activeDrinks}
+              />
+            ) : (
+              <View>
+                <Text>{errorStatus}</Text>
+              </View>
+            )}</>
+        ) : (<ActivityIndicator size={250} color={"#c0c0c0"}/>)
+        }  
+      </View >
       }
-
-    </View >
+    </View>
   );
 }

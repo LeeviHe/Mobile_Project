@@ -25,7 +25,6 @@ export async function getJsonIngredients (url, condition, setJsonData) {
               alert('Error retrieving recipes!');
           }
         } catch (err) {
-        alert('jou');
         }
     }
 

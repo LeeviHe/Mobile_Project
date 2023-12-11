@@ -1,4 +1,4 @@
-import { Text, View, TouchableOpacity, Image, FlatList} from 'react-native';
+import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator} from 'react-native';
 import styles from '../styles/styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useState, useEffect } from 'react';
@@ -17,6 +17,7 @@ export default function Favourites({ navigation , route }) {
   const [temp, setTemp] = useState([])
   const { asyncStorageData } = useGlobalState()
   const [newInfo, setNewInfo] = useState([])
+  const [isAsyncbusy, setAsyncBusy] = useState(false)
 
   async function clear() {
     try { 
@@ -30,29 +31,33 @@ export default function Favourites({ navigation , route }) {
 
   useEffect (() => {
     const unsubsribe = navigation.addListener('focus', async () => {
-        favouriteData()
+      favouriteData()
     })
     return () => {unsubsribe()}
   }, [asyncStorageData, navigation])
 
 
   useEffect (() => {
-    console.log(favouritesIds.length)
     const fetchData = async () => {
-      let tempData = []
-      for (let i = 0; i < favouritesIds.length; i++) {
+      if (favouritesIds) {
+        setAsyncBusy(true)
+        const fetchPromises = favouritesIds.map(fav => 
+          getJsonDrinks(URL,'lookup.php?i=' + fav.drinkId, setTemp)
+        )
         try {
-          const result = await getJsonDrinks(URL, 'lookup.php?i=' + favouritesIds[i].drinkId, setTemp)
-          tempData = [...tempData, ...result]
+          const results = await Promise.all(fetchPromises)
+          const tempData = results.flat()
+          if (tempData) {
+            setNewInfo(tempData)
+          } else {
+            console.log('No tempData')
+            return
+          }
         } catch(e) {
           console.log('error fetching and updating')
         }
       }
-      if (tempData) {
-        setNewInfo(tempData)
-      } else {
-        console.log('No tempData')
-      }
+      setAsyncBusy(false)
     }
     fetchData()
   }, [favouritesIds])
@@ -65,7 +70,6 @@ export default function Favourites({ navigation , route }) {
 
 
   const favouriteData = async () => {
-    
     try {
         const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
         if (jsonValue !== null) {
@@ -102,7 +106,6 @@ export default function Favourites({ navigation , route }) {
   
   const renderDrinkItem = ({ item, index }) => {
     const isFavourited = true
-
     const toggleHeart = async() => {
       try {
         if (isFavourited) {
@@ -189,9 +192,9 @@ export default function Favourites({ navigation , route }) {
   return (
     <ScrollView style={{ backgroundColor: colors.white}}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>My Favourites</Text>
-
       <View style={styles.favBtnContainer}>
         <Button icon="camera"onPress={() =>clear()} />
+        {!isAsyncbusy ? (<>
         { favouritesIds.length === 0 ? 
         <Text>No favourites saved</Text> 
         :
@@ -201,7 +204,7 @@ export default function Favourites({ navigation , route }) {
             renderItem={renderDrinkItem}
             extraData={favourites}
           />
-        }
+        }</>):(<ActivityIndicator size={250} color={"#c0c0c0"}/>)}
         </View>
     </ScrollView>
   );
