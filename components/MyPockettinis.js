@@ -5,6 +5,7 @@ import { colors, fonts, textStyles } from '../styles/style-constants';
 import { usePockettini } from './PockettiniContext';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-virtualized-view';
 
 export default function MyPockettinis({ navigation, route }) {
   const { pockettinis, removePockettini } = usePockettini();
@@ -27,8 +28,45 @@ export default function MyPockettinis({ navigation, route }) {
     );
   }
 
+const isAlcoholic = (category) => {
+    const alcoholicCategories = [
+      'Ordinary Drink',
+      'Cocktail',
+      'Shot',
+      'Homemade Liqueur',
+      'Punch / Party Drink',
+      'Beer'
+    ]
+    return alcoholicCategories.includes(category)
+  }
+
+  const isNotAlcoholic = (category) => {
+    const nonAlcoholicCategories = [
+      'Shake',
+      'Cocoa'
+    ]
+    return nonAlcoholicCategories.includes(category)
+  }
+
+  const categoryBackgroundColor = (item) => {
+    const categoryColors = {
+      'Coffee / Tea': colors.brown,
+      'Other / Unknown': '#999',
+      'Alcoholic': colors.purple,
+      'Non Alcoholic': colors.green,
+      'Soft Drink': colors.yellow
+    }
+    if (item.drinkCategory) {
+      return isAlcoholic(item.drinkCategory)
+        ? categoryColors['Alcoholic']
+        : isNotAlcoholic(item.drinkCategory)
+          ? categoryColors['Non Alcoholic']
+          : categoryColors[item.drinkCategory] || colors.purple;
+    } 
+  }
+
   return (
-    <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
+    <ScrollView style={{ backgroundColor: colors.white}}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>My Pockettinis</Text>
 
       <View style={styles.btnContainer}>
@@ -49,9 +87,8 @@ export default function MyPockettinis({ navigation, route }) {
 
         {
           pockettinis.map((pockettini, index) => (
-            <GestureHandlerRootView>
+            <GestureHandlerRootView key={index}>
               <Swipeable
-                key={index}
                 renderRightActions={() => (
                   <View style={{ alignItems: 'center', justifyContent: 'space-between', marginVertical: 10 }}>
                     <TouchableOpacity
@@ -78,7 +115,7 @@ export default function MyPockettinis({ navigation, route }) {
 
                 <TouchableOpacity
                   key={index}
-                  style={[styles.cocktail, { backgroundColor: colors.purple }]}>
+                  style={[styles.cocktail, { backgroundColor: categoryBackgroundColor(pockettini) }]}>
 
                   <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
 
@@ -101,6 +138,6 @@ export default function MyPockettinis({ navigation, route }) {
 
       </View>
 
-    </View>
+    </ScrollView>
   );
 }

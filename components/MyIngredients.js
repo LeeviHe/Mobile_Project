@@ -133,8 +133,13 @@ const getFavouriteData = async () => {
       }
   }
 
+  function multiSelectColor(i) {
+    return selectedItemsIndex[i] ? 'green' : 'red'
+  }
+
   const renderItem = ({ item, index }) => {
     const isOwned = true
+    const checked = multiSelectColor(index) === 'green';
     
     const toggleStar = async() => {
         try {
@@ -159,7 +164,7 @@ const getFavouriteData = async () => {
         <Icon name={isOwned ? 'star' : 'star-outline'} size={30} color="#e7c500" />
       </TouchableOpacity>
       <Pressable style={styles.myBtn} onPress={() => selectItems(index, item.strIngredient)}>
-        <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
+        <Icon name='check' size={18} color={checked ? colors.mainFontColour : 'transparent'} />
       </Pressable>
 
       <View style={{ alignItems: 'center', gap: 10 }}>
@@ -202,6 +207,8 @@ const getFavouriteData = async () => {
   const toggleCheck = () => {
     setCheck(!check);
   };
+
+
 
   const renderDrinkItem = ({ item, index }) => {
     
