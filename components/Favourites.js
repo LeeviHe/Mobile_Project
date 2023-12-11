@@ -30,7 +30,6 @@ export default function Favourites({ navigation , route }) {
   }
 
   useEffect (() => {
-    
     const unsubsribe = navigation.addListener('focus', async () => {
       favouriteData()
     })
@@ -39,22 +38,24 @@ export default function Favourites({ navigation , route }) {
 
 
   useEffect (() => {
-    setAsyncBusy(true)
-    console.log(favouritesIds.length)
     const fetchData = async () => {
-      let tempData = []
-      for (let i = 0; i < favouritesIds.length; i++) {
+      if (favouritesIds) {
+        setAsyncBusy(true)
+        const fetchPromises = favouritesIds.map(fav => 
+          getJsonDrinks(URL,'lookup.php?i=' + fav.drinkId, setTemp)
+        )
         try {
-          const result = await getJsonDrinks(URL, 'lookup.php?i=' + favouritesIds[i].drinkId, setTemp)
-          tempData = [...tempData, ...result]
+          const results = await Promise.all(fetchPromises)
+          const tempData = results.flat()
+          if (tempData) {
+            setNewInfo(tempData)
+          } else {
+            console.log('No tempData')
+            return
+          }
         } catch(e) {
           console.log('error fetching and updating')
         }
-      }
-      if (tempData) {
-        setNewInfo(tempData)
-      } else {
-        console.log('No tempData')
       }
       setAsyncBusy(false)
     }
@@ -64,13 +65,11 @@ export default function Favourites({ navigation , route }) {
   useEffect (() => {
     if (newInfo.length > 0) {
       setFavourites(newInfo)
-      
     }
   }, [newInfo])
 
 
   const favouriteData = async () => {
-    
     try {
         const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
         if (jsonValue !== null) {
@@ -81,7 +80,6 @@ export default function Favourites({ navigation , route }) {
     catch (e) {
         console.log('Read error: ' + e)
     }
-    
   }
   
   const isAlcoholic = (category) => {
@@ -108,7 +106,6 @@ export default function Favourites({ navigation , route }) {
   
   const renderDrinkItem = ({ item, index }) => {
     const isFavourited = true
-
     const toggleHeart = async() => {
       try {
         if (isFavourited) {
