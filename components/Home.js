@@ -79,7 +79,7 @@ function Home({ navigation, route }) {
             title: 'Surprise me!',
             text: 'Discover something\n new and exciting',
             img: require('../assets/images/Carousel-cocktails-1.png'),
-            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { id: '', condition: 'c', search: 'random.php' } })
+            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { id: '', condition: 'c', search: 'random.php', navigator: 'HomeNavigator', screen:'Home' } })
         },
         {
             backgroundColor: colors.brown,
