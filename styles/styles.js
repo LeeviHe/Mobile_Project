@@ -18,8 +18,8 @@ export default StyleSheet.create({
     paddingVertical: 10
   },
   carouselImage: {
-    width: '80%',
-    height: 150
+    width: 200,
+    height: 140
   },
   page: {
     width: '100%',
