@@ -2,16 +2,15 @@ import { Text, View, TouchableOpacity, Image, Pressable, FlatList } from 'react-
 import styles from '../styles/styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useState, useEffect } from 'react';
-import { colors, fonts, padding, textStyles } from '../styles/style-constants';
+import { colors, fonts, textStyles } from '../styles/style-constants';
 import { Row, Col } from "react-native-flex-grid";
-import { Searchbar } from 'react-native-paper';
 import { URL, OWNED_INGR_KEY, FAVOURITE_DRINKS_KEY } from '../reusables/Constants';
 import { getJsonIngredients } from '../reusables/Functions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-virtualized-view'
 import { useGlobalState } from '../reusables/Functions';
 
-export default function MyPockettinis( { navigation, route } ) {
+export default function MyPockettinis({ navigation, route }) {
   const [check, setCheck] = useState(false);
   const [cocktailView, setCocktailView] = useState(false);
   const [ingredientView, setIngredientView] = useState(true);
@@ -22,8 +21,8 @@ export default function MyPockettinis( { navigation, route } ) {
   const { asyncStorageData } = useGlobalState()
   const [errorStatus, setErrorStatus] = useState(null)
 
-    // Iteration of favourited drinks
-    const [favourites, setFavourites] = useState([])
+  // Iteration of favourited drinks
+  const [favourites, setFavourites] = useState([])
   //Selected ingredients index
   const [selectedItemsIndex, setSelectedItemsIndex] = useState([])
   //Selected ingredients names
@@ -31,71 +30,69 @@ export default function MyPockettinis( { navigation, route } ) {
   // Drinks available with selectedItems
   const [availableRecipes, setAvailableRecipes] = useState([])
 
-  useEffect (() => {
+  useEffect(() => {
     const unsubsribe = navigation.addListener('focus', () => {
       getOwnedData()
     })
-    return () => {unsubsribe()}
+    return () => { unsubsribe() }
   }, [asyncStorageData])
 
   useEffect(() => {
     let string = selectedItems.toString()
     if (selectedItems.length === 0) {
-      console.log('Non selected')
-      setErrorStatus('No ingredients selected')
+      setErrorStatus('No ingredients selected!')
       setAvailableRecipes([])
     } else {
       getDrinks('filter.php?i=' + string)
     }
   }, [selectedItems])
 
-  useEffect (() => {
-      console.log(ownedId.length)
-      const fetchData = async () => {
-        let tempData = []
-        for (let i = 0; i < ownedId.length; i++) {
-          try {
-            const result = await getJsonIngredients(URL, 'lookup.php?iid=' + ownedId[i].idIngredient, setTemp)
-            tempData = [...tempData, ...result]
-          } catch(e) {
-            console.log('error fetching and updating')
-          }
-        }
-        if (tempData) {
-          setNewInfo(tempData)
-        } else {
-          console.log('No tempData')
+  useEffect(() => {
+    const fetchData = async () => {
+      let tempData = []
+      for (let i = 0; i < ownedId.length; i++) {
+        try {
+          const result = await getJsonIngredients(URL, 'lookup.php?iid=' + ownedId[i].idIngredient, setTemp)
+          tempData = [...tempData, ...result]
+        } catch (e) {
+          console.log('error fetching and updating')
         }
       }
-      fetchData()
+      if (tempData) {
+        setNewInfo(tempData)
+      } else {
+        console.log('No tempData')
+      }
+    }
+    fetchData()
   }, [ownedId])
 
-  useEffect (() => {
+  useEffect(() => {
     if (newInfo.length > 0) {
       setOwned(newInfo)
       setSelectedItemsIndex(new Array(newInfo.length).fill(false))
     }
   }, [newInfo])
 
-  useEffect (() => {
+  useEffect(() => {
     const unsubsribe = navigation.addListener('focus', () => {
-        getFavouriteData()
+      getFavouriteData()
     })
     return unsubsribe
-}, [navigation])
+  }, [navigation])
 
-const getFavouriteData = async () => {
+  const getFavouriteData = async () => {
     try {
-        const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
-        if (jsonValue !== null) {
-            let tmp = JSON.parse(jsonValue)
-            setFavourites(tmp)
-        }
+      const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
+      if (jsonValue !== null) {
+        let tmp = JSON.parse(jsonValue)
+        setFavourites(tmp)
+      }
     }
     catch (e) {
-        console.log('Read error: ' + e)
+      console.log('Read error: ' + e)
     }
-}
+  }
 
   async function getDrinks(method) {
     try {
@@ -121,16 +118,16 @@ const getFavouriteData = async () => {
   }
 
   const getOwnedData = async () => {
-      try {
-          const jsonValue = await AsyncStorage.getItem(OWNED_INGR_KEY)
-          if (jsonValue !== null) {
-              let data = JSON.parse(jsonValue)
-              setOwnedId(data)
-          }
+    try {
+      const jsonValue = await AsyncStorage.getItem(OWNED_INGR_KEY)
+      if (jsonValue !== null) {
+        let data = JSON.parse(jsonValue)
+        setOwnedId(data)
       }
-      catch (e) {
-          console.log('Read error: ' + e)
-      }
+    }
+    catch (e) {
+      console.log('Read error: ' + e)
+    }
   }
 
   function multiSelectColor(i) {
@@ -140,38 +137,48 @@ const getFavouriteData = async () => {
   const renderItem = ({ item, index }) => {
     const isOwned = true
     const checked = multiSelectColor(index) === 'green';
-    
-    const toggleStar = async() => {
-        try {
-            if (isOwned) {
-              const newOwned = owned.filter((own) => own.idIngredient !== item.idIngredient)
-              setOwned(newOwned)
-              const newOwnedId = ownedId.filter((own) => own.idIngredient !== item.idIngredient);
-              setOwnedId(newOwnedId);
-              await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
-              alert('Ingredient removed from owned')
-            }
-        } catch(error) {
-            console.log('Error saving ingredient: ' + error)
-            setOwned((prevOwned) => 
-            prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
-        }
-    }
-    
-    return (
-    <View >
-      <TouchableOpacity onPress={toggleStar}>
-        <Icon name={isOwned ? 'star' : 'star-outline'} size={30} color="#e7c500" />
-      </TouchableOpacity>
-      <Pressable style={styles.myBtn} onPress={() => selectItems(index, item.strIngredient)}>
-        <Icon name='check' size={18} color={checked ? colors.mainFontColour : 'transparent'} />
-      </Pressable>
 
-      <View style={{ alignItems: 'center', gap: 10 }}>
-        <Image source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png' }} style={styles.drinkImg} />
-        <Text>{item.strIngredient}</Text>
-      </View>
-    </View>
+    const toggleStar = async () => {
+      try {
+        if (isOwned) {
+          const newOwned = owned.filter((own) => own.idIngredient !== item.idIngredient)
+          setOwned(newOwned)
+          const newOwnedId = ownedId.filter((own) => own.idIngredient !== item.idIngredient);
+          setOwnedId(newOwnedId);
+          await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
+          alert('Ingredient removed from owned')
+        }
+      } catch (error) {
+        console.log('Error saving ingredient: ' + error)
+        setOwned((prevOwned) =>
+          prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
+      }
+    }
+
+    return (
+      <Col style={styles.myCol}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+          <TouchableOpacity onPress={toggleStar}>
+            <Icon name={isOwned ? 'star' : 'star-outline'} size={30} color="#e7c500" />
+          </TouchableOpacity>
+
+          <Pressable style={styles.myBtn} onPress={() => selectItems(index, item.strIngredient)}>
+            <Icon name='check' size={18} color={checked ? colors.mainFontColour : 'transparent'} />
+          </Pressable>
+        </View>
+
+        <View style={{ alignItems: 'center', gap: 10, paddingHorizontal: 5 }}>
+          <Image
+            source={
+              item.strType
+                ? { uri: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png' }
+                : require('../assets/images/img-placeholder.jpg')
+            }
+            style={styles.drinkImg}
+          />
+          <Text style={{ fontFamily: fonts.text }}>{item.strIngredient}</Text>
+        </View>
+      </Col>
     )
   }
 
@@ -208,13 +215,10 @@ const getFavouriteData = async () => {
     setCheck(!check);
   };
 
-
-
   const renderDrinkItem = ({ item, index }) => {
-    
     const isFavourited = favourites.some((fav) => fav.drinkId === item.idDrink)
 
-    const toggleHeart = async() => {
+    const toggleHeart = async () => {
       try {
         if (isFavourited) {
           const newFavourites = favourites.filter((fav) => fav.drinkId !== item.idDrink)
@@ -222,7 +226,7 @@ const getFavouriteData = async () => {
           setFavourites(newFavourites)
           alert('Drink removed from favourites')
         } else {
-          
+
           const newKey = favourites.length + 1
           const drinkInfo = {
             key: newKey,
@@ -233,10 +237,10 @@ const getFavouriteData = async () => {
           setFavourites(newFavourites)
           alert('Favourite saved')
         }
-      } catch(error) {
+      } catch (error) {
         console.log('Error saving favourite: ' + error)
-        setFavourites((prevFavourites) => 
-        prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
+        setFavourites((prevFavourites) =>
+          prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
         )
       }
     }
@@ -247,16 +251,20 @@ const getFavouriteData = async () => {
           key={index}
           style={[styles.cocktail, { backgroundColor: 'pink' }]}
           onPress={() =>
-            navigation.navigate('Recipe', {
-              drinkId: item.idDrink,
-              drinkName: item.strDrink,
-              image: item.strDrinkThumb,
-              category: item.strCategory,
-              glass: item.strGlass,
-              instructions: item.strInstructions,
-              navigator: 'IngredientsNavigator',
-              screen: 'MyIngredients'
-            })
+            navigation.navigate('CocktailsNavigator',
+              {
+                screen: 'Recipe', params: {
+
+                  drinkId: item.idDrink,
+                  drinkName: item.strDrink,
+                  image: item.strDrinkThumb,
+                  category: item.strCategory,
+                  glass: item.strGlass,
+                  instructions: item.strInstructions,
+                  navigator: 'IngredientsNavigator',
+                  screen: 'MyIngredients'
+                }
+              })
           }>
 
           <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
@@ -266,7 +274,7 @@ const getFavouriteData = async () => {
               <Text style={styles.drinkText} numberOfLines={1} ellipsizeMode="tail">
                 {item.strDrink}
               </Text>
-                <Text style={styles.drinkText}>{item.strCategory}</Text>
+              <Text style={styles.drinkText}>{item.strCategory}</Text>
             </View>
 
           </View>
@@ -302,7 +310,7 @@ const getFavouriteData = async () => {
 
               <View style={styles.topIngrNbr}
                 backgroundColor={ingredientView ? '#333' : '#ddd'}>
-                <Text style={{ color: colors.white }}>{selectedItems.length}</Text>
+                <Text style={{ color: colors.white }}>{ownedId.length}</Text>
               </View>
 
             </TouchableOpacity>
@@ -317,7 +325,7 @@ const getFavouriteData = async () => {
                 fontSize: 16,
                 color: cocktailView ? colors.mainFontColour : '#ccc',
                 fontFamily: fonts.header
-              }}>Cocktails</Text>
+              }}>Drinks</Text>
 
               <View style={styles.topIngrNbr}
                 backgroundColor={cocktailView ? '#333' : '#ddd'}>
@@ -329,83 +337,37 @@ const getFavouriteData = async () => {
       </View>
 
       {ingredientView && (
-        <ScrollView>
-          <View style={{ marginBottom: 50 }}>
-            <Searchbar
-              placeholder="Search"
-              style={styles.ingrSearch}
-              inputStyle={{ marginTop: -10 }}
-              iconColor={colors.mainFontColour}
-              placeholderTextColor={colors.mainFontColour}
+        <ScrollView style={{ height: '100%' }}>
+
+          <View style={{ marginHorizontal: 20, marginTop: 20 }}>
+            <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Owned ingredients</Text>
+
+            <FlatList
+              data={owned}
+              style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => index.toString()}
             />
-          </View>
 
-          <View style={{ marginHorizontal: 20 }}>
-            <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Name of type</Text>
-
-            <Row style={styles.myRow}>
-              <Col style={styles.myCol}>
-                <FlatList
-                  data={owned}
-                  renderItem={renderItem}
-                  keyExtractor={(item, index) => index.toString()}
-                />
-               </Col>
-            </Row>
-
-            <Row style={styles.myRow}>
-              <Col style={styles.myCol}>
-                <Pressable style={styles.myBtn} onPress={toggleCheck}>
-                  <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-                </Pressable>
-
-                <View style={{ alignItems: 'center', gap: 10 }}>
-                  <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-                  <Text>Name</Text>
-                </View>
-              </Col>
-
-              <Col style={styles.myCol}>
-                <Pressable style={styles.myBtn} onPress={toggleCheck}>
-                  <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-                </Pressable>
-
-                <View style={{ alignItems: 'center', gap: 10 }}>
-                  <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-                  <Text>Name</Text>
-                </View>
-              </Col>
-
-              <Col style={styles.myCol}>
-                <Pressable style={styles.myBtn}>
-                  <Icon name='check' size={18} color={check ? colors.mainFontColour : 'transparent'} />
-                </Pressable>
-
-                <View style={{ alignItems: 'center', gap: 10 }}>
-                  <Image source={require('../assets/images/Alcoholic.png')} style={styles.drinkImg} />
-                  <Text>Name</Text>
-                </View>
-              </Col>
-            </Row>
           </View>
         </ScrollView>
       )}
 
-      {cocktailView && 
-        <View>
-          <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Possible cocktails</Text>
-          { errorStatus ? 
-          <Text>{errorStatus}</Text>
-          :
-          <View style={styles.drinkContainer}>
-            <FlatList
-            data={availableRecipes}
-            renderItem={renderDrinkItem}
-            keyExtractor={(item, index) => index.toString()}
-            extraData={availableRecipes}
-            />
-          </View>
-        }
+      {cocktailView &&
+        <View style={{ marginTop: 20, height: '100%', backgroundColor: colors.white }}>
+          <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10, marginHorizontal: 20 }}>Possible recipes</Text>
+          {errorStatus ?
+            <Text style={{ textAlign: 'center', marginTop: 20 }}>{errorStatus}</Text>
+            :
+            <View style={styles.drinkContainer}>
+              <FlatList
+                data={availableRecipes}
+                renderItem={renderDrinkItem}
+                keyExtractor={(item, index) => index.toString()}
+                extraData={availableRecipes}
+              />
+            </View>
+          }
         </View>
       }
     </View>

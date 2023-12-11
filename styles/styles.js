@@ -274,15 +274,10 @@ export default StyleSheet.create({
     paddingHorizontal: 10,
     justifyContent: 'center'
   },
-  myRow: {
-    gap: 10,
-    marginVertical: 10
-  },
   myCol: {
-    alignItems: "center",
     borderRadius: 10,
-    paddingVertical: 5,
-    backgroundColor: '#ccc'
+    paddingVertical: 10,
+    backgroundColor: '#5c849480'
   },
   myBtn: {
     borderRadius: 50,

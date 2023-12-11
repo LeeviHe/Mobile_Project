@@ -32,10 +32,6 @@ export default function Ingredients({ navigation, route }) {
   }, [searchQuery])
 
   useEffect(() => {
-    clear()
-  }, [])
-
-  useEffect(() => {
     const unsubsribe = navigation.addListener('focus', () => {
       getOwnedData()
     })
@@ -133,8 +129,13 @@ export default function Ingredients({ navigation, route }) {
 
           <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
             <Image
-              source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png' }}
-              style={styles.drinkImg} />
+              source={
+                item.strType
+                  ? { uri: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png' }
+                  : require('../assets/images/img-placeholder.jpg')
+              }
+              style={styles.drinkImg}
+            />
 
             <View style={styles.cocktailInfo}>
               <Text style={styles.drinkText}>{item.strIngredient}</Text>
