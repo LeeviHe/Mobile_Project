@@ -1,4 +1,4 @@
-import { Text, View, TouchableOpacity, Image, FlatList} from 'react-native';
+import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator} from 'react-native';
 import styles from '../styles/styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useState, useEffect } from 'react';
@@ -17,6 +17,7 @@ export default function Favourites({ navigation , route }) {
   const [temp, setTemp] = useState([])
   const { asyncStorageData } = useGlobalState()
   const [newInfo, setNewInfo] = useState([])
+  const [isAsyncbusy, setAsyncBusy] = useState(false)
 
   async function clear() {
     try { 
@@ -29,14 +30,16 @@ export default function Favourites({ navigation , route }) {
   }
 
   useEffect (() => {
+    
     const unsubsribe = navigation.addListener('focus', async () => {
-        favouriteData()
+      favouriteData()
     })
     return () => {unsubsribe()}
   }, [asyncStorageData, navigation])
 
 
   useEffect (() => {
+    setAsyncBusy(true)
     console.log(favouritesIds.length)
     const fetchData = async () => {
       let tempData = []
@@ -53,6 +56,7 @@ export default function Favourites({ navigation , route }) {
       } else {
         console.log('No tempData')
       }
+      setAsyncBusy(false)
     }
     fetchData()
   }, [favouritesIds])
@@ -60,6 +64,7 @@ export default function Favourites({ navigation , route }) {
   useEffect (() => {
     if (newInfo.length > 0) {
       setFavourites(newInfo)
+      
     }
   }, [newInfo])
 
@@ -76,6 +81,7 @@ export default function Favourites({ navigation , route }) {
     catch (e) {
         console.log('Read error: ' + e)
     }
+    
   }
   
   const isAlcoholic = (category) => {
@@ -189,9 +195,9 @@ export default function Favourites({ navigation , route }) {
   return (
     <ScrollView style={{ backgroundColor: colors.white}}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>My Favourites</Text>
-
       <View style={styles.favBtnContainer}>
         <Button icon="camera"onPress={() =>clear()} />
+        {!isAsyncbusy ? (<>
         { favouritesIds.length === 0 ? 
         <Text>No favourites saved</Text> 
         :
@@ -201,7 +207,7 @@ export default function Favourites({ navigation , route }) {
             renderItem={renderDrinkItem}
             extraData={favourites}
           />
-        }
+        }</>):(<ActivityIndicator size={250} color={"#c0c0c0"}/>)}
         </View>
     </ScrollView>
   );

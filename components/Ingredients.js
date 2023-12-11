@@ -1,4 +1,4 @@
-import { Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import { colors, textStyles } from '../styles/style-constants';
@@ -12,6 +12,7 @@ export default function Ingredients({ navigation, route }) {
   const [ingredientData, setIngredientData] = useState([])
   const [errorStatus, setErrorStatus] = useState('')
   const [owned, setOwned] = useState([])
+  const [isAPIbusy, setAPIBusy] = useState(false)
 
   const onChangeSearch = query => setSearchQuery(query);
   async function clear() {
@@ -55,6 +56,7 @@ export default function Ingredients({ navigation, route }) {
   }
 
   async function getIngredient(method) {
+    setAPIBusy(true)
     try {
       const response = await fetch(URL + method);
       if (response.ok) {
@@ -74,6 +76,7 @@ export default function Ingredients({ navigation, route }) {
     } catch (err) {
       alert(err);
     }
+    setAPIBusy(false)
   }
 
   const handleSearch = () => {
@@ -171,16 +174,17 @@ export default function Ingredients({ navigation, route }) {
           iconColor={colors.mainFontColour}
           placeholderTextColor={colors.mainFontColour} />
       </View>
-      {errorStatus.trim().length === 0 ?
-        <FlatList
-          data={ingredientData} // Assuming ingredientData is your data array
-          renderItem={renderItem}
-          keyExtractor={item => item.idIngredient.toString()}
-        />
-        :
-        <View>
-          <Text>{errorStatus}</Text>
-        </View>}
+      {!isAPIbusy ? (<>
+        {errorStatus.trim().length === 0 ?
+          <FlatList
+            data={ingredientData} // Assuming ingredientData is your data array
+            renderItem={renderItem}
+            keyExtractor={item => item.idIngredient.toString()}
+          />
+          :
+          <View>
+            <Text>{errorStatus}</Text>
+          </View>}</>):(<ActivityIndicator size={250} color={"#c0c0c0"}/>)}
     </View>
   );
 }
