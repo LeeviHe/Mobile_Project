@@ -10,7 +10,7 @@ import { URL, FAVOURITE_DRINKS_KEY } from '../reusables/Constants';
 
 const Recipe = ({ navigation, route }) => {
     const [recipeData, setRecipeData] = useState([]);
-      // Iteration of favourited drinks
+    // Iteration of favourited drinks
     const [favourites, setFavourites] = useState([])
 
     useEffect(() => {
@@ -48,7 +48,7 @@ const Recipe = ({ navigation, route }) => {
         }
     }
 
-    useEffect (() => {
+    useEffect(() => {
         const unsubsribe = navigation.addListener('focus', () => {
             getFavouriteData()
         })
@@ -69,8 +69,8 @@ const Recipe = ({ navigation, route }) => {
     }
 
     const isFavourited = favourites.some(fav => fav.drinkId === route.params.drinkId)
-    
-    const toggleHeart = async() => {
+
+    const toggleHeart = async () => {
         try {
             if (isFavourited) {
                 const newFavourites = favourites.filter((fav) => fav.drinkId !== recipeData[0].idDrink)
@@ -88,12 +88,12 @@ const Recipe = ({ navigation, route }) => {
                 setFavourites(newFavourites)
                 alert('Favourite saved')
             }
-        } catch(error) {
+        } catch (error) {
             console.log('Error saving favourite: ' + error)
-            setFavourites((prevFavourites) => 
-             prevFavourites.filter((fav) => fav.drinkId !== recipeData[0].idDrink))
+            setFavourites((prevFavourites) =>
+                prevFavourites.filter((fav) => fav.drinkId !== recipeData[0].idDrink))
         }
-        //
+
         console.log(favourites.length)
     }
 
@@ -202,7 +202,7 @@ const Recipe = ({ navigation, route }) => {
                     style={{ paddingVertical: 30 }}>
 
                     <View style={styles.topBar}>
-                        <TouchableOpacity onPress={() => navigation.navigate(route.params.navigator, {screen: route.params.screen})}>
+                        <TouchableOpacity onPress={() => navigation.navigate(route.params.navigator, { screen: route.params.screen })}>
                             <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={toggleHeart}>
@@ -221,7 +221,7 @@ const Recipe = ({ navigation, route }) => {
                     </View>
                 </ImageBackground>
 
-                <View backgroundColor={categoryColors[route.params.category]} paddingVertical={20} z-index={0}>
+                <View backgroundColor={categoryColors[route.params.category]} paddingVertical={20}>
                     <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Ingredients</Text>
 
                     <View>

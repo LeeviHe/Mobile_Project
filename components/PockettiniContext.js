@@ -32,10 +32,11 @@ export const PockettiniProvider = ({ children }) => {
     await AsyncStorage.setItem('pockettinis', JSON.stringify(newPockettinis));
   };
 
-  const updatePockettini = (index, updatedPockettini) => {
+  const updatePockettini = async (index, updatedPockettini) => {
     setPockettinis(pockettinis => {
       const newPockettinis = [...pockettinis];
       newPockettinis[index] = updatedPockettini;
+      AsyncStorage.setItem('pockettinis', JSON.stringify(newPockettinis));
       return newPockettinis;
     });
   };

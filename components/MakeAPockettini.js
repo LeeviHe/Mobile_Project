@@ -18,8 +18,7 @@ export default function MakeAPockettini({ navigation, route }) {
   const [category, setCategory] = useState(pockettini?.drinkCategory || '')
   const [number, setNumber] = useState(pockettini?.number || '')
   const [amount, setAmount] = useState(pockettini?.amount || '')
-  const [ingrName, setIngrName] = useState(pockettini?.ingrName || '')
-  const [ingredients, setIngredients] = useState([])
+  const [ingredients, setIngredients] = useState(pockettini?.drinkIngredients || [{ number: 0, amount: '-', name: '' }])
   const [preparations, setPreparations] = useState(pockettini?.steps || [])
   const [notes, setNotes] = useState(pockettini?.notes || [])
 
@@ -27,7 +26,13 @@ export default function MakeAPockettini({ navigation, route }) {
   const [isModalVisible, setModalVisible] = useState(false)
   const [isOverlayVisible, setOverlayVisible] = useState(false)
 
-  const isEmpty = !drinkName || !category || !number || !amount || preparations.length === 0;
+  const isEmpty = !drinkName ||
+    !category ||
+    ingredients.length === 0 ||
+    ingredients[0].number === 0 ||
+    ingredients[0].amount === '-' ||
+    !ingredients[0].name ||
+    preparations.length === 0;
 
   const [currentIngredientIndex, setCurrentIngredientIndex] = useState(null);
 
@@ -144,7 +149,7 @@ export default function MakeAPockettini({ navigation, route }) {
       drinkCategory: category,
       number: number,
       amount: amount,
-      ingrName: ingrName,
+      drinkIngredients: ingredients,
       steps: preparations,
       notes: notes
     }
@@ -265,36 +270,6 @@ export default function MakeAPockettini({ navigation, route }) {
             <Text style={[textStyles.H1Upper, { marginBottom: 10 }]}>Ingredients</Text>
 
             <View>
-              <Row style={{ borderRadius: 5 }}>
-                <Col style={[styles.editAmount, styles.shadow]}>
-                  <TouchableOpacity
-                    onPress={() => togglePicker('numberAmount')}
-                    style={styles.measureView}>
-
-                    <Text style={styles.editMeasure}>
-                      {number ? number : '0'}
-                    </Text>
-
-                    <View style={{ borderLeftWidth: 1, borderLeftColor: colors.mainFontColour }} />
-
-                    <Text style={styles.editMeasure}>
-                      {amount ? amount : '-'}
-                    </Text>
-                  </TouchableOpacity>
-                </Col>
-
-                <Col style={[styles.inputView, styles.shadow]}>
-                  <TextInput
-                    style={{ color: colors.mainFontColour }}
-                    value={ingrName}
-                    placeholder='Ingredient name..'
-                    onChangeText={setIngrName}
-                  />
-                </Col>
-              </Row>
-            </View>
-
-            <View>
               {ingredients.map((ingredient, index) => (
                 <Row key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
                   <Col style={styles.editAmount}>
@@ -319,15 +294,17 @@ export default function MakeAPockettini({ navigation, route }) {
                       style={{ color: colors.mainFontColour }}
                       value={ingredient.name}
                       placeholder='Ingredient name..'
-                      onChangeText={(ingrName) => {
+                      onChangeText={(name) => {
                         const newIngredients = [...ingredients];
-                        newIngredients[index].name = ingrName;
+                        newIngredients[index].name = name;
                         setIngredients(newIngredients);
                       }}
                     />
-                    <TouchableOpacity onPress={() => removeIngredient(index)}>
-                      <Icon name='close-circle-outline' size={30} color='#ff6161' />
-                    </TouchableOpacity>
+                    {index !== 0 && (
+                      <TouchableOpacity onPress={() => removeIngredient(index)}>
+                        <Icon name='close-circle-outline' size={30} color='#ff6161' />
+                      </TouchableOpacity>
+                    )}
                   </Col>
                 </Row>
               ))
@@ -351,7 +328,6 @@ export default function MakeAPockettini({ navigation, route }) {
                 placeholder='Step 1..'
                 onChangeText={(text) => updatePreparation(0, text)}
               />
-
             </View>
 
             <View>
