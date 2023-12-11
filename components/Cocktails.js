@@ -59,10 +59,10 @@ export default function Cocktails({ navigation, route }) {
   const [showDropdown2, setShowDropdown2] = useState(false);
   const [isAPIbusy, setAPIBusy] = useState(false)
 
+  const [visibleItems, setVisibleItems] = useState(10);
+
   //
   //useEffects
-
-  //Might not need 
   useEffect (() => {
       const unsubsribe = navigation.addListener('focus', () => {
           getFavouriteData()
@@ -76,7 +76,8 @@ export default function Cocktails({ navigation, route }) {
     if (activeFilters.length === 0) {
       console.log('empty')
       if (route.params !== undefined && route.params.id == 'empty' && !activeCategory && searchQuery.trim().length === 0) {
-        defaultSetup()
+        setFilterCondition('')
+        setFilterSearch('')
       }
     } else if (activeFilters.length !== 0) {
       searchFilter('', 'i', string, false)
@@ -107,7 +108,7 @@ export default function Cocktails({ navigation, route }) {
           activate(route.params.condition, route.params.search)
         }
       }
-    } else if (searchQuery.trim().length === 0 && !ascendSort && !descendSort && activeFilters.length === 0 && !activeCategory) {
+    } else if (searchQuery.trim().length === 0 && activeFilters.length === 0 && !activeCategory && route.params.id !== 'empty') {
       defaultSetup()
     } else if (activeFilters.length > 0 && searchQuery.trim().length === 0) {
       let first = activeFilters.length > 0 ? activeFilters[0].toString() : '';
@@ -211,7 +212,7 @@ export default function Cocktails({ navigation, route }) {
     } else if (condition == 'i') {
       getDrink('filter.php?' + condition + '=' + search, firstFilter)
     } else {
-      console.log('error in activate')
+      defaultSetup()
     }
     setFilterView(false)
   }
@@ -507,7 +508,7 @@ export default function Cocktails({ navigation, route }) {
   );
 
   const RenderIngredientDropdownContent = ({ ingredientJson, showDropdown2, selectFilter, multiFilterSelectColor, colors, fonts }) => {
-    const [visibleItems, setVisibleItems] = useState(50);
+    const [visibleIngredients, setVisibleIngredients] = useState(20);
 
     //BASE INGREDIENT
     const renderItem = ({ item, index }) => (
@@ -527,11 +528,11 @@ export default function Cocktails({ navigation, route }) {
         {showDropdown2 && (
           <View style={styles.dropdownList}>
             <FlatList
-              data={ingredientJson.slice(0, visibleItems)}
+              data={ingredientJson.slice(0, visibleIngredients)}
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderItem}
-              onEndReached={() => setVisibleItems((prev) => prev + 20)}
-              onEndReachedThreshold={0.5}
+              onEndReached={() => setVisibleIngredients((prev) => prev + 20)}
+              onEndReachedThreshold={0.2}
             />
           </View>
         )}
@@ -686,10 +687,12 @@ export default function Cocktails({ navigation, route }) {
           <>
             {errorStatus.trim().length === 0 ? (
               <FlatList
-                data={activeDrinks}
+                data={activeDrinks.slice(0, visibleItems)}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderDrinkItem}
                 extraData={activeDrinks}
+                onEndReached={() => setVisibleItems((prev) => prev + 10)}
+                onEndReachedThreshold={0.2}
               />
             ) : (
               <View>
