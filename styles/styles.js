@@ -22,8 +22,6 @@ export default StyleSheet.create({
     height: 140
   },
   page: {
-    width: '100%',
-    height: 210,
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center'

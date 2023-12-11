@@ -121,7 +121,7 @@ function Home({ navigation, route }) {
                         opacity={0.5}
                         blurRadius={30}>
 
-                        <View style={{ marginBottom: 80 }}>
+                        <View style={{ marginBottom: 80, marginTop: 10 }}>
                             <Image source={require('../assets/logos/pockettini-logo-regular-256px-black.png')}
                                 style={styles.logo} />
                         </View>

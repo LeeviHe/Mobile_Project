@@ -108,8 +108,12 @@ export default function Cocktails({ navigation, route }) {
           activate(route.params.condition, route.params.search)
         }
       }
-    } else if (searchQuery.trim().length === 0 && activeFilters.length === 0 && !activeCategory && route.params.id !== 'empty') {
-      defaultSetup()
+    } else if (searchQuery.trim().length === 0 && activeFilters.length === 0 && !activeCategory && route.params === undefined) {
+        defaultSetup()
+    } else if (searchQuery.trim().length === 0 && activeFilters.length === 0 && !activeCategory && route.params !== undefined) {
+      if (route.params.id !== 'empty') {
+        defaultSetup()
+      }
     } else if (activeFilters.length > 0 && searchQuery.trim().length === 0) {
       let first = activeFilters.length > 0 ? activeFilters[0].toString() : '';
       let string = activeFilters.toString()
