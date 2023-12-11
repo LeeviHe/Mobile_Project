@@ -5,7 +5,6 @@ import styles from '../styles/styles';
 import { colors, fonts, textStyles } from '../styles/style-constants';
 import { StatusBar } from 'expo-status-bar';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const MyRecipe = ({ navigation, route }) => {
   const pockettini = route.params.pockettini;
