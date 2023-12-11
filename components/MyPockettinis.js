@@ -87,9 +87,8 @@ const isAlcoholic = (category) => {
 
         {
           pockettinis.map((pockettini, index) => (
-            <GestureHandlerRootView>
+            <GestureHandlerRootView key={index}>
               <Swipeable
-                key={index}
                 renderRightActions={() => (
                   <View style={{ alignItems: 'center', justifyContent: 'space-between', marginVertical: 10 }}>
                     <TouchableOpacity
