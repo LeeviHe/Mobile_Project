@@ -7,7 +7,7 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ScrollView } from 'react-native-virtualized-view';
 
-export default function MyPockettinis({ navigation, route }) {
+export default function MyPockettinis({ navigation }) {
   const { pockettinis, removePockettini } = usePockettini();
 
   const deletePockettini = (index) => {
@@ -28,7 +28,7 @@ export default function MyPockettinis({ navigation, route }) {
     );
   }
 
-const isAlcoholic = (category) => {
+  const isAlcoholic = (category) => {
     const alcoholicCategories = [
       'Ordinary Drink',
       'Cocktail',
@@ -62,11 +62,11 @@ const isAlcoholic = (category) => {
         : isNotAlcoholic(item.drinkCategory)
           ? categoryColors['Non Alcoholic']
           : categoryColors[item.drinkCategory] || colors.purple;
-    } 
+    }
   }
 
   return (
-    <ScrollView style={{ backgroundColor: colors.white}}>
+    <ScrollView style={{ backgroundColor: colors.white }}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>My Pockettinis</Text>
 
       <View style={styles.btnContainer}>
@@ -115,7 +115,13 @@ const isAlcoholic = (category) => {
 
                 <TouchableOpacity
                   key={index}
-                  style={[styles.cocktail, { backgroundColor: categoryBackgroundColor(pockettini) }]}>
+                  style={[styles.cocktail, { backgroundColor: categoryBackgroundColor(pockettini) }]}
+                  onPress={() =>
+                    navigation.navigate('MyRecipe', {
+                      pockettini: pockettinis[index],
+                      backgroundColor: categoryBackgroundColor(pockettini),
+                      index
+                    })}>
 
                   <View style={[styles.cocktailInfo, { flexDirection: 'row', alignItems: 'center' }]}>
 
