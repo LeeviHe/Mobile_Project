@@ -1,7 +1,7 @@
-import { Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
-import { colors, textStyles } from '../styles/style-constants';
+import { colors, textStyles, modalStyle } from '../styles/style-constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/styles';
 import { OWNED_INGR_KEY, URL } from '../reusables/Constants';
@@ -13,16 +13,12 @@ export default function Ingredients({ navigation, route }) {
   const [errorStatus, setErrorStatus] = useState('')
   const [owned, setOwned] = useState([])
   const [isAPIbusy, setAPIBusy] = useState(false)
+  const [modal, setModal] = useState(false)
+  const [modalText, setModalText] = useState('')
+  const [linkText, setLinkText] = useState('')
 
   const onChangeSearch = query => setSearchQuery(query);
-  async function clear() {
-    try {
-      await AsyncStorage.removeItem(OWNED_INGR_KEY)
-      setOwned([])
-    } catch (e) {
-      console.log('Clear error: ' + e)
-    }
-  }
+
   useEffect(() => {
     if (searchQuery.trim().length === 0) {
       defaultSetup()
@@ -93,7 +89,12 @@ export default function Ingredients({ navigation, route }) {
           const newOwned = owned.filter((own) => own.idIngredient !== item.idIngredient)
           await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
           setOwned(newOwned)
-          alert('Ingredient removed from owned')
+          setModal(true)
+          setModalText('Removed from owned ingredients')
+          setLinkText('')
+          setTimeout(() => {
+            setModal(false)
+          }, 1000);
         } else {
           const newKey = owned.length + 1
           const ingrInfo = {
@@ -103,7 +104,12 @@ export default function Ingredients({ navigation, route }) {
           const newOwned = [...owned, ingrInfo]
           await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
           setOwned(newOwned)
-          alert('Ingredient saved')
+          setModal(true)
+          setModalText('Added to ')
+          setLinkText('owned ingredients')
+          setTimeout(() => {
+            setModal(false)
+          }, 2000);
         }
       } catch (error) {
         console.log('Error saving ingredient: ' + error)
@@ -185,7 +191,37 @@ export default function Ingredients({ navigation, route }) {
           :
           <View>
             <Text>{errorStatus}</Text>
-          </View>}</>):(<ActivityIndicator size={250} color={"#c0c0c0"}/>)}
+          </View>}</>) : (<ActivityIndicator size={250} color={"#c0c0c0"} />)}
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modal}
+        onRequestClose={() => {
+          setModal(!modal);
+        }}>
+
+        <View style={modalStyle.container}>
+          <View style={modalStyle.view}>
+
+            <Text style={modalStyle.text}>
+              {modalText}
+              {linkText ? (
+                <Text
+                  style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
+                  onPress={() => navigation.navigate('MyIngredients')}>
+                  {linkText}
+                </Text>
+              ) : null}
+            </Text>
+
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModal(!modal)}>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
