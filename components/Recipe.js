@@ -289,10 +289,10 @@ const Recipe = ({ navigation, route }) => {
                                 ) : null}
                             </Text>
 
-                            <Pressable
+                            <TouchableOpacity
                                 style={[styles.button, styles.buttonClose]}
                                 onPress={() => setModal(!modal)}>
-                            </Pressable>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </Modal>

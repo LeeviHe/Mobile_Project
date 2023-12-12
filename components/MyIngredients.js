@@ -58,7 +58,7 @@ export default function MyPockettinis({ navigation, route }) {
     const fetchData = async () => {
       if (ownedId) {
         setAsyncBusy(true)
-        const fetchPromises = ownedId.map(own => 
+        const fetchPromises = ownedId.map(own =>
           getJsonIngredients(URL, 'lookup.php?iid=' + own.idIngredient, setTemp)
         )
         try {
@@ -83,7 +83,7 @@ export default function MyPockettinis({ navigation, route }) {
       setOwned(newInfo)
     }
   }, [newInfo])
-  
+
   useEffect(() => {
     const unsubsribe = navigation.addListener('focus', () => {
       getFavouriteData()
@@ -93,7 +93,7 @@ export default function MyPockettinis({ navigation, route }) {
 
   const navToFav = () => {
     navigation.navigate('MoreNavigator', {
-        screen: 'Favourites',
+      screen: 'Favourites',
     });
   };
 
@@ -139,6 +139,7 @@ export default function MyPockettinis({ navigation, route }) {
       const jsonValue = await AsyncStorage.getItem(OWNED_INGR_KEY)
       if (jsonValue !== null) {
         let data = JSON.parse(jsonValue)
+        setErrorStatus('No ingredients found!')
         setOwnedId(data)
       } else {
         console.log('No data found in Async')
@@ -167,7 +168,12 @@ export default function MyPockettinis({ navigation, route }) {
           setOwnedId(newOwnedId);
           selectItems(index, item.strIngredient)
           await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
-          alert('Ingredient removed from owned')
+          setModal(true)
+          setModalText('Removed from owned ingredients')
+          setLinkText('')
+          setTimeout(() => {
+            setModal(false)
+          }, 1000);
         }
       } catch (error) {
         console.log('Error saving ingredient: ' + error)
@@ -317,7 +323,7 @@ export default function MyPockettinis({ navigation, route }) {
   }
 
   return (
-    <View style={{ backgroundColor: colors.white}}>
+    <View style={{ backgroundColor: colors.white }}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>My Ingredients</Text>
       <View style={{ marginBottom: 20 }}>
         <Row>
@@ -347,7 +353,7 @@ export default function MyPockettinis({ navigation, route }) {
                 color: cocktailView ? colors.mainFontColour : '#ccc',
                 fontFamily: fonts.header
               }}>Drinks</Text>
-              
+
               <View style={styles.topIngrNbr}
                 backgroundColor={cocktailView ? '#333' : '#ddd'}>
                 <Text style={{ color: colors.white }}>{availableRecipes.length}</Text>
@@ -358,23 +364,38 @@ export default function MyPockettinis({ navigation, route }) {
       </View>
 
       {!cocktailView ? (
-      <ScrollView style={{ height: '100%' }}>
+        <ScrollView style={{ height: '100%' }}>
           <View style={{ marginHorizontal: 20, marginTop: 20 }}>
             <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Owned ingredients</Text>
-              {!isAsyncbusy ? (
+            {!isAsyncbusy ? (<>
+              {ownedId.length === 0 ?
+                <View style={{ alignItems: 'center', marginTop: 20 }}>
+                  <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>No ingredients saved!</Text>
+                  <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>Your starred items will show here.</Text>
+                </View>
+                :
                 <FlatList
                   data={owned}
                   style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
                   renderItem={renderItem}
                   keyExtractor={(item, index) => index.toString()}
                 />
-              ) : (<ActivityIndicator size={250} color={"#c0c0c0"}/>)}
+              }</>) : (
+              <ActivityIndicator size={250} color={"#c0c0c0"} />
+            )}
           </View>
-        </ScrollView>) : (
-        <View style={{ backgroundColor: colors.white, marginBottom: 570}}>
+        </ScrollView>
+
+      ) : (
+
+        <View style={{ backgroundColor: colors.white, marginBottom: 570 }}>
           <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10, marginHorizontal: 20 }}>Possible recipes</Text>
           {errorStatus ?
-            <Text style={{ textAlign: 'center', marginTop: 20 }}>{errorStatus}</Text>
+            <View style={{ alignItems: 'center', marginTop: 20, marginHorizontal: 40 }}>
+              <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>{errorStatus}</Text>
+              <Text></Text>
+              <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour, textAlign: 'center' }}>Choosing different drinks will display relevant recipes here.</Text>
+            </View>
             :
             <View style={styles.drinkContainer}>
               <FlatList
@@ -385,7 +406,8 @@ export default function MyPockettinis({ navigation, route }) {
             </View>
           }
         </View>)}
-        <Modal
+
+      <Modal
         animationType="fade"
         transparent={true}
         visible={modal}
@@ -395,20 +417,20 @@ export default function MyPockettinis({ navigation, route }) {
         <View style={modalStyle.container}>
           <View style={modalStyle.view}>
 
-          <Text style={modalStyle.text}>
-            {modalText}
-            {linkText ? (
-              <Text
-                style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
-                onPress={navToFav}>
-                {linkText}
-              </Text>
-            ) : null}
-          </Text>
-          <TouchableOpacity
-            style={[styles.button, styles.buttonClose]}
-            onPress={() => setModal(!modal)}>
-          </TouchableOpacity>
+            <Text style={modalStyle.text}>
+              {modalText}
+              {linkText ? (
+                <Text
+                  style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
+                  onPress={navToFav}>
+                  {linkText}
+                </Text>
+              ) : null}
+            </Text>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModal(!modal)}>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
