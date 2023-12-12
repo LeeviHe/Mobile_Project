@@ -52,3 +52,4 @@ export const DEVS_FAVOURITES = [
 export const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 export const FAVOURITE_DRINKS_KEY = "@favourites"
 export const OWNED_INGR_KEY = "@owned"
+export const MAPS_KEY = "AIzaSyAxr6uGD0CCuomLoT8JM3VtZM9uBFV6CvU"

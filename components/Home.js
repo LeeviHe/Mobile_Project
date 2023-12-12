@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, View, Image, ImageBackground, TouchableOpacity, TouchableHighlight, Pressable } from 'react-native';
+import { ScrollView, Text, View, Image, ImageBackground, TouchableOpacity } from 'react-native';
 import { Container, Row, Col } from "react-native-flex-grid";
 import { PageSlider } from '@pietile-native-kit/page-slider';
 import styles from '../styles/styles'
@@ -9,9 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { colors } from '../styles/style-constants'
-import { URL } from '../reusables/Constants';
-
-const MAPS_KEY = "AIzaSyAxr6uGD0CCuomLoT8JM3VtZM9uBFV6CvU"
+import { MAPS_KEY } from '../reusables/Constants';
 
 function Home({ navigation, route }) {
     const [selectedPage, setSelectedPage] = useState(0);
@@ -79,7 +77,7 @@ function Home({ navigation, route }) {
             title: 'Surprise me!',
             text: 'Discover something\n new and exciting',
             img: require('../assets/images/Carousel-cocktails-1.png'),
-            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { id: '', condition: 'c', search: 'random.php', navigator: 'HomeNavigator', screen:'Home' } })
+            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { id: '', condition: 'c', search: 'random.php', navigator: 'HomeNavigator', screen: 'Home' } })
         },
         {
             backgroundColor: colors.brown,
