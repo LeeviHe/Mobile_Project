@@ -21,6 +21,8 @@ export default function MyPockettinis({ navigation, route }) {
   const [errorStatus, setErrorStatus] = useState(null)
   const [isAsyncbusy, setAsyncBusy] = useState(false)
 
+  // To replace strCategory in filtering situation
+  const [replaceCategory, setReplaceCategory] = useState('')
   // Iteration of favourited drinks
   const [favourites, setFavourites] = useState([])
   //Selected ingredients index
@@ -43,7 +45,7 @@ export default function MyPockettinis({ navigation, route }) {
       setErrorStatus('No ingredients selected!')
       setAvailableRecipes([])
     } else {
-      getDrinks('filter.php?i=' + string)
+      getDrinks('filter.php?i=' + string, string)
     }
   }, [selectedItems])
 
@@ -97,7 +99,7 @@ export default function MyPockettinis({ navigation, route }) {
     }
   }
 
-  async function getDrinks(method) {
+  async function getDrinks(method, ingr) {
     try {
       const response = await fetch(URL + method);
       if (response.ok) {
@@ -112,6 +114,7 @@ export default function MyPockettinis({ navigation, route }) {
         }
         const drinks = json.drinks;
         setAvailableRecipes(drinks);
+        setReplaceCategory(ingr)
       } else {
         alert('Error retrieving recipes!');
       }
@@ -277,7 +280,7 @@ export default function MyPockettinis({ navigation, route }) {
               <Text style={styles.drinkText} numberOfLines={1} ellipsizeMode="tail">
                 {item.strDrink}
               </Text>
-              <Text style={styles.drinkText}>{item.strCategory}</Text>
+              <Text style={styles.drinkText} numberOfLines={1}>{replaceCategory}</Text>
             </View>
 
           </View>
@@ -293,16 +296,14 @@ export default function MyPockettinis({ navigation, route }) {
   }
 
   return (
-    <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
+    <View style={{ backgroundColor: colors.white}}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>My Ingredients</Text>
-
       <View style={{ marginBottom: 20 }}>
         <Row>
           <Col style={ingredientView ? styles.topIngrColActive : styles.topIngrCol}>
             <TouchableOpacity
               onPress={viewIngredients}
               style={{ flexDirection: 'row', gap: 10 }}>
-
               <Text fontFamily={fonts.header}
                 style={{
                   fontSize: 16,
@@ -310,26 +311,22 @@ export default function MyPockettinis({ navigation, route }) {
                   fontFamily: fonts.header
                 }}>Ingredients
               </Text>
-
               <View style={styles.topIngrNbr}
                 backgroundColor={ingredientView ? '#333' : '#ddd'}>
                 <Text style={{ color: colors.white }}>{ownedId.length}</Text>
               </View>
-
             </TouchableOpacity>
           </Col>
-
           <Col style={cocktailView ? styles.topIngrColActive : styles.topIngrCol}>
             <TouchableOpacity
               onPress={viewCocktails}
               style={{ flexDirection: 'row', gap: 10 }}>
-
               <Text fontFamily={fonts.header} style={{
                 fontSize: 16,
                 color: cocktailView ? colors.mainFontColour : '#ccc',
                 fontFamily: fonts.header
               }}>Drinks</Text>
-
+              
               <View style={styles.topIngrNbr}
                 backgroundColor={cocktailView ? '#333' : '#ddd'}>
                 <Text style={{ color: colors.white }}>{availableRecipes.length}</Text>
@@ -339,9 +336,8 @@ export default function MyPockettinis({ navigation, route }) {
         </Row>
       </View>
 
-      
-        <ScrollView style={{ height: '100%' }}>
-
+      {!cocktailView ? (
+      <ScrollView style={{ height: '100%' }}>
           <View style={{ marginHorizontal: 20, marginTop: 20 }}>
             <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Owned ingredients</Text>
               {!isAsyncbusy ? (
@@ -353,11 +349,8 @@ export default function MyPockettinis({ navigation, route }) {
                 />
               ) : (<ActivityIndicator size={250} color={"#c0c0c0"}/>)}
           </View>
-        </ScrollView>
-      
-
-      {cocktailView &&
-        <View style={{ marginTop: 20, height: '100%', backgroundColor: colors.white }}>
+        </ScrollView>) : (
+        <View style={{ backgroundColor: colors.white, marginBottom: 570}}>
           <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10, marginHorizontal: 20 }}>Possible recipes</Text>
           {errorStatus ?
             <Text style={{ textAlign: 'center', marginTop: 20 }}>{errorStatus}</Text>
@@ -367,12 +360,10 @@ export default function MyPockettinis({ navigation, route }) {
                 data={availableRecipes}
                 renderItem={renderDrinkItem}
                 keyExtractor={(item, index) => index.toString()}
-                extraData={availableRecipes}
               />
             </View>
           }
-        </View>
-      }
+        </View>)}
     </View>
   )
 }

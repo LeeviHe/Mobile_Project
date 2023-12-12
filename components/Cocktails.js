@@ -35,7 +35,7 @@ export default function Cocktails({ navigation, route }) {
     useState(new Array(2).fill(false))
   //Selected multi-ingredient filters (489)
   const [selectedIngredients, setSelectedIngredients] =
-    useState(new Array(489).fill(false))
+    useState(new Array(ingredientJson.length).fill(false))
   //Activated multi-ingredient filters that are supposed to show
   const [activeFilters, setActiveFilters] = useState([])
   // Checking if any categories/alc/non-alc are selected
@@ -46,8 +46,6 @@ export default function Cocktails({ navigation, route }) {
   const [filterCondition, setFilterCondition] = useState('')
   // To set current filter search for activating filter
   const [filterSearch, setFilterSearch] = useState('')
-  // To set first of multi-filter ingredients
-  const [firstMultiFilter, setFirstMultiFilter] = useState('') 
   // Iteration of favourited drinks
   const [favourites, setFavourites] = useState([])
 
@@ -80,8 +78,13 @@ export default function Cocktails({ navigation, route }) {
         setFilterSearch('')
       }
     } else if (activeFilters.length !== 0) {
-      searchFilter('', 'i', string, false)
-      setFirstMultiFilter(first)
+      if (activeFilters.length > 4) {
+        alert('Maximum of 4 ingredients at a time')
+        setActiveFilters([])
+        selectedIngredients.fill(false)
+      } else {
+        searchFilter('', 'i', string, false)
+      }
     }
   }, [activeFilters])
 
@@ -210,11 +213,9 @@ export default function Cocktails({ navigation, route }) {
   }
 
 
-  function activate(condition, search, firstFilter) {
-    if (condition === 'c' || condition === 'a') {
+  function activate(condition, search) {
+    if (condition === 'c' || condition === 'a' || condition == 'i') {
       getDrink('filter.php?' + condition + '=' + search, search)
-    } else if (condition == 'i') {
-      getDrink('filter.php?' + condition + '=' + search, firstFilter)
     } else {
       defaultSetup()
     }
@@ -424,7 +425,7 @@ export default function Cocktails({ navigation, route }) {
               {item.strCategory ? (
                 <Text style={styles.drinkText}>{item.strCategory}</Text>
               ) : (
-                <Text style={styles.drinkText}>{replaceCategory}</Text>
+                <Text style={styles.drinkText} numberOfLines={1}>{replaceCategory}</Text>
               )}
             </View>
 
@@ -461,7 +462,6 @@ export default function Cocktails({ navigation, route }) {
     setActiveCategory(false)
     setFilterCondition('')
     setFilterSearch('')
-    setFirstMultiFilter('')
     defaultSetup()
   }
 
@@ -545,7 +545,7 @@ export default function Cocktails({ navigation, route }) {
   };
 
   return (
-    <View style={{ backgroundColor: colors.white, marginBottom: 240 }}>
+    <View style={{ backgroundColor: colors.white, marginBottom: 250, height:'100%'}}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>Cocktails</Text>
 
       <View style={{ marginBottom: 50 }}>
@@ -584,7 +584,7 @@ export default function Cocktails({ navigation, route }) {
               <Text style={styles.filterHeading}>Filters</Text>
 
               <TouchableOpacity
-                onPress={() => activate(filterCondition, filterSearch, firstMultiFilter)}
+                onPress={() => activate(filterCondition, filterSearch)}
                 style={styles.applyBtn}>
                 <Text style={textStyles.button}>Apply</Text>
               </TouchableOpacity>
@@ -686,9 +686,9 @@ export default function Cocktails({ navigation, route }) {
 
         </ScrollView>
       ) : 
-      <View>
+      <>
         {!isAPIbusy ? (
-          <>
+          <View style={{ backgroundColor: colors.white, marginBottom: 250 }}>
             {errorStatus.trim().length === 0 ? (
               <FlatList
                 data={activeDrinks.slice(0, visibleItems)}
@@ -702,10 +702,11 @@ export default function Cocktails({ navigation, route }) {
               <View>
                 <Text>{errorStatus}</Text>
               </View>
-            )}</>
+            )}
+          </View>
         ) : (<ActivityIndicator size={250} color={"#c0c0c0"}/>)
         }  
-      </View >
+      </>
       }
     </View>
   );
