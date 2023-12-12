@@ -1,11 +1,11 @@
 
-import { Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native';
 import { Searchbar, RadioButton } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native-virtualized-view'
 import { Row, Col } from "react-native-flex-grid";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { colors, fonts, padding, textStyles } from '../styles/style-constants';
+import { colors, fonts, padding, textStyles, modalStyle } from '../styles/style-constants';
 import styles from '../styles/styles';
 import { DEVS_FAVOURITES, FAVOURITE_DRINKS_KEY, URL } from '../reusables/Constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -48,6 +48,11 @@ export default function Cocktails({ navigation, route }) {
   const [filterSearch, setFilterSearch] = useState('')
   // Iteration of favourited drinks
   const [favourites, setFavourites] = useState([])
+
+  //Modal
+  const [modal, setModal] = useState(false)
+  const [modalText, setModalText] = useState('')
+  const [linkText, setLinkText] = useState('')
 
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
@@ -262,7 +267,12 @@ export default function Cocktails({ navigation, route }) {
   //
   //consts
 
-  //Might not need
+  const navToFav = () => {
+    navigation.navigate('MoreNavigator', {
+      screen: 'Favourites',
+    });
+  };
+
   const getFavouriteData = async () => {
       try {
           const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
@@ -345,9 +355,13 @@ export default function Cocktails({ navigation, route }) {
           const newFavourites = favourites.filter((fav) => fav.drinkId !== item.idDrink)
           await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
           setFavourites(newFavourites)
-          alert('Drink removed from favourites')
+          setModal(true)
+          setModalText('Removed from favourites')
+          setLinkText('')
+          setTimeout(() => {
+            setModal(false)
+          }, 1000);
         } else {
-          
           const newKey = favourites.length + 1
           const drinkInfo = {
             key: newKey,
@@ -356,7 +370,12 @@ export default function Cocktails({ navigation, route }) {
           const newFavourites = [...favourites, drinkInfo]
           await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
           setFavourites(newFavourites)
-          alert('Favourite saved')
+          setModal(true)
+          setModalText('Added to ')
+          setLinkText('favourites')
+          setTimeout(() => {
+            setModal(false)
+          }, 2000);
         }
       } catch(error) {
         console.log('Error saving favourite: ' + error)
@@ -708,6 +727,33 @@ export default function Cocktails({ navigation, route }) {
         }  
       </>
       }
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modal}
+        onRequestClose={() => {
+          setModal(!modal);
+        }}>
+        <View style={modalStyle.container}>
+          <View style={modalStyle.view}>
+
+          <Text style={modalStyle.text}>
+            {modalText}
+            {linkText ? (
+              <Text
+                style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
+                onPress={navToFav}>
+                {linkText}
+              </Text>
+            ) : null}
+          </Text>
+          <TouchableOpacity
+            style={[styles.button, styles.buttonClose]}
+            onPress={() => setModal(!modal)}>
+          </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

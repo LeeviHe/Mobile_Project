@@ -1,8 +1,8 @@
-import { Text, View, TouchableOpacity, Image, Pressable, FlatList, ActivityIndicator } from 'react-native';
+import { Text, View, TouchableOpacity, Image, Pressable, FlatList, ActivityIndicator, Modal } from 'react-native';
 import styles from '../styles/styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useState, useEffect } from 'react';
-import { colors, fonts, textStyles } from '../styles/style-constants';
+import { colors, fonts, textStyles, modalStyle } from '../styles/style-constants';
 import { Row, Col } from "react-native-flex-grid";
 import { URL, OWNED_INGR_KEY, FAVOURITE_DRINKS_KEY } from '../reusables/Constants';
 import { getJsonIngredients } from '../reusables/Functions';
@@ -20,6 +20,11 @@ export default function MyPockettinis({ navigation, route }) {
   const { asyncStorageData } = useGlobalState()
   const [errorStatus, setErrorStatus] = useState(null)
   const [isAsyncbusy, setAsyncBusy] = useState(false)
+
+  //Modal
+  const [modal, setModal] = useState(false)
+  const [modalText, setModalText] = useState('')
+  const [linkText, setLinkText] = useState('')
 
   // To replace strCategory in filtering situation
   const [replaceCategory, setReplaceCategory] = useState('')
@@ -85,6 +90,12 @@ export default function MyPockettinis({ navigation, route }) {
     })
     return unsubsribe
   }, [navigation])
+
+  const navToFav = () => {
+    navigation.navigate('MoreNavigator', {
+        screen: 'Favourites',
+    });
+  };
 
   const getFavouriteData = async () => {
     try {
@@ -230,7 +241,12 @@ export default function MyPockettinis({ navigation, route }) {
           const newFavourites = favourites.filter((fav) => fav.drinkId !== item.idDrink)
           await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
           setFavourites(newFavourites)
-          alert('Drink removed from favourites')
+          setModal(true)
+          setModalText('Removed from favourites')
+          setLinkText('')
+          setTimeout(() => {
+            setModal(false)
+          }, 1000);
         } else {
 
           const newKey = favourites.length + 1
@@ -241,7 +257,12 @@ export default function MyPockettinis({ navigation, route }) {
           const newFavourites = [...favourites, drinkInfo]
           await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
           setFavourites(newFavourites)
-          alert('Favourite saved')
+          setModal(true)
+          setModalText('Added to ')
+          setLinkText('favourites')
+          setTimeout(() => {
+            setModal(false)
+          }, 2000);
         }
       } catch (error) {
         console.log('Error saving favourite: ' + error)
@@ -364,6 +385,33 @@ export default function MyPockettinis({ navigation, route }) {
             </View>
           }
         </View>)}
+        <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modal}
+        onRequestClose={() => {
+          setModal(!modal);
+        }}>
+        <View style={modalStyle.container}>
+          <View style={modalStyle.view}>
+
+          <Text style={modalStyle.text}>
+            {modalText}
+            {linkText ? (
+              <Text
+                style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
+                onPress={navToFav}>
+                {linkText}
+              </Text>
+            ) : null}
+          </Text>
+          <TouchableOpacity
+            style={[styles.button, styles.buttonClose]}
+            onPress={() => setModal(!modal)}>
+          </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   )
 }
