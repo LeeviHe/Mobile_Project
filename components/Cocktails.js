@@ -10,7 +10,7 @@ import styles from '../styles/styles';
 import { DEVS_FAVOURITES, FAVOURITE_DRINKS_KEY, URL } from '../reusables/Constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { getJsonDrinks } from '../reusables/Functions';
+import { getJsonDrinks, getJsonIngredients } from '../reusables/Functions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator()
@@ -35,7 +35,7 @@ export default function Cocktails({ navigation, route }) {
     useState(new Array(2).fill(false))
   //Selected multi-ingredient filters (489)
   const [selectedIngredients, setSelectedIngredients] =
-    useState(new Array(ingredientJson.length).fill(false))
+    useState(new Array(489).fill(false))
   //Activated multi-ingredient filters that are supposed to show
   const [activeFilters, setActiveFilters] = useState([])
   // Checking if any categories/alc/non-alc are selected
@@ -48,7 +48,10 @@ export default function Cocktails({ navigation, route }) {
   const [filterSearch, setFilterSearch] = useState('')
   // Iteration of favourited drinks
   const [favourites, setFavourites] = useState([])
-
+  //
+  const [filterQuery, setFilterQuery] = useState('')
+  //
+  const [searchedIngr, setSearchedIngr] = useState([])
   //Modal
   const [modal, setModal] = useState(false)
   const [modalText, setModalText] = useState('')
@@ -75,7 +78,6 @@ export default function Cocktails({ navigation, route }) {
 
   useEffect(() => {
     let string = activeFilters.toString()
-    let first = activeFilters.length > 0 ? activeFilters[0].toString() : '';
     if (activeFilters.length === 0) {
       console.log('empty')
       if (route.params !== undefined && route.params.id == 'empty' && !activeCategory && searchQuery.trim().length === 0) {
@@ -100,7 +102,15 @@ export default function Cocktails({ navigation, route }) {
     if (ingredientJson.length === 0) {
       getJsonDrinks(URL, "list.php?i=list", setIngredientJson)
     }
-  }, [categoryJson, ingredientJson])
+    if (filterQuery.trim().length > 0) {
+      handleFilterSearch()
+      console.log('handle search')
+    } else {
+      console.log('search clearred')
+      setSearchedIngr([])
+    }
+
+  }, [categoryJson, ingredientJson, filterQuery])
 
   useEffect(() => {
     console.log(activeFilters)
@@ -294,6 +304,12 @@ export default function Cocktails({ navigation, route }) {
     selectedAlcohol.fill(false)
     setActiveFilters([])
     getDrink('search.php?s=' + searchQuery);
+  }
+
+  const onFilterSearch = query => setFilterQuery(query)
+
+  const handleFilterSearch = () => {
+    getJsonIngredients(URL, "search.php?i=" + filterQuery, setSearchedIngr)
   }
 
   const defaultSetup = () => {
@@ -544,19 +560,49 @@ export default function Cocktails({ navigation, route }) {
           fonts={fonts}
         />
       </View>
-    );
+    )
+
+    const renderSingleItem = ({ item, index }) => (
+      <View style={{ marginVertical: 5, marginHorizontal: 20 }}>
+        <FilterItem
+          label={item.strIngredient}
+          onPress={() => selectFilter(item.idIngredient - 1, item.strIngredient)}
+          checked={multiFilterSelectColor(item.idIngredient - 1) === 'green'}
+          colors={colors}
+          fonts={fonts}
+        />
+      </View>
+    )
 
     return (
       <View>
         {showDropdown2 && (
           <View style={styles.dropdownList}>
+            <Searchbar
+              placeholder="Search"
+              onChangeText={(value) => { onFilterSearch(value) }}
+              value={filterQuery}
+              style={{width:200}}
+              inputStyle={{ marginTop: -10 }}
+              iconColor={colors.mainFontColour}
+              placeholderTextColor={colors.mainFontColour}/>
+            {searchedIngr.length > 0 && searchedIngr !== null && searchedIngr !== undefined? 
+            <View>
+              <FlatList
+              data={searchedIngr}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={renderSingleItem}
+              /> 
+            </View>
+            : 
             <FlatList
               data={ingredientJson.slice(0, visibleIngredients)}
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderItem}
               onEndReached={() => setVisibleIngredients((prev) => prev + 20)}
               onEndReachedThreshold={0.2}
-            />
+            />}
+            
           </View>
         )}
       </View>
@@ -684,7 +730,6 @@ export default function Cocktails({ navigation, route }) {
             <View style={{ borderBottomWidth: 1, borderBottomColor: '#CEC56F' }}>
               <View style={[styles.dropdownContainer, { marginVertical: 10, marginHorizontal: 20 }]}>
                 <Text style={styles.filterHeading}>Base Ingredients</Text>
-
                 <TouchableOpacity onPress={toggleIngredientDropdown} style={styles.dropdownHeader}>
                   <Icon name={showDropdown2 ? 'minus' : 'plus'} size={40} color={colors.mainFontColour} />
                 </TouchableOpacity>

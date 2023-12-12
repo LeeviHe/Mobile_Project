@@ -15,6 +15,7 @@ const Recipe = ({ navigation, route }) => {
     const [modal, setModal] = useState(false)
     const [modalText, setModalText] = useState('')
     const [linkText, setLinkText] = useState('')
+    const [drinkId, setDrinkId] = useState('')
 
     const navToFav = () => {
         navigation.navigate('MoreNavigator', {
@@ -35,6 +36,7 @@ const Recipe = ({ navigation, route }) => {
                     const json = await response.json()
                     const data = json.drinks
                     setRecipeData(data)
+                    setDrinkId(route.params.drinkId)
                 } else {
                     alert('Error retrieving recipes!');
                 }
@@ -50,6 +52,9 @@ const Recipe = ({ navigation, route }) => {
                 if (response.ok) {
                     const json = await response.json()
                     const data = json.drinks
+                    data.map((data, id) => {
+                        setDrinkId(data.idDrink)
+                    })
                     setRecipeData(data)
                 } else {
                     alert('Error retrieving recipes!');
@@ -81,7 +86,7 @@ const Recipe = ({ navigation, route }) => {
         }
     }
 
-    const isFavourited = favourites.some(fav => fav.drinkId === route.params.drinkId)
+    const isFavourited = favourites.some(fav => fav.drinkId === drinkId)
 
     const toggleHeart = async () => {
         try {

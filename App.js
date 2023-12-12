@@ -128,15 +128,7 @@ export default function App() {
                 tabBarIcon: ({ color, size }) => {
                   return <Icon name="home" size={size} color={color} />;
                 },
-              }}
-              listeners={({ navigation }) => ({
-                tabPress: (e) => {
-                  // Prevent default action
-                  e.preventDefault();
-                  // Navigate to the initial route of CocktailsNavigator
-                  navigation.navigate('HomeNavigator', { screen: 'Home' });
-                },
-              })} />
+              }} />
             <Tab.Screen
               name="CocktailsNavigator"
               component={CocktailsNavigator}
@@ -163,14 +155,7 @@ export default function App() {
                   return <Icon name="bottle-tonic" size={size} color={color} />;
                 },
               }}
-              listeners={({ navigation }) => ({
-                tabPress: (e) => {
-                  // Prevent default action
-                  e.preventDefault();
-                  // Navigate to the initial route of CocktailsNavigator
-                  navigation.navigate('IngredientsNavigator', { screen: 'Ingredients' });
-                },
-              })} />
+              />
             <Tab.Screen
               name="MoreNavigator"
               component={MoreNavigator}

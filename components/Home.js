@@ -79,7 +79,7 @@ function Home({ navigation, route }) {
             title: 'Surprise me!',
             text: 'Discover something\n new and exciting',
             img: require('../assets/images/Carousel-cocktails-1.png'),
-            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { id: '', condition: 'c', search: 'random.php', navigator: 'HomeNavigator', screen:'Home' } })
+            onPress: () => navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { search: 'random.php', navigator: 'HomeNavigator', screen:'Home' } })
         },
         {
             backgroundColor: colors.brown,
@@ -138,21 +138,21 @@ function Home({ navigation, route }) {
 
                                 <TouchableOpacity
                                     style={styles.page}
-                                    onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: '', condition: 'devs', search: '' } })}>
+                                    onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { condition: 'devs'} })}>
                                     <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-1.png')} />
                                     <Text style={textStyles.H1}>Devs' Favourites</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
                                     style={styles.page}
-                                    onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: '', condition: 'popular', search: 'popular.php' } })}>
+                                    onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { condition: 'popular', search: 'popular.php' } })}>
                                     <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-2.png')} />
                                     <Text style={textStyles.H1}>Most Popular</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
                                     style={styles.page}
-                                    onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: { id: '', condition: 'latest', search: 'latest.php' } })}>
+                                    onPress={() => navigation.navigate('CocktailsNavigator', { screen: 'Cocktails', params: {condition: 'latest', search: 'latest.php' } })}>
                                     <Image style={styles.carouselImage} source={require('../assets/images/Carousel-cocktails-3.png')} />
                                     <Text style={textStyles.H1}>Latest Recipes</Text>
                                 </TouchableOpacity>
