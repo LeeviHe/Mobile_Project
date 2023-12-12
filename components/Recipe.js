@@ -1,18 +1,26 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, ImageBackground, Image, TouchableOpacity, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ImageBackground, Image, TouchableOpacity, Pressable, ActivityIndicator, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { StatusBar } from 'expo-status-bar';
 import styles from '../styles/styles';
-import { colors, fonts, textStyles } from '../styles/style-constants';
+import { colors, fonts, textStyles, modalStyle } from '../styles/style-constants';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { URL, FAVOURITE_DRINKS_KEY } from '../reusables/Constants';
 
 const Recipe = ({ navigation, route }) => {
     const [recipeData, setRecipeData] = useState([]);
-    // Iteration of favourited drinks
     const [favourites, setFavourites] = useState([])
     const [isAPIbusy, setAPIBusy] = useState(false)
+    const [modal, setModal] = useState(false)
+    const [modalText, setModalText] = useState('')
+    const [linkText, setLinkText] = useState('')
+
+    const navToFav = () => {
+        navigation.navigate('MoreNavigator', {
+            screen: 'Favourites',
+        });
+    };
 
     useEffect(() => {
         getJson()
@@ -81,7 +89,12 @@ const Recipe = ({ navigation, route }) => {
                 const newFavourites = favourites.filter((fav) => fav.drinkId !== recipeData[0].idDrink)
                 await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
                 setFavourites(newFavourites)
-                alert('Drink removed from favourites')
+                setModal(true)
+                setModalText('Removed from favourites')
+                setLinkText('')
+                setTimeout(() => {
+                    setModal(false)
+                }, 1000);
             } else {
                 const newKey = favourites.length + 1
                 const drinkInfo = {
@@ -91,7 +104,12 @@ const Recipe = ({ navigation, route }) => {
                 const newFavourites = [...favourites, drinkInfo]
                 await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
                 setFavourites(newFavourites)
-                alert('Favourite saved')
+                setModal(true)
+                setModalText('Added to ')
+                setLinkText('favourites')
+                setTimeout(() => {
+                    setModal(false)
+                }, 2000);
             }
         } catch (error) {
             console.log('Error saving favourite: ' + error)
@@ -101,6 +119,8 @@ const Recipe = ({ navigation, route }) => {
 
         console.log(favourites.length)
     }
+
+    console.log(favourites.length)
 
     const drinkInfo = recipeData.map((data, id) => {
         const ingredients = [];
@@ -210,6 +230,7 @@ const Recipe = ({ navigation, route }) => {
                         <TouchableOpacity onPress={() => navigation.navigate(route.params.navigator, { screen: route.params.screen })}>
                             <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
                         </TouchableOpacity>
+
                         <TouchableOpacity onPress={toggleHeart}>
                             <Icon name={isFavourited ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
                         </TouchableOpacity>
@@ -235,7 +256,7 @@ const Recipe = ({ navigation, route }) => {
 
                     <View marginTop={30}>
                         <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Preparation</Text>
-                        {!isAPIbusy ? <>{drinkInstructions}</> : (<ActivityIndicator size={250} color={"#c0c0c0"}/>)}
+                        {!isAPIbusy ? <>{drinkInstructions}</> : (<ActivityIndicator size={250} color={"#c0c0c0"} />)}
                     </View>
 
                     <View style={{ marginTop: 30, marginHorizontal: 20 }}>
@@ -245,6 +266,37 @@ const Recipe = ({ navigation, route }) => {
                         </Pressable>
                     </View>
                 </View>
+
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={modal}
+                    onRequestClose={() => {
+                        setModal(!modal);
+                    }}>
+
+                    <View style={modalStyle.container}>
+                        <View style={modalStyle.view}>
+
+                            <Text style={modalStyle.text}>
+                                {modalText}
+                                {linkText ? (
+                                    <Text
+                                        style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
+                                        onPress={navToFav}>
+                                        {linkText}
+                                    </Text>
+                                ) : null}
+                            </Text>
+
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={() => setModal(!modal)}>
+                            </Pressable>
+                        </View>
+                    </View>
+                </Modal>
+
             </View>
         </ScrollView>
     );

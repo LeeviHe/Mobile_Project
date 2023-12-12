@@ -26,6 +26,7 @@ const CocktailsNavigator = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Cocktails" component={Cocktails} />
       <Stack.Screen name="Recipe" component={Recipe} />
+      <Stack.Screen name="Favourites" component={Favourites} />
     </Stack.Navigator>
   );
 };
