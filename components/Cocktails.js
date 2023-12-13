@@ -1,4 +1,4 @@
-import { Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native';
+import { Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator, Modal, KeyboardAvoidingView } from 'react-native';
 import { Searchbar, RadioButton } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native-virtualized-view'
@@ -113,27 +113,30 @@ export default function Cocktails({ navigation, route }) {
         } else if (route.params.condition == 'random') {
           navigation.setParams({ id: 'empty' })
           defaultSetup()
-          navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { search: 'random.php', navigator: 'HomeNavigator', screen:'Home' } })
+          navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { search: 'random.php', navigator: 'HomeNavigator', screen: 'Home' } })
         } else if (route.params.condition == 'navfix') {
           navigation.setParams({ id: 'empty' })
           defaultSetup()
           navigation.navigate('CocktailsNavigator',
-              {screen: 'Recipe', params: {
-                  drinkId: route.params.drinkId,
-                  drinkName: route.params.drinkName,
-                  image: route.params.image,
-                  category: route.params.category,
-                  glass: route.params.glass,
-                  instructions: route.params.instructions,
-                  navigator: route.params.navigator,
-                  screen: route.params.screen}})
+            {
+              screen: 'Recipe', params: {
+                drinkId: route.params.drinkId,
+                drinkName: route.params.drinkName,
+                image: route.params.image,
+                category: route.params.category,
+                glass: route.params.glass,
+                instructions: route.params.instructions,
+                navigator: route.params.navigator,
+                screen: route.params.screen
+              }
+            })
         } else {
           searchFilter(route.params.id, route.params.condition, route.params.search, true)
           activate(route.params.condition, route.params.search)
         }
       }
     } else if (searchQuery.trim().length === 0 && activeFilters.length === 0 && !activeCategory && route.params === undefined) {
-        defaultSetup()
+      defaultSetup()
     } else if (searchQuery.trim().length === 0 && activeFilters.length === 0 && !activeCategory && route.params !== undefined) {
       if (route.params.id !== 'empty') {
         defaultSetup()
@@ -328,7 +331,7 @@ export default function Cocktails({ navigation, route }) {
   const renderDrinkItem = ({ item, index }) => {
     const isFavourited = favouritesData.some((fav) => fav.idDrink === item.idDrink)
 
-    const toggleHeart = async() => {
+    const toggleHeart = async () => {
       try {
         if (isFavourited) {
           removeFavourite(item.idDrink)
@@ -358,10 +361,10 @@ export default function Cocktails({ navigation, route }) {
             setModal(false)
           }, 2000);
         }
-      } catch(error) {
+      } catch (error) {
         console.log('Error saving favourite: ' + error)
-        setFavouritesData((prevFavourites) => 
-        prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
+        setFavouritesData((prevFavourites) =>
+          prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
         )
       }
     }
@@ -534,47 +537,53 @@ export default function Cocktails({ navigation, route }) {
     )
 
     return (
-      <View>
-        {showDropdown2 && (
-          <View style={styles.dropdownList}>
-            <Searchbar
-              placeholder="Search"
-              onChangeText={(value) => {onFilterSearch(value)}}
-              value={filterQuery}
-              style={{width: 300}}
-              iconColor={colors.mainFontColour}
-              placeholderTextColor={colors.mainFontColour}/>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 32 : 0}
+        style={{ flex: 1, backgroundColor: 'transparent' }}>
+        <View>
+          {showDropdown2 && (
+            <View style={styles.dropdownList}>
+              <Searchbar
+                placeholder="Search"
+                onChangeText={(value) => { onFilterSearch(value) }}
+                value={filterQuery}
+                style={styles.search}
+                inputStyle={{ marginTop: -10 }}
+                iconColor={colors.mainFontColour}
+                placeholderTextColor={colors.mainFontColour} />
               {/*
             <TouchableOpacity
               onPress={() => onFilterSearch(ingrValue)}
               style={styles.applyBtn}>
               <Text style={textStyles.button}>Apply</Text>
         </TouchableOpacity>*/}
-            {searchedIngr !== null && searchedIngr !== undefined && searchedIngr.length > 0 ? 
-            <View>
-              <FlatList
-              data={searchedIngr}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={renderSingleItem}
-              /> 
+              {searchedIngr !== null && searchedIngr !== undefined && searchedIngr.length > 0 ?
+                <View>
+                  <FlatList
+                    data={searchedIngr}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={renderSingleItem}
+                  />
+                </View>
+                :
+                <FlatList
+                  data={ingredientJson.slice(0, visibleIngredients)}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={renderItem}
+                  onEndReached={() => setVisibleIngredients((prev) => prev + 20)}
+                  onEndReachedThreshold={0.2}
+                />}
+
             </View>
-            : 
-            <FlatList
-              data={ingredientJson.slice(0, visibleIngredients)}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={renderItem}
-              onEndReached={() => setVisibleIngredients((prev) => prev + 20)}
-              onEndReachedThreshold={0.2}
-            />}
-            
-          </View>
-        )}
-      </View>
+          )}
+        </View>
+      </KeyboardAvoidingView>
     );
   };
 
   return (
-    <View style={{ backgroundColor: colors.white, marginBottom: 250, height:'100%'}}>
+    <View style={{ backgroundColor: colors.white, marginBottom: 250, height: '100%' }}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>Cocktails</Text>
 
       <View style={{ marginBottom: 50 }}>
@@ -704,28 +713,28 @@ export default function Cocktails({ navigation, route }) {
             </View>
           </View>
         </ScrollView>
-      ) : 
-      <>
-        {!isAPIbusy ? (
-          <View style={{ backgroundColor: colors.white, marginBottom: 250 }}>
-            {errorStatus.trim().length === 0 ? (
-              <FlatList
-                data={activeDrinks.slice(0, visibleItems)}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={renderDrinkItem}
-                extraData={activeDrinks}
-                onEndReached={() => setVisibleItems((prev) => prev + 10)}
-                onEndReachedThreshold={0.2}
-              />
-            ) : (
-              <View>
-                <Text>{errorStatus}</Text>
-              </View>
-            )}
-          </View>
-        ) : (<ActivityIndicator size={250} color={"#c0c0c0"}/>)
-        }  
-      </>
+      ) :
+        <>
+          {!isAPIbusy ? (
+            <View style={{ backgroundColor: colors.white, marginBottom: 250 }}>
+              {errorStatus.trim().length === 0 ? (
+                <FlatList
+                  data={activeDrinks.slice(0, visibleItems)}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={renderDrinkItem}
+                  extraData={activeDrinks}
+                  onEndReached={() => setVisibleItems((prev) => prev + 10)}
+                  onEndReachedThreshold={0.2}
+                />
+              ) : (
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>{errorStatus}</Text>
+                </View>
+              )}
+            </View>
+          ) : (<ActivityIndicator size={250} color={"#c0c0c0"} />)
+          }
+        </>
       }
       <Modal
         animationType="fade"
@@ -737,20 +746,20 @@ export default function Cocktails({ navigation, route }) {
         <View style={modalStyle.container}>
           <View style={modalStyle.view}>
 
-          <Text style={modalStyle.text}>
-            {modalText}
-            {linkText ? (
-              <Text
-                style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
-                onPress={navToFav}>
-                {linkText}
-              </Text>
-            ) : null}
-          </Text>
-          <TouchableOpacity
-            style={[styles.button, styles.buttonClose]}
-            onPress={() => setModal(!modal)}>
-          </TouchableOpacity>
+            <Text style={modalStyle.text}>
+              {modalText}
+              {linkText ? (
+                <Text
+                  style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
+                  onPress={navToFav}>
+                  {linkText}
+                </Text>
+              ) : null}
+            </Text>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModal(!modal)}>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
