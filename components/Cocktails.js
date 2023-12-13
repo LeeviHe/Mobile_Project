@@ -4,16 +4,14 @@ import { Searchbar, RadioButton } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native-virtualized-view'
 import { Row, Col } from "react-native-flex-grid";
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { colors, fonts, padding, textStyles, modalStyle } from '../styles/style-constants';
 import styles from '../styles/styles';
-import { DEVS_FAVOURITES, FAVOURITE_DRINKS_KEY, URL } from '../reusables/Constants';
+import { DEVS_FAVOURITES, FAVOURITE_DRINKS_KEY, URL, isAlcoholic, isNotAlcoholic } from '../reusables/Constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { getJsonDrinks, getJsonIngredients } from '../reusables/Functions';
+import { getFavouriteData, getJsonDrinks, getJsonIngredients } from '../reusables/Functions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Stack = createNativeStackNavigator()
 export default function Cocktails({ navigation, route }) {
   const [searchQuery, setSearchQuery] = useState('');
   //Non-sorted drink data
@@ -48,15 +46,17 @@ export default function Cocktails({ navigation, route }) {
   const [filterSearch, setFilterSearch] = useState('')
   // Iteration of favourited drinks
   const [favourites, setFavourites] = useState([])
-  //
+  // Search query for multi-ingredient search
   const [filterQuery, setFilterQuery] = useState('')
-  //
+  // Searched ingredients in the filterview search
   const [searchedIngr, setSearchedIngr] = useState([])
   //Modal
   const [modal, setModal] = useState(false)
   const [modalText, setModalText] = useState('')
   const [linkText, setLinkText] = useState('')
 
+  //
+  const [ingrValue, setIngrValue] = useState('')
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
   const [ascendSort, setAscendSort] = useState(false)
@@ -70,7 +70,7 @@ export default function Cocktails({ navigation, route }) {
   //useEffects
   useEffect (() => {
       const unsubsribe = navigation.addListener('focus', () => {
-          getFavouriteData()
+          getFavouriteData(setFavourites)
       })
       return unsubsribe
   }, [navigation])
@@ -101,7 +101,7 @@ export default function Cocktails({ navigation, route }) {
     if (ingredientJson.length === 0) {
       getJsonDrinks(URL, "list.php?i=list", setIngredientJson)
     }
-    if (filterQuery.trim().length > 0) {
+    if (filterQuery.trim().length > 0 && searchedIngr) {
       handleFilterSearch()
     } else {
       setSearchedIngr([])
@@ -275,40 +275,19 @@ export default function Cocktails({ navigation, route }) {
     return selectedIngredients[i] ? 'green' : 'red'
   }
 
-  //fix alcoholselect / selectalcohol mixup
-  function alcSelectColor(i) {
-    return selectedAlcohol[i] ? colors.mainFontColour : 'transparent';
-  }
-
-  function categorySelectColor(i) {
-    return selectedCategory[i] ? 'green' : 'red'
-  }
-
   function sortColor(i) {
     return selectedSort[i] ? colors.mainFontColour : colors.white
   }
 
   //
-  //consts
+  //constants
 
+  //Modal navigation to favourites
   const navToFav = () => {
     navigation.navigate('MoreNavigator', {
       screen: 'Favourites',
     });
   };
-
-  const getFavouriteData = async () => {
-      try {
-          const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
-          if (jsonValue !== null) {
-              let tmp = JSON.parse(jsonValue)
-              setFavourites(tmp)
-          }
-      }
-      catch (e) {
-          console.log('Read error: ' + e)
-      }
-  }
 
   const onChangeSearch = query => setSearchQuery(query);
 
@@ -352,28 +331,6 @@ export default function Cocktails({ navigation, route }) {
       setActiveFilters(filterCopy)
     }
     navigation.setParams({ id: 'empty' })
-  }
-
-  const isAlcoholic = (category) => {
-    const alcoholicCategories = [
-      'Ordinary Drink',
-      'Cocktail',
-      'Shot',
-      'Homemade Liqueur',
-      'Punch / Party Drink',
-      'Beer'
-    ]
-
-    return alcoholicCategories.includes(category)
-  }
-
-  const isNotAlcoholic = (category) => {
-    const nonAlcoholicCategories = [
-      'Shake',
-      'Cocoa'
-    ]
-
-    return nonAlcoholicCategories.includes(category)
   }
 
   const renderDrinkItem = ({ item, index }) => {
@@ -520,12 +477,10 @@ export default function Cocktails({ navigation, route }) {
             <TouchableOpacity
               key={id}
               onPress={() => selectCategory(id)}>
-
               <View style={styles.dropdownContainer}>
                 <View>
                   <Text style={{ fontFamily: fonts.text }}>{data.strCategory}</Text>
                 </View>
-
                 <View>
                   <RadioButton.Android
                     style={{ alignSelf: 'flex-end' }}
@@ -592,13 +547,18 @@ export default function Cocktails({ navigation, route }) {
           <View style={styles.dropdownList}>
             <Searchbar
               placeholder="Search"
-              onChangeText={(value) => { onFilterSearch(value) }}
+              onChangeText={(value) => {onFilterSearch(value)}}
               value={filterQuery}
-              style={{width:200}}
-              inputStyle={{ marginTop: -10 }}
+              style={{width: 300}}
               iconColor={colors.mainFontColour}
               placeholderTextColor={colors.mainFontColour}/>
-            {searchedIngr.length > 0 && searchedIngr !== null && searchedIngr !== undefined? 
+              {/*
+            <TouchableOpacity
+              onPress={() => onFilterSearch(ingrValue)}
+              style={styles.applyBtn}>
+              <Text style={textStyles.button}>Apply</Text>
+        </TouchableOpacity>*/}
+            {searchedIngr !== null && searchedIngr !== undefined && searchedIngr.length > 0 ? 
             <View>
               <FlatList
               data={searchedIngr}
@@ -670,7 +630,6 @@ export default function Cocktails({ navigation, route }) {
 
           <View style={{ marginHorizontal: 20, marginTop: 20 }}>
             <Text style={styles.filterHeading}>Sort</Text>
-
             <View style={styles.filterContainer}>
               <View style={{ gap: 5 }}>
                 <FilterItem
@@ -680,7 +639,6 @@ export default function Cocktails({ navigation, route }) {
                   colors={colors}
                   fonts={fonts}
                 />
-
                 <FilterItem
                   label="Name Z-A"
                   onPress={() => setSort('desc', 1)}
@@ -688,9 +646,7 @@ export default function Cocktails({ navigation, route }) {
                   colors={colors}
                   fonts={fonts}
                 />
-
               </View>
-
               <View style={{ gap: 5 }}>
                 <FilterItem
                   label="Alcoholic"
@@ -702,7 +658,6 @@ export default function Cocktails({ navigation, route }) {
                   colors={colors}
                   fonts={fonts}
                 />
-
                 <FilterItem
                   label="Non-Alcoholic"
                   index={1}
@@ -714,9 +669,7 @@ export default function Cocktails({ navigation, route }) {
                   fonts={fonts}
                 />
               </View>
-
             </View>
-
           </View>
 
           <View style={{ borderTopWidth: 1, borderTopColor: '#CEC56F' }}>
@@ -735,7 +688,6 @@ export default function Cocktails({ navigation, route }) {
                 {categoryDropdownContent}
               </View>
             </View>
-
           </View>
 
           <View>
@@ -759,7 +711,6 @@ export default function Cocktails({ navigation, route }) {
               />
             </View>
           </View>
-
         </ScrollView>
       ) : 
       <>
@@ -812,5 +763,5 @@ export default function Cocktails({ navigation, route }) {
         </View>
       </Modal>
     </View>
-  );
+  )
 }

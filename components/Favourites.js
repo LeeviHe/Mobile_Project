@@ -170,11 +170,7 @@ export default function Favourites({ navigation, route }) {
               <Text style={styles.drinkText} numberOfLines={1} ellipsizeMode="tail">
                 {item.strDrink}
               </Text>
-              {item.strCategory ? (
                 <Text style={styles.drinkText}>{item.strCategory}</Text>
-              ) : (
-                <Text style={styles.drinkText}>{replaceCategory}</Text>
-              )}
             </View>
 
           </View>

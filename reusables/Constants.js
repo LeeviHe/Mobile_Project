@@ -53,3 +53,24 @@ export const URL = 'https://www.thecocktaildb.com/api/json/v2/9973533/';
 export const FAVOURITE_DRINKS_KEY = "@favourites"
 export const OWNED_INGR_KEY = "@owned"
 export const MAPS_KEY = "AIzaSyAxr6uGD0CCuomLoT8JM3VtZM9uBFV6CvU"
+
+export const isAlcoholic = (category) => {
+    const alcoholicCategories = [
+    'Ordinary Drink',
+    'Cocktail',
+    'Shot',
+    'Homemade Liqueur',
+    'Punch / Party Drink',
+    'Beer'
+]
+
+return alcoholicCategories.includes(category)
+}
+
+export const isNotAlcoholic = (category) => {
+const nonAlcoholicCategories = [
+    'Shake',
+    'Cocoa'
+]
+return nonAlcoholicCategories.includes(category)
+}

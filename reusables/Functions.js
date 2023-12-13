@@ -1,3 +1,20 @@
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FAVOURITE_DRINKS_KEY, OWNED_INGR_KEY } from './Constants';
+
+export async function getFavouriteData(setFavourites) {
+  try {
+      const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
+      if (jsonValue !== null) {
+          let tmp = JSON.parse(jsonValue)
+          setFavourites(tmp)
+      }
+  }
+  catch (e) {
+      console.log('Read error: ' + e)
+  }
+}
+
 export async function getJsonDrinks (url, condition, setJsonData) {
         try {
         const response = await fetch(url + condition);
@@ -28,9 +45,6 @@ export async function getJsonIngredients (url, condition, setJsonData) {
         }
     }
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FAVOURITE_DRINKS_KEY, OWNED_INGR_KEY } from './Constants';
 
 // Create a context to share the global state
 const GlobalContext = createContext();
@@ -56,8 +70,6 @@ const GlobalProvider = ({ children }) => {
         console.error('Error fetching data from AsyncStorage:', error);
       }
     };
-
-    // Call the fetchData function
     fetchData();
   }, []);
 
