@@ -15,8 +15,8 @@ import Ingredient from './components/Ingredient';
 import MyIngredients from './components/MyIngredients'
 import MakeAPockettini from './components/MakeAPockettini';
 import MyRecipe from './components/MyRecipe';
-import GlobalProvider from './reusables/Functions';
 import { PockettiniProvider } from './components/PockettiniContext';
+import { FavouritesProvider } from './components/FavouritesContext';
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator();
@@ -63,7 +63,7 @@ const HomeNavigator = () => {
 
 export default function App() {
   return (
-    <GlobalProvider>
+    <FavouritesProvider>
       <PockettiniProvider>
         <NavigationContainer>
           <Tab.Navigator
@@ -168,6 +168,6 @@ export default function App() {
           </Tab.Navigator>
         </NavigationContainer>
       </PockettiniProvider>
-    </GlobalProvider>
+    </FavouritesProvider>
   );
 }

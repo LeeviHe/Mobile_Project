@@ -4,45 +4,33 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useState, useEffect } from 'react';
 import { colors, fonts, textStyles, modalStyle } from '../styles/style-constants';
 import { Row, Col } from "react-native-flex-grid";
-import { URL, OWNED_INGR_KEY, FAVOURITE_DRINKS_KEY } from '../reusables/Constants';
-import { getJsonIngredients } from '../reusables/Functions';
+import { URL, OWNED_INGR_KEY } from '../reusables/Constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-virtualized-view'
-import { useGlobalState } from '../reusables/Functions';
+import { useFavourites } from './FavouritesContext';
 
 export default function MyPockettinis({ navigation, route }) {
   const [cocktailView, setCocktailView] = useState(false);
   const [ingredientView, setIngredientView] = useState(true);
-  const [ownedId, setOwnedId] = useState([])
-  const [owned, setOwned] = useState([])
-  const [temp, setTemp] = useState([])
-  const [newInfo, setNewInfo] = useState([])
-  const { asyncStorageData } = useGlobalState()
   const [errorStatus, setErrorStatus] = useState(null)
-  const [isAsyncbusy, setAsyncBusy] = useState(false)
 
   //Modal
   const [modal, setModal] = useState(false)
   const [modalText, setModalText] = useState('')
   const [linkText, setLinkText] = useState('')
 
+  
+  const {favouritesData, removeFavourite, ownedData, setOwnedData, removeOwned} = useFavourites()
   // To replace strCategory in filtering situation
   const [replaceCategory, setReplaceCategory] = useState('')
   // Iteration of favourited drinks
   const [favourites, setFavourites] = useState([])
   //Selected ingredients index
-  const [selectedItemsIndex, setSelectedItemsIndex] = useState(new Array(newInfo.length).fill(false))
+  const [selectedItemsIndex, setSelectedItemsIndex] = useState(new Array(ownedData.length).fill(false))
   //Selected ingredients names
   const [selectedItems, setSelectedItems] = useState([])
   // Drinks available with selectedItems
   const [availableRecipes, setAvailableRecipes] = useState([])
-
-  useEffect(() => {
-    const unsubsribe = navigation.addListener('focus', () => {
-      getOwnedData()
-    })
-    return () => { unsubsribe() }
-  }, [asyncStorageData])
 
   useEffect(() => {
     let string = selectedItems.toString()
@@ -54,61 +42,11 @@ export default function MyPockettinis({ navigation, route }) {
     }
   }, [selectedItems])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (ownedId) {
-        setAsyncBusy(true)
-        const fetchPromises = ownedId.map(own =>
-          getJsonIngredients(URL, 'lookup.php?iid=' + own.idIngredient, setTemp)
-        )
-        try {
-          const results = await Promise.all(fetchPromises)
-          const tempData = results.flat()
-          if (tempData) {
-            setNewInfo(tempData)
-          } else {
-            console.log('No tempData')
-          }
-        } catch (e) {
-          console.log('error fetching and updating')
-        }
-      }
-      setAsyncBusy(false)
-    }
-    fetchData();
-  }, [ownedId])
-
-  useEffect(() => {
-    if (newInfo.length > 0) {
-      setOwned(newInfo)
-    }
-  }, [newInfo])
-
-  useEffect(() => {
-    const unsubsribe = navigation.addListener('focus', () => {
-      getFavouriteData()
-    })
-    return unsubsribe
-  }, [navigation])
-
   const navToFav = () => {
     navigation.navigate('MoreNavigator', {
       screen: 'Favourites',
     });
   };
-
-  const getFavouriteData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
-      if (jsonValue !== null) {
-        let tmp = JSON.parse(jsonValue)
-        setFavourites(tmp)
-      }
-    }
-    catch (e) {
-      console.log('Read error: ' + e)
-    }
-  }
 
   async function getDrinks(method, ingr) {
     try {
@@ -134,23 +72,6 @@ export default function MyPockettinis({ navigation, route }) {
     }
   }
 
-  const getOwnedData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(OWNED_INGR_KEY)
-      if (jsonValue !== null) {
-        let data = JSON.parse(jsonValue)
-        setErrorStatus('No ingredients found!')
-        setOwnedId(data)
-      } else {
-        console.log('No data found in Async')
-        setOwnedId([])
-      }
-    }
-    catch (e) {
-      console.log('Read error: ' + e)
-    }
-  }
-
   function multiSelectColor(i) {
     return selectedItemsIndex[i] ? 'green' : 'red'
   }
@@ -162,12 +83,7 @@ export default function MyPockettinis({ navigation, route }) {
     const toggleStar = async () => {
       try {
         if (isOwned) {
-          const newOwned = owned.filter((own) => own.idIngredient !== item.idIngredient)
-          setOwned(newOwned)
-          const newOwnedId = ownedId.filter((own) => own.idIngredient !== item.idIngredient);
-          setOwnedId(newOwnedId);
-          selectItems(index, item.strIngredient)
-          await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
+          removeOwned(item.idIngredient)
           setModal(true)
           setModalText('Removed from owned ingredients')
           setLinkText('')
@@ -177,7 +93,7 @@ export default function MyPockettinis({ navigation, route }) {
         }
       } catch (error) {
         console.log('Error saving ingredient: ' + error)
-        setOwned((prevOwned) =>
+        setOwnedData((prevOwned) =>
           prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
       }
     }
@@ -239,43 +155,18 @@ export default function MyPockettinis({ navigation, route }) {
   };
 
   const renderDrinkItem = ({ item, index }) => {
-    const isFavourited = favourites.some((fav) => fav.drinkId === item.idDrink)
+    const isFavourited = favouritesData.some((fav) => fav.idDrink === item.idDrink)
 
     const toggleHeart = async () => {
-      try {
         if (isFavourited) {
-          const newFavourites = favourites.filter((fav) => fav.drinkId !== item.idDrink)
-          await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
-          setFavourites(newFavourites)
+          removeFavourite(item.idDrink)
           setModal(true)
           setModalText('Removed from favourites')
           setLinkText('')
           setTimeout(() => {
             setModal(false)
           }, 1000);
-        } else {
-
-          const newKey = favourites.length + 1
-          const drinkInfo = {
-            key: newKey,
-            drinkId: item.idDrink,
-          }
-          const newFavourites = [...favourites, drinkInfo]
-          await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
-          setFavourites(newFavourites)
-          setModal(true)
-          setModalText('Added to ')
-          setLinkText('favourites')
-          setTimeout(() => {
-            setModal(false)
-          }, 2000);
         }
-      } catch (error) {
-        console.log('Error saving favourite: ' + error)
-        setFavourites((prevFavourites) =>
-          prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
-        )
-      }
     }
 
     return (
@@ -313,7 +204,10 @@ export default function MyPockettinis({ navigation, route }) {
 
           <View style={{ marginRight: 40 }}>
             <TouchableOpacity onPress={toggleHeart}>
-              <Icon name={isFavourited ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
+              {isFavourited ? 
+              <Icon name= {'heart'} size={35} color="#ff6161" />
+              :
+              <></>}
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -339,7 +233,7 @@ export default function MyPockettinis({ navigation, route }) {
               </Text>
               <View style={styles.topIngrNbr}
                 backgroundColor={ingredientView ? '#333' : '#ddd'}>
-                <Text style={{ color: colors.white }}>{ownedId.length}</Text>
+                <Text style={{ color: colors.white }}>{ownedData.length}</Text>
               </View>
             </TouchableOpacity>
           </Col>
@@ -366,22 +260,19 @@ export default function MyPockettinis({ navigation, route }) {
         <ScrollView style={{ height: '100%' }}>
           <View style={{ marginHorizontal: 20, marginTop: 20 }}>
             <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Owned ingredients</Text>
-            {!isAsyncbusy ? (<>
-              {ownedId.length === 0 ?
+              {ownedData.length === 0 ?
                 <View style={{ alignItems: 'center', marginTop: 20 }}>
                   <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>No ingredients saved!</Text>
                   <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>Your starred items will show here.</Text>
                 </View>
                 :
                 <FlatList
-                  data={owned}
+                  data={ownedData}
                   style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
                   renderItem={renderItem}
                   keyExtractor={(item, index) => index.toString()}
                 />
-              }</>) : (
-              <ActivityIndicator size={250} color={"#c0c0c0"} />
-            )}
+              }
           </View>
         </ScrollView>
 

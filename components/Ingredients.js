@@ -4,18 +4,19 @@ import { useState, useEffect } from 'react';
 import { colors, textStyles, modalStyle } from '../styles/style-constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/styles';
-import { OWNED_INGR_KEY, URL } from '../reusables/Constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { URL } from '../reusables/Constants';
+import { useFavourites } from './FavouritesContext';
 
 export default function Ingredients({ navigation, route }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [ingredientData, setIngredientData] = useState([])
   const [errorStatus, setErrorStatus] = useState('')
-  const [owned, setOwned] = useState([])
   const [isAPIbusy, setAPIBusy] = useState(false)
   const [modal, setModal] = useState(false)
   const [modalText, setModalText] = useState('')
   const [linkText, setLinkText] = useState('')
+
+  const {ownedData, setOwnedData, addOwned, removeOwned} = useFavourites()
 
   const onChangeSearch = query => setSearchQuery(query);
 
@@ -26,26 +27,6 @@ export default function Ingredients({ navigation, route }) {
       handleSearch()
     }
   }, [searchQuery])
-
-  useEffect(() => {
-    const unsubsribe = navigation.addListener('focus', () => {
-      getOwnedData()
-    })
-    return unsubsribe
-  }, [navigation])
-
-  const getOwnedData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(OWNED_INGR_KEY)
-      if (jsonValue !== null) {
-        let tmp = JSON.parse(jsonValue)
-        setOwned(tmp)
-      }
-    }
-    catch (e) {
-      console.log('Read error: ' + e)
-    }
-  }
 
   async function getIngredient(method) {
     setAPIBusy(true)
@@ -81,14 +62,12 @@ export default function Ingredients({ navigation, route }) {
 
   const renderItem = ({ item, index }) => {
 
-    const isOwned = owned.some(own => own.idIngredient === item.idIngredient)
+    const isOwned = ownedData.some(own => own.idIngredient === item.idIngredient)
 
     const toggleStar = async () => {
       try {
         if (isOwned) {
-          const newOwned = owned.filter((own) => own.idIngredient !== item.idIngredient)
-          await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
-          setOwned(newOwned)
+          removeOwned(item.idIngredient)
           setModal(true)
           setModalText('Removed from owned ingredients')
           setLinkText('')
@@ -96,14 +75,14 @@ export default function Ingredients({ navigation, route }) {
             setModal(false)
           }, 1000);
         } else {
-          const newKey = owned.length + 1
+          const newKey = ownedData.length + 1
           const ingrInfo = {
             key: newKey,
             idIngredient: item.idIngredient,
+            strIngredient: item.strIngredient,
+            strType: item.strType
           }
-          const newOwned = [...owned, ingrInfo]
-          await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
-          setOwned(newOwned)
+          addOwned(ingrInfo)
           setModal(true)
           setModalText('Added to ')
           setLinkText('owned ingredients')
@@ -113,11 +92,9 @@ export default function Ingredients({ navigation, route }) {
         }
       } catch (error) {
         console.log('Error saving ingredient: ' + error)
-        setOwned((prevOwned) =>
+        setOwnedData((prevOwned) =>
           prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
       }
-      //
-      console.log(owned.length)
     }
 
     return (
@@ -184,7 +161,7 @@ export default function Ingredients({ navigation, route }) {
       {!isAPIbusy ? (<>
         {errorStatus.trim().length === 0 ?
           <FlatList
-            data={ingredientData} // Assuming ingredientData is your data array
+            data={ingredientData}
             renderItem={renderItem}
             keyExtractor={item => item.idIngredient.toString()}
           />

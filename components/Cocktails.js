@@ -1,4 +1,3 @@
-
 import { Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native';
 import { Searchbar, RadioButton } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
@@ -6,11 +5,11 @@ import { ScrollView } from 'react-native-virtualized-view'
 import { Row, Col } from "react-native-flex-grid";
 import { colors, fonts, padding, textStyles, modalStyle } from '../styles/style-constants';
 import styles from '../styles/styles';
-import { DEVS_FAVOURITES, FAVOURITE_DRINKS_KEY, URL, isAlcoholic, isNotAlcoholic } from '../reusables/Constants';
+import { DEVS_FAVOURITES, URL, isAlcoholic, isNotAlcoholic } from '../reusables/Constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { getFavouriteData, getJsonDrinks, getJsonIngredients } from '../reusables/Functions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getJsonDrinks, getJsonIngredients } from '../reusables/Functions';
+import { useFavourites } from './FavouritesContext';
 
 export default function Cocktails({ navigation, route }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,8 +43,8 @@ export default function Cocktails({ navigation, route }) {
   const [filterCondition, setFilterCondition] = useState('')
   // To set current filter search for activating filter
   const [filterSearch, setFilterSearch] = useState('')
-  // Iteration of favourited drinks
-  const [favourites, setFavourites] = useState([])
+  // NEW FAVOURITE SYSTEM
+  const {favouritesData, setFavouritesData, addFavourite, removeFavourite} = useFavourites()
   // Search query for multi-ingredient search
   const [filterQuery, setFilterQuery] = useState('')
   // Searched ingredients in the filterview search
@@ -55,8 +54,7 @@ export default function Cocktails({ navigation, route }) {
   const [modalText, setModalText] = useState('')
   const [linkText, setLinkText] = useState('')
 
-  //
-  const [ingrValue, setIngrValue] = useState('')
+  //const [ingrValue, setIngrValue] = useState('')
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
   const [ascendSort, setAscendSort] = useState(false)
@@ -68,12 +66,6 @@ export default function Cocktails({ navigation, route }) {
   const [visibleItems, setVisibleItems] = useState(10);
   //
   //useEffects
-  useEffect (() => {
-      const unsubsribe = navigation.addListener('focus', () => {
-          getFavouriteData(setFavourites)
-      })
-      return unsubsribe
-  }, [navigation])
 
   useEffect(() => {
     let string = activeFilters.toString()
@@ -334,14 +326,12 @@ export default function Cocktails({ navigation, route }) {
   }
 
   const renderDrinkItem = ({ item, index }) => {
-    const isFavourited = favourites.some((fav) => fav.drinkId === item.idDrink)
+    const isFavourited = favouritesData.some((fav) => fav.idDrink === item.idDrink)
 
     const toggleHeart = async() => {
       try {
         if (isFavourited) {
-          const newFavourites = favourites.filter((fav) => fav.drinkId !== item.idDrink)
-          await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
-          setFavourites(newFavourites)
+          removeFavourite(item.idDrink)
           setModal(true)
           setModalText('Removed from favourites')
           setLinkText('')
@@ -349,14 +339,18 @@ export default function Cocktails({ navigation, route }) {
             setModal(false)
           }, 1000);
         } else {
-          const newKey = favourites.length + 1
+          const newKey = favouritesData.length + 1
+          if (item.strCategory === undefined) {
+            item.strCategory = replaceCategory
+          }
           const drinkInfo = {
             key: newKey,
-            drinkId: item.idDrink,
+            idDrink: item.idDrink,
+            strDrink: item.strDrink,
+            strDrinkThumb: item.strDrinkThumb,
+            strCategory: item.strCategory
           }
-          const newFavourites = [...favourites, drinkInfo]
-          await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
-          setFavourites(newFavourites)
+          addFavourite(drinkInfo)
           setModal(true)
           setModalText('Added to ')
           setLinkText('favourites')
@@ -366,13 +360,11 @@ export default function Cocktails({ navigation, route }) {
         }
       } catch(error) {
         console.log('Error saving favourite: ' + error)
-        setFavourites((prevFavourites) => 
+        setFavouritesData((prevFavourites) => 
         prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
         )
       }
     }
-
-    
 
     const categoryBackgroundColor = () => {
       // Duplicates for search query issues

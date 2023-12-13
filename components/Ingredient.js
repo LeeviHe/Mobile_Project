@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, ImageBackground, Image, Pressable, FlatList, ActivityIndicator } from 'react-native';
+import { Text, View, TouchableOpacity, ImageBackground, Image, FlatList, Modal} from 'react-native';
 import styles from '../styles/styles';
 import { StatusBar } from 'expo-status-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { colors, fonts } from '../styles/style-constants';
-import { Col, Row } from 'react-native-flex-grid';
+import { colors, fonts, modalStyle } from '../styles/style-constants';
+import { Col } from 'react-native-flex-grid';
 import { getJsonIngredients, getJsonDrinks } from '../reusables/Functions';
-import { URL, OWNED_INGR_KEY } from '../reusables/Constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { URL } from '../reusables/Constants';
+import { useFavourites } from './FavouritesContext';
 
 const Ingredient = ({ navigation, route }) => {
   const [ingredientData, setIngredientData] = useState([]);
   const [ingredientDrinks, setIngredientDrinks] = useState([]);
-  const [owned, setOwned] = useState([])
+  const [modal, setModal] = useState(false)
+  const [modalText, setModalText] = useState('')
+  const [linkText, setLinkText] = useState('')
+
+  const {ownedData, setOwnedData, addOwned, removeOwned} = useFavourites()
 
   useEffect(() => {
     console.log('route change: ' + route.params.idIngredient + " " + route.params.ingrName)
@@ -20,54 +24,39 @@ const Ingredient = ({ navigation, route }) => {
     getJsonDrinks(URL, 'filter.php?i=' + route.params.ingrName, setIngredientDrinks);
   }, [route]);
 
-  useEffect(() => {
-    const unsubsribe = navigation.addListener('focus', () => {
-      getOwnedData()
-    })
-    return unsubsribe
-  }, [route.params, navigation])
-
-  const getOwnedData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(OWNED_INGR_KEY)
-      if (jsonValue !== null) {
-        let tmp = JSON.parse(jsonValue)
-        setOwned(tmp)
-      }
-    }
-    catch (e) {
-      console.log('Read error: ' + e)
-    }
-  }
-
-  const isOwned = owned.some(own => own.idIngredient === route.params.idIngredient)
+  const isOwned = ownedData.some(own => own.idIngredient === route.params.idIngredient)
 
   const toggleStar = async () => {
     try {
-      console.log(ingredientData[0].idIngredient)
       if (isOwned) {
-        const newOwned = owned.filter((own) => own.idIngredient !== ingredientData[0].idIngredient)
-        await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
-        setOwned(newOwned)
-        alert('Ingredient removed from owned')
+        removeOwned(route.params.idIngredient)
+        setModal(true)
+        setModalText('Removed from owned ingredients')
+        setLinkText('')
+        setTimeout(() => {
+          setModal(false)
+        }, 1000);
       } else {
-        const newKey = owned.length + 1
+        const newKey = ownedData.length + 1
         const ingrInfo = {
           key: newKey,
           idIngredient: ingredientData[0].idIngredient,
+          strIngredient: ingredientData[0].strIngredient,
+          strType: ingredientData[0].strType
         }
-        const newOwned = [...owned, ingrInfo]
-        await AsyncStorage.setItem(OWNED_INGR_KEY, JSON.stringify(newOwned))
-        setOwned(newOwned)
-        alert('Ingredient saved')
+        addOwned(ingrInfo)
+        setModal(true)
+          setModalText('Added to ')
+          setLinkText('owned ingredients')
+          setTimeout(() => {
+            setModal(false)
+          }, 2000);
       }
     } catch (error) {
       console.log('Error saving ingredient: ' + error)
-      setOwned((prevOwned) =>
+      setOwnedData((prevOwned) =>
         prevOwned.filter((own) => own.idIngredient !== ingredientData[0].idIngredient))
     }
-    //
-    console.log(owned.length)
   }
 
   const renderDrinkItem = ({ item, index }) => {
@@ -154,7 +143,35 @@ const Ingredient = ({ navigation, route }) => {
           contentContainerStyle={{ justifyContent: 'space-around' }}
         />
       </View>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modal}
+        onRequestClose={() => {
+          setModal(!modal);
+        }}>
 
+        <View style={modalStyle.container}>
+          <View style={modalStyle.view}>
+
+            <Text style={modalStyle.text}>
+              {modalText}
+              {linkText ? (
+                <Text
+                  style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
+                  onPress={() => navigation.navigate('MyIngredients')}>
+                  {linkText}
+                </Text>
+              ) : null}
+            </Text>
+
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModal(!modal)}>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

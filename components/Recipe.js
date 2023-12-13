@@ -5,17 +5,18 @@ import { StatusBar } from 'expo-status-bar';
 import styles from '../styles/styles';
 import { colors, fonts, textStyles, modalStyle } from '../styles/style-constants';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { URL, FAVOURITE_DRINKS_KEY } from '../reusables/Constants';
+import { URL } from '../reusables/Constants';
+import { useFavourites } from './FavouritesContext';
 
 const Recipe = ({ navigation, route }) => {
     const [recipeData, setRecipeData] = useState([]);
-    const [favourites, setFavourites] = useState([])
     const [isAPIbusy, setAPIBusy] = useState(false)
     const [modal, setModal] = useState(false)
     const [modalText, setModalText] = useState('')
     const [linkText, setLinkText] = useState('')
     const [drinkId, setDrinkId] = useState('')
+
+    const {favouritesData, setFavouritesData, addFavourite, removeFavourite} = useFavourites()
 
     const navToFav = () => {
         navigation.navigate('MoreNavigator', {
@@ -66,34 +67,12 @@ const Recipe = ({ navigation, route }) => {
         }
     }
 
-    useEffect(() => {
-        const unsubsribe = navigation.addListener('focus', () => {
-            getFavouriteData()
-        })
-        return unsubsribe
-    }, [navigation])
-
-    const getFavouriteData = async () => {
-        try {
-            const jsonValue = await AsyncStorage.getItem(FAVOURITE_DRINKS_KEY)
-            if (jsonValue !== null) {
-                let tmp = JSON.parse(jsonValue)
-                setFavourites(tmp)
-            }
-        }
-        catch (e) {
-            console.log('Read error: ' + e)
-        }
-    }
-
-    const isFavourited = favourites.some(fav => fav.drinkId === drinkId)
+    const isFavourited = favouritesData.some(fav => fav.idDrink === drinkId)
 
     const toggleHeart = async () => {
         try {
             if (isFavourited) {
-                const newFavourites = favourites.filter((fav) => fav.drinkId !== recipeData[0].idDrink)
-                await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
-                setFavourites(newFavourites)
+                removeFavourite(drinkId)
                 setModal(true)
                 setModalText('Removed from favourites')
                 setLinkText('')
@@ -101,14 +80,15 @@ const Recipe = ({ navigation, route }) => {
                     setModal(false)
                 }, 1000);
             } else {
-                const newKey = favourites.length + 1
+                const newKey = favouritesData.length + 1
                 const drinkInfo = {
                     key: newKey,
-                    drinkId: recipeData[0].idDrink,
+                    idDrink: recipeData[0].idDrink,
+                    strDrink: recipeData[0].strDrink,
+                    strDrinkThumb: recipeData[0].strDrinkThumb,
+                    strCategory: recipeData[0].strCategory
                 }
-                const newFavourites = [...favourites, drinkInfo]
-                await AsyncStorage.setItem(FAVOURITE_DRINKS_KEY, JSON.stringify(newFavourites))
-                setFavourites(newFavourites)
+                addFavourite(drinkInfo)
                 setModal(true)
                 setModalText('Added to ')
                 setLinkText('favourites')
@@ -118,7 +98,7 @@ const Recipe = ({ navigation, route }) => {
             }
         } catch (error) {
             console.log('Error saving favourite: ' + error)
-            setFavourites((prevFavourites) =>
+            setFavouritesData((prevFavourites) =>
                 prevFavourites.filter((fav) => fav.drinkId !== recipeData[0].idDrink))
         }
     }
