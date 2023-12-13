@@ -66,7 +66,6 @@ export default function Cocktails({ navigation, route }) {
   const [isAPIbusy, setAPIBusy] = useState(false)
 
   const [visibleItems, setVisibleItems] = useState(10);
-  const r = route.params
   //
   //useEffects
   useEffect (() => {
@@ -128,14 +127,14 @@ export default function Cocktails({ navigation, route }) {
           defaultSetup()
           navigation.navigate('CocktailsNavigator',
               {screen: 'Recipe', params: {
-                  drinkId: r.drinkId,
-                  drinkName: r.drinkName,
-                  image: r.image,
-                  category: r.category,
-                  glass: r.glass,
-                  instructions: r.instructions,
-                  navigator: r.navigator,
-                  screen: r.screen}})
+                  drinkId: route.params.drinkId,
+                  drinkName: route.params.drinkName,
+                  image: route.params.image,
+                  category: route.params.category,
+                  glass: route.params.glass,
+                  instructions: route.params.instructions,
+                  navigator: route.params.navigator,
+                  screen: route.params.screen}})
         } else {
           searchFilter(route.params.id, route.params.condition, route.params.search, true)
           activate(route.params.condition, route.params.search)
