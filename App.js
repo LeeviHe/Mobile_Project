@@ -137,15 +137,7 @@ export default function App() {
                 tabBarIcon: ({ color, size }) => {
                   return <Icon name="glass-cocktail" size={size} color={color} />;
                 },
-              }}
-              listeners={({ navigation }) => ({
-                tabPress: (e) => {
-                  // Prevent default action
-                  e.preventDefault();
-                  // Navigate to the initial route of CocktailsNavigator
-                  navigation.navigate('CocktailsNavigator', { screen: 'Cocktails' });
-                },
-              })} />
+              }}/>
             <Tab.Screen
               name="IngredientsNavigator"
               component={IngredientsNavigator}

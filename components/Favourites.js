@@ -149,7 +149,8 @@ export default function Favourites({ navigation, route }) {
           style={[styles.cocktail, { backgroundColor: categoryBackgroundColor() }]}
           onPress={() =>
             navigation.navigate('CocktailsNavigator', {
-              screen: 'Recipe', params: {
+              screen: 'Cocktails', params: {
+                condition: 'navfix',
                 drinkId: item.idDrink,
                 drinkName: item.strDrink,
                 image: item.strDrinkThumb,

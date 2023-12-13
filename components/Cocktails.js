@@ -66,7 +66,7 @@ export default function Cocktails({ navigation, route }) {
   const [isAPIbusy, setAPIBusy] = useState(false)
 
   const [visibleItems, setVisibleItems] = useState(10);
-
+  const r = route.params
   //
   //useEffects
   useEffect (() => {
@@ -104,9 +104,7 @@ export default function Cocktails({ navigation, route }) {
     }
     if (filterQuery.trim().length > 0) {
       handleFilterSearch()
-      console.log('handle search')
     } else {
-      console.log('search clearred')
       setSearchedIngr([])
     }
 
@@ -121,6 +119,23 @@ export default function Cocktails({ navigation, route }) {
           getDrink(route.params.search)
         } else if (route.params.condition == 'devs') {
           setRecipeData(DEVS_FAVOURITES)
+        } else if (route.params.condition == 'random') {
+          navigation.setParams({ id: 'empty' })
+          defaultSetup()
+          navigation.navigate('CocktailsNavigator', { screen: 'Recipe', params: { search: 'random.php', navigator: 'HomeNavigator', screen:'Home' } })
+        } else if (route.params.condition == 'navfix') {
+          navigation.setParams({ id: 'empty' })
+          defaultSetup()
+          navigation.navigate('CocktailsNavigator',
+              {screen: 'Recipe', params: {
+                  drinkId: r.drinkId,
+                  drinkName: r.drinkName,
+                  image: r.image,
+                  category: r.category,
+                  glass: r.glass,
+                  instructions: r.instructions,
+                  navigator: r.navigator,
+                  screen: r.screen}})
         } else {
           searchFilter(route.params.id, route.params.condition, route.params.search, true)
           activate(route.params.condition, route.params.search)
@@ -399,8 +414,6 @@ export default function Cocktails({ navigation, route }) {
         prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
         )
       }
-      //
-      console.log(favourites.length)
     }
 
     

@@ -285,9 +285,8 @@ export default function MyPockettinis({ navigation, route }) {
           style={[styles.cocktail, { backgroundColor: 'pink' }]}
           onPress={() =>
             navigation.navigate('CocktailsNavigator',
-              {
-                screen: 'Recipe', params: {
-
+              {screen: 'Cocktails', params: {
+                  condition: 'navfix',
                   drinkId: item.idDrink,
                   drinkName: item.strDrink,
                   image: item.strDrinkThumb,

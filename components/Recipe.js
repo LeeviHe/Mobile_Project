@@ -121,11 +121,7 @@ const Recipe = ({ navigation, route }) => {
             setFavourites((prevFavourites) =>
                 prevFavourites.filter((fav) => fav.drinkId !== recipeData[0].idDrink))
         }
-
-        console.log(favourites.length)
     }
-
-    console.log(favourites.length)
 
     const drinkInfo = recipeData.map((data, id) => {
         const ingredients = [];
