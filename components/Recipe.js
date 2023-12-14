@@ -9,8 +9,6 @@ import { URL } from '../reusables/Constants';
 import { useFavourites } from './FavouritesContext';
 import { usePockettini } from './PockettiniContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Recipe = ({ navigation, route }) => {
     const [recipeData, setRecipeData] = useState([]);
@@ -141,23 +139,21 @@ const Recipe = ({ navigation, route }) => {
     };
 
     const notesList = notes.map((note, index) => (
-        <GestureHandlerRootView key={index} style={styles.inputViewLarge}>
-            <Swipeable
-                renderRightActions={() => (
-                    <TouchableOpacity onPress={() => removeNotes(index)}>
-                        <Icon name='trash-can-outline' size={30} color='#ff6161' />
-                    </TouchableOpacity>
-                )}
-            >
-                <TextInput
-                    style={[styles.note, { height: 30 }]}
-                    value={note}
-                    placeholder='Write something..'
-                    onChangeText={(text) => handleNoteChange(index, text)}
-                    onBlur={() => AsyncStorage.setItem(`notes_${drinkId}`, JSON.stringify(notes))}
-                />
-            </Swipeable>
-        </GestureHandlerRootView >
+
+        <View style={styles.inputViewLarge}>
+            <TextInput
+                style={[styles.note, { height: 30 }]}
+                value={note}
+                placeholder='Write something..'
+                onChangeText={(text) => handleNoteChange(index, text)}
+                onBlur={() => AsyncStorage.setItem(`notes_${drinkId}`, JSON.stringify(notes))}
+            />
+
+            <TouchableOpacity onPress={() => removeNotes(index)}>
+                <Icon name='trash-can-outline' size={30} color={colors.mainFontColour} />
+            </TouchableOpacity>
+        </View>
+
     ));
     const drinkInfo = recipeData.map((data, id) => {
         const ingredients = [];
