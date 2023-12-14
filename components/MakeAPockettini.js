@@ -291,7 +291,7 @@ export default function MakeAPockettini({ navigation, route }) {
 
                   <Col style={styles.inputView}>
                     <TextInput
-                      style={{ color: colors.mainFontColour }}
+                      style={[styles.ingrName, { color: colors.mainFontColour }]}
                       value={ingredient.name}
                       placeholder='Ingredient name..'
                       onChangeText={(name) => {
@@ -323,7 +323,7 @@ export default function MakeAPockettini({ navigation, route }) {
 
             <View style={[styles.inputViewLarge, styles.shadow]}>
               <TextInput
-                style={{ color: colors.mainFontColour }}
+                style={[styles.prepName, { color: colors.mainFontColour }]}
                 value={preparations[0]}
                 placeholder='Step 1..'
                 onChangeText={(text) => updatePreparation(0, text)}
@@ -335,7 +335,7 @@ export default function MakeAPockettini({ navigation, route }) {
                 <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
                   <View style={styles.inputViewLarge}>
                     <TextInput
-                      style={{ color: colors.mainFontColour }}
+                      style={[styles.prepName, { color: colors.mainFontColour }]}
                       value={preparation}
                       placeholder={`Step ${index + 2}..`}
                       onChangeText={(text) => updatePreparation(index + 1, text)} />
@@ -361,7 +361,7 @@ export default function MakeAPockettini({ navigation, route }) {
                 <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
                   <View style={styles.inputViewLarge}>
                     <TextInput
-                      style={{ color: colors.mainFontColour }}
+                      style={[styles.prepName, { color: colors.mainFontColour }]}
                       value={note}
                       placeholder={'Write something here..'}
                       onChangeText={(text) => updateNote(index, text)}
@@ -373,7 +373,6 @@ export default function MakeAPockettini({ navigation, route }) {
                 </View>
               ))}
             </View>
-
 
             <TouchableOpacity style={styles.noteBtn} onPress={addNotes}>
               <Text style={[textStyles.H1Upper, styles.addBtn]}>Add Notes</Text>
