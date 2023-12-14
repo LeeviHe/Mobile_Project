@@ -51,17 +51,18 @@ const MyRecipe = ({ navigation, route }) => {
   ));
 
   const notesList = pockettini.notes.map((note, index) => (
-    <View key={index} style={[styles.shadow, { borderRadius: 5, backgroundColor: 'white' }]}>
-      <View style={styles.inputViewLarge}>
-        <Text style={{ fontFamily: fonts.text }}>{note}</Text>
 
-        <BouncyCheckbox
-          size={22}
-          fillColor={colors.mainFontColour}
-          unfillColor="#FFFFFF"
-          iconStyle={{ borderColor: "gray" }}
-          innerIconStyle={{ borderWidth: 1 }} />
+    <View key={index} style={styles.inputViewLarge}>
+      <View>
+        <Text style={styles.note}>{note}</Text>
       </View>
+
+      <BouncyCheckbox
+        size={22}
+        fillColor={colors.mainFontColour}
+        unfillColor="#FFFFFF"
+        iconStyle={{ borderColor: "gray" }}
+        innerIconStyle={{ borderWidth: 1 }} />
     </View>
   ));
 

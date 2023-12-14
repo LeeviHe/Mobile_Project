@@ -227,20 +227,26 @@ export default StyleSheet.create({
     marginHorizontal: 20,
     alignItems: "center",
     padding: 6,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   listItem: {
     flexDirection: 'row',
     gap: 20,
     marginLeft: 10,
-    height: 20
+    minHeight: 20,
+    maxHeight: 'auto'
   },
   measure: {
     fontFamily: fonts.boldText,
     width: 80
   },
   ingredient: {
-    fontFamily: fonts.text
+    fontFamily: fonts.text,
+    flexWrap: "wrap",
+    width: 170
+  },
+  ingrName: {
+    width: 190
   },
   prepList: {
     marginTop: 10,
@@ -258,12 +264,19 @@ export default StyleSheet.create({
     padding: 10,
     backgroundColor: 'white'
   },
+  prepName: {
+    width: 290
+  },
   step: {
     color: colors.mainFontColour,
     fontFamily: fonts.text,
     fontSize: 12
   },
   prep: {
+    fontFamily: fonts.text,
+    width: 280
+  },
+  note: {
     fontFamily: fonts.text,
     width: 280
   },
@@ -399,17 +412,17 @@ export default StyleSheet.create({
     borderBottomRightRadius: 5
   },
   inputViewLarge: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 5,
-    backgroundColor: 'white',
-    flexBasis: '40%',
-    height: 60,
-    borderRadius: 5,
     borderWidth: 1,
+    borderRadius: 10,
     borderColor: colors.mainFontColour,
+    justifyContent: 'space-between',
+    paddingLeft: 10,
+    flexDirection: 'row',
     alignItems: "center",
-    paddingHorizontal: 10
+    padding: 10,
+    backgroundColor: 'white',
+    minHeight: 60,
+    maxHeight: 'auto'
   },
   shadow: {
     shadowColor: '#000',
