@@ -100,7 +100,7 @@ const Ingredient = ({ navigation, route }) => {
       {ingredientData.map((data, id) => (
         <View key={id} >
           <ImageBackground
-            source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png' }}
+            source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + data.strIngredient + '.png' }}
             resizeMode="cover"
             opacity={0.5}
             blurRadius={20}
@@ -125,7 +125,7 @@ const Ingredient = ({ navigation, route }) => {
                 <View>
                   <Image
                     style={{ width: 300, height: 300 }}
-                    source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + data.strType + '.png' }}
+                    source={{ uri: 'https://www.thecocktaildb.com/images/ingredients/' + data.strIngredient + '.png' }}
                   />
                 </View>
               </View>

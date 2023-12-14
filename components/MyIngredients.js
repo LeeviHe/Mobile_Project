@@ -4,8 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useState, useEffect } from 'react';
 import { colors, fonts, textStyles, modalStyle } from '../styles/style-constants';
 import { Row, Col } from "react-native-flex-grid";
-import { URL, OWNED_INGR_KEY } from '../reusables/Constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { URL } from '../reusables/Constants';
 import { ScrollView } from 'react-native-virtualized-view'
 import { useFavourites } from './FavouritesContext';
 
@@ -23,8 +22,6 @@ export default function MyPockettinis({ navigation, route }) {
   const { favouritesData, removeFavourite, ownedData, setOwnedData, removeOwned } = useFavourites()
   // To replace strCategory in filtering situation
   const [replaceCategory, setReplaceCategory] = useState('')
-  // Iteration of favourited drinks
-  const [favourites, setFavourites] = useState([])
   //Selected ingredients index
   const [selectedItemsIndex, setSelectedItemsIndex] = useState(new Array(ownedData.length).fill(false))
   //Selected ingredients names
@@ -40,7 +37,7 @@ export default function MyPockettinis({ navigation, route }) {
     } else {
       getDrinks('filter.php?i=' + string, string)
     }
-  }, [selectedItems])
+  }, [selectedItems, ownedData])
 
   const navToFav = () => {
     navigation.navigate('MoreNavigator', {
@@ -78,7 +75,7 @@ export default function MyPockettinis({ navigation, route }) {
 
   const renderItem = ({ item, index }) => {
     const isOwned = true
-    const checked = multiSelectColor(index) === 'green';
+    const checked = multiSelectColor(item.idIngredient) === 'green';
 
     const toggleStar = async () => {
       try {
@@ -90,38 +87,42 @@ export default function MyPockettinis({ navigation, route }) {
           setTimeout(() => {
             setModal(false)
           }, 1000);
-        }
-      } catch (error) {
-        console.log('Error saving ingredient: ' + error)
-        setOwnedData((prevOwned) =>
-          prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
+          console.log('splice')
+          setSelectedItems(oldValues => {
+            return oldValues.filter(checked => checked !== item.strIngredient)
+          })
+          }
+        } catch (error) {
+          console.log('Error saving ingredient: ' + error)
+          setOwnedData((prevOwned) =>
+            prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
       }
     }
 
     return (
-      <Col style={styles.myCol}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
-          <TouchableOpacity onPress={toggleStar}>
-            <Icon name={isOwned ? 'star' : 'star-outline'} size={30} color="#e7c500" />
-          </TouchableOpacity>
+        <Col style={styles.myCol}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10}}>
+            <TouchableOpacity onPress={toggleStar}>
+              <Icon name={isOwned ? 'star' : 'star-outline'} size={30} color="#e7c500" />
+            </TouchableOpacity>
 
-          <Pressable style={styles.myBtn} onPress={() => selectItems(index, item.strIngredient)}>
-            <Icon name='check' size={18} color={checked ? colors.mainFontColour : 'transparent'} />
-          </Pressable>
-        </View>
+            <Pressable style={styles.myBtn} onPress={() => selectItems(item.idIngredient, item.strIngredient)}>
+              <Icon name='check' size={18} color={checked ? colors.mainFontColour : 'transparent'} />
+            </Pressable>
+          </View>
 
-        <View style={{ alignItems: 'center', gap: 10, paddingHorizontal: 5 }}>
-          <Image
-            source={
-              item.strType
-                ? { uri: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png' }
-                : require('../assets/images/img-placeholder.jpg')
-            }
-            style={styles.drinkImg}
-          />
-          <Text style={{ fontFamily: fonts.text }}>{item.strIngredient}</Text>
-        </View>
-      </Col>
+          <View style={{ alignItems: 'center', gap: 10, paddingHorizontal: 5, minWidth:20, maxWidth: 'auto' }}>
+            <Image
+              source={
+                item.strType
+                  ? { uri: 'https://www.thecocktaildb.com/images/ingredients/' + item.strIngredient + '.png' }
+                  : require('../assets/images/img-placeholder.jpg')
+              }
+              style={styles.drinkImg}
+            />
+            <Text style={{ fontFamily: fonts.text, flexWrap: "wrap", width: 83 }}>{item.strIngredient.length > 15 ? item.strIngredient.substring(0, 15) + '..' : item.strIngredient}</Text>
+          </View>
+        </Col>
     )
   }
 
@@ -217,7 +218,7 @@ export default function MyPockettinis({ navigation, route }) {
   }
 
   return (
-    <View style={{ backgroundColor: colors.white }}>
+    <ScrollView style={{ backgroundColor: colors.white }}>
       <Text style={[textStyles.pageTitle, textStyles.spacingHelp]}>My Ingredients</Text>
       <View style={{ marginBottom: 20 }}>
         <Row>
@@ -258,8 +259,7 @@ export default function MyPockettinis({ navigation, route }) {
       </View>
 
       {!cocktailView ? (
-        <ScrollView style={{ height: '100%' }}>
-          <View style={{ marginHorizontal: 20, marginTop: 20 }}>
+          <ScrollView style={{ height: '100%', marginHorizontal: 20, marginTop: 20 }}>
             <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Owned ingredients</Text>
             {ownedData.length === 0 ?
               <View style={{ alignItems: 'center', marginTop: 20 }}>
@@ -267,15 +267,15 @@ export default function MyPockettinis({ navigation, route }) {
                 <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>Your starred items will show here.</Text>
               </View>
               :
-              <FlatList
-                data={ownedData}
-                style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-              />
+                <FlatList
+                  data={ownedData}
+                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
+                  renderItem={renderItem}
+                  keyExtractor={(item, index) => index.toString()}
+                  scrollEnabled={false}
+                />
             }
-          </View>
-        </ScrollView>
+          </ScrollView>
 
       ) : (
 
@@ -325,6 +325,6 @@ export default function MyPockettinis({ navigation, route }) {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   )
 }
