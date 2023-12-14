@@ -95,6 +95,8 @@ export default function Cocktails({ navigation, route }) {
     }
     if (filterQuery.trim().length > 0 && searchedIngr) {
       handleFilterSearch()
+      console.log(searchedIngr)
+      console.log(filterQuery)
     } else {
       setSearchedIngr([])
     }
@@ -588,14 +590,16 @@ export default function Cocktails({ navigation, route }) {
                 />
               </View>
               :
-              <FlatList
+              <>
+              {filterQuery.length > 0 && !searchedIngr ? (<Text style={{ fontFamily: fonts.text, color: colors.mainFontColour, alignSelf: 'center' }}>No ingredients found.</Text>) 
+              : 
+              (<FlatList
                 data={ingredientJson.slice(0, visibleIngredients)}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderItem}
                 onEndReached={() => setVisibleIngredients((prev) => prev + 20)}
                 onEndReachedThreshold={0.2}
-              />}
-
+              />)}</>}
           </View>
         )}
       </KeyboardAvoidingView>
