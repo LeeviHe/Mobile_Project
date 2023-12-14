@@ -19,8 +19,8 @@ export default function MyPockettinis({ navigation, route }) {
   const [modalText, setModalText] = useState('')
   const [linkText, setLinkText] = useState('')
 
-  
-  const {favouritesData, removeFavourite, ownedData, setOwnedData, removeOwned} = useFavourites()
+
+  const { favouritesData, removeFavourite, ownedData, setOwnedData, removeOwned } = useFavourites()
   // To replace strCategory in filtering situation
   const [replaceCategory, setReplaceCategory] = useState('')
   // Iteration of favourited drinks
@@ -158,25 +158,26 @@ export default function MyPockettinis({ navigation, route }) {
     const isFavourited = favouritesData.some((fav) => fav.idDrink === item.idDrink)
 
     const toggleHeart = async () => {
-        if (isFavourited) {
-          removeFavourite(item.idDrink)
-          setModal(true)
-          setModalText('Removed from favourites')
-          setLinkText('')
-          setTimeout(() => {
-            setModal(false)
-          }, 1000);
-        }
+      if (isFavourited) {
+        removeFavourite(item.idDrink)
+        setModal(true)
+        setModalText('Removed from favourites')
+        setLinkText('')
+        setTimeout(() => {
+          setModal(false)
+        }, 1000);
+      }
     }
 
     return (
       <View style={styles.drinkContainer}>
         <TouchableOpacity
           key={index}
-          style={[styles.cocktail, { backgroundColor: 'pink' }]}
+          style={[styles.cocktail, { backgroundColor: '#98b5c280' }]}
           onPress={() =>
             navigation.navigate('CocktailsNavigator',
-              {screen: 'Cocktails', params: {
+              {
+                screen: 'Cocktails', params: {
                   condition: 'navfix',
                   drinkId: item.idDrink,
                   drinkName: item.strDrink,
@@ -204,10 +205,10 @@ export default function MyPockettinis({ navigation, route }) {
 
           <View style={{ marginRight: 40 }}>
             <TouchableOpacity onPress={toggleHeart}>
-              {isFavourited ? 
-              <Icon name= {'heart'} size={35} color="#ff6161" />
-              :
-              <></>}
+              {isFavourited ?
+                <Icon name={'heart'} size={35} color="#ff6161" />
+                :
+                <></>}
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -260,19 +261,19 @@ export default function MyPockettinis({ navigation, route }) {
         <ScrollView style={{ height: '100%' }}>
           <View style={{ marginHorizontal: 20, marginTop: 20 }}>
             <Text style={{ fontFamily: fonts.header, fontSize: 18, marginBottom: 10 }}>Owned ingredients</Text>
-              {ownedData.length === 0 ?
-                <View style={{ alignItems: 'center', marginTop: 20 }}>
-                  <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>No ingredients saved!</Text>
-                  <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>Your starred items will show here.</Text>
-                </View>
-                :
-                <FlatList
-                  data={ownedData}
-                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
-                  renderItem={renderItem}
-                  keyExtractor={(item, index) => index.toString()}
-                />
-              }
+            {ownedData.length === 0 ?
+              <View style={{ alignItems: 'center', marginTop: 20 }}>
+                <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>No ingredients saved!</Text>
+                <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour }}>Your starred items will show here.</Text>
+              </View>
+              :
+              <FlatList
+                data={ownedData}
+                style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+              />
+            }
           </View>
         </ScrollView>
 
