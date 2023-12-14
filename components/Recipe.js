@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, ImageBackground, Image, TouchableOpacity, Pressable, ActivityIndicator, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, ImageBackground, Image, TouchableOpacity, ActivityIndicator, Modal, TextInput, KeyboardAvoidingView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { StatusBar } from 'expo-status-bar';
 import styles from '../styles/styles';
@@ -7,6 +7,10 @@ import { colors, fonts, textStyles, modalStyle } from '../styles/style-constants
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { URL } from '../reusables/Constants';
 import { useFavourites } from './FavouritesContext';
+import { usePockettini } from './PockettiniContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Recipe = ({ navigation, route }) => {
     const [recipeData, setRecipeData] = useState([]);
@@ -15,8 +19,11 @@ const Recipe = ({ navigation, route }) => {
     const [modalText, setModalText] = useState('')
     const [linkText, setLinkText] = useState('')
     const [drinkId, setDrinkId] = useState('')
+    const [notes, setNotes] = useState([])
+    const [newNote, setNewNote] = useState('')
+    const { updatePockettini } = usePockettini()
 
-    const {favouritesData, setFavouritesData, addFavourite, removeFavourite} = useFavourites()
+    const { favouritesData, setFavouritesData, addFavourite, removeFavourite } = useFavourites()
 
     const navToFav = () => {
         navigation.navigate('MoreNavigator', {
@@ -103,6 +110,55 @@ const Recipe = ({ navigation, route }) => {
         }
     }
 
+    const handleAddNote = async () => {
+        const updatedNotes = [...notes, newNote];
+        setNotes(updatedNotes);
+        await AsyncStorage.setItem(`notes_${drinkId}`, JSON.stringify(updatedNotes));
+        setNewNote('');
+    };
+
+    const removeNotes = async (index) => {
+        const newNotes = [...notes]
+        newNotes.splice(index, 1)
+        setNotes(newNotes)
+        await AsyncStorage.setItem(`notes_${drinkId}`, JSON.stringify(newNotes));
+    };
+
+    useEffect(() => {
+        const loadNotes = async () => {
+            const savedNotes = await AsyncStorage.getItem(`notes_${drinkId}`);
+            if (savedNotes) {
+                setNotes(JSON.parse(savedNotes));
+            }
+        };
+        loadNotes();
+    }, [drinkId]);
+
+    const handleNoteChange = (index, text) => {
+        const updatedNotes = [...notes];
+        updatedNotes[index] = text;
+        setNotes(updatedNotes);
+    };
+
+    const notesList = notes.map((note, index) => (
+        <GestureHandlerRootView key={index} style={styles.inputViewLarge}>
+            <Swipeable
+                renderRightActions={() => (
+                    <TouchableOpacity onPress={() => removeNotes(index)}>
+                        <Icon name='trash-can-outline' size={30} color='#ff6161' />
+                    </TouchableOpacity>
+                )}
+            >
+                <TextInput
+                    style={[styles.note, { height: 30 }]}
+                    value={note}
+                    placeholder='Write something..'
+                    onChangeText={(text) => handleNoteChange(index, text)}
+                    onBlur={() => AsyncStorage.setItem(`notes_${drinkId}`, JSON.stringify(notes))}
+                />
+            </Swipeable>
+        </GestureHandlerRootView >
+    ));
     const drinkInfo = recipeData.map((data, id) => {
         const ingredients = [];
         for (let i = 1; i <= 15; i++) {
@@ -196,90 +252,99 @@ const Recipe = ({ navigation, route }) => {
     };
 
     return (
-        <ScrollView>
-            <View style={styles.recipeContainer} >
-                <StatusBar hidden={true} />
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 32 : 0}
+            style={{ flex: 1, backgroundColor: 'transparent' }}>
 
-                <ImageBackground
-                    source={{ uri: route.params.image }}
-                    resizeMode="cover"
-                    opacity={0.5}
-                    blurRadius={30}
-                    style={{ paddingVertical: 30 }}>
+            <ScrollView>
+                <View style={styles.recipeContainer} >
+                    <StatusBar hidden={true} />
 
-                    <View style={styles.topBar}>
-                        <TouchableOpacity onPress={() => navigation.navigate(route.params.navigator, { screen: route.params.screen })}>
-                            <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
-                        </TouchableOpacity>
+                    <ImageBackground
+                        source={{ uri: route.params.image }}
+                        resizeMode="cover"
+                        opacity={0.5}
+                        blurRadius={30}
+                        style={{ paddingVertical: 30 }}>
 
-                        <TouchableOpacity onPress={toggleHeart}>
-                            <Icon name={isFavourited ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
-                        </TouchableOpacity>
-                    </View>
+                        <View style={styles.topBar}>
+                            <TouchableOpacity onPress={() => navigation.navigate(route.params.navigator, { screen: route.params.screen })}>
+                                <Icon name="chevron-left" size={30} color={colors.mainFontColour} />
+                            </TouchableOpacity>
 
-                    <View style={styles.drinkInfo}>
-                        <View style={{ alignItems: 'center' }}>
-                            <Text style={styles.drinkName}>{route.params.drinkName}</Text>
-                            <Text style={styles.drinkCategory}>{route.params.category}</Text>
+                            <TouchableOpacity onPress={toggleHeart}>
+                                <Icon name={isFavourited ? 'heart' : 'heart-outline'} size={35} color="#ff6161" />
+                            </TouchableOpacity>
                         </View>
+
+                        <View style={styles.drinkInfo}>
+                            <View style={{ alignItems: 'center' }}>
+                                <Text style={styles.drinkName}>{route.params.drinkName}</Text>
+                                <Text style={styles.drinkCategory}>{route.params.category}</Text>
+                            </View>
+                            <View>
+                                <Image style={{ width: 200, height: 200 }} source={{ uri: route.params.image }} />
+                            </View>
+                        </View>
+                    </ImageBackground>
+
+                    <View backgroundColor={categoryColors[route.params.category]} paddingVertical={20}>
+                        <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Ingredients</Text>
+
                         <View>
-                            <Image style={{ width: 200, height: 200 }} source={{ uri: route.params.image }} />
+                            {drinkInfo}
                         </View>
-                    </View>
-                </ImageBackground>
 
-                <View backgroundColor={categoryColors[route.params.category]} paddingVertical={20}>
-                    <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Ingredients</Text>
+                        <View marginTop={30}>
+                            <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Preparation</Text>
+                            {!isAPIbusy ? <>{drinkInstructions}</> : (<ActivityIndicator size={250} color={"#c0c0c0"} />)}
+                        </View>
 
-                    <View>
-                        {drinkInfo}
-                    </View>
+                        <View style={{ gap: 10, marginTop: 30, marginHorizontal: 20 }}>
+                            <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Notes</Text>
 
-                    <View marginTop={30}>
-                        <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Preparation</Text>
-                        {!isAPIbusy ? <>{drinkInstructions}</> : (<ActivityIndicator size={250} color={"#c0c0c0"} />)}
-                    </View>
+                            {notesList}
 
-                    <View style={{ marginTop: 30, marginHorizontal: 20 }}>
-                        <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Notes</Text>
-                        <Pressable style={styles.noteBtn}>
-                            <Text style={[textStyles.H1Upper, { color: colors.white, fontFamily: fonts.text, alignSelf: 'center' }]}>Add notes</Text>
-                        </Pressable>
-                    </View>
-                </View>
-
-                <Modal
-                    animationType="fade"
-                    transparent={true}
-                    visible={modal}
-                    onRequestClose={() => {
-                        setModal(!modal);
-                    }}>
-
-                    <View style={modalStyle.container}>
-                        <View style={modalStyle.view}>
-
-                            <Text style={modalStyle.text}>
-                                {modalText}
-                                {linkText ? (
-                                    <Text
-                                        style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
-                                        onPress={navToFav}>
-                                        {linkText}
-                                    </Text>
-                                ) : null}
-                            </Text>
-
-                            <TouchableOpacity
-                                style={[styles.button, styles.buttonClose]}
-                                onPress={() => setModal(!modal)}>
+                            <TouchableOpacity style={styles.noteBtn} onPress={handleAddNote}>
+                                <Text style={[textStyles.H1Upper, { color: colors.white, fontFamily: fonts.text, alignSelf: 'center' }]}>Add notes</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
-                </Modal>
 
-            </View>
-        </ScrollView>
+                    <Modal
+                        animationType="fade"
+                        transparent={true}
+                        visible={modal}
+                        onRequestClose={() => {
+                            setModal(!modal);
+                        }}>
+
+                        <View style={modalStyle.container}>
+                            <View style={modalStyle.view}>
+
+                                <Text style={modalStyle.text}>
+                                    {modalText}
+                                    {linkText ? (
+                                        <Text
+                                            style={[modalStyle.linkText, { textDecorationLine: 'underline' }]}
+                                            onPress={navToFav}>
+                                            {linkText}
+                                        </Text>
+                                    ) : null}
+                                </Text>
+
+                                <TouchableOpacity
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={() => setModal(!modal)}>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
