@@ -1,7 +1,7 @@
 import { Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native';
 import { Searchbar } from 'react-native-paper';
 import { useState, useEffect } from 'react';
-import { colors, textStyles, modalStyle } from '../styles/style-constants';
+import { colors, textStyles, modalStyle, fonts } from '../styles/style-constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/styles';
 import { URL } from '../reusables/Constants';
@@ -37,6 +37,7 @@ export default function Ingredients({ navigation, route }) {
         if (json.ingredients === undefined || json.ingredients === null || json.ingredients === '' || json.ingredients === 0 || !json.ingredients) {
           setErrorStatus('No ingredients found!')
           setIngredientData([])
+          setAPIBusy(false)
           return
         } else {
           setErrorStatus('')
@@ -106,7 +107,7 @@ export default function Ingredients({ navigation, route }) {
             navigation.navigate('Ingredient', {
               idIngredient: item.idIngredient,
               ingrName: item.strIngredient,
-              ingrImg: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png'
+              ingrImg: 'https://www.thecocktaildb.com/images/ingredients/' + item.strIngredient + '.png'
             })
           }>
 
@@ -114,7 +115,7 @@ export default function Ingredients({ navigation, route }) {
             <Image
               source={
                 item.strType
-                  ? { uri: 'https://www.thecocktaildb.com/images/ingredients/' + item.strType + '.png' }
+                  ? { uri: 'https://www.thecocktaildb.com/images/ingredients/' + item.strIngredient + '.png' }
                   : require('../assets/images/img-placeholder.jpg')
               }
               style={styles.drinkImg}
@@ -167,7 +168,7 @@ export default function Ingredients({ navigation, route }) {
           />
           :
           <View>
-            <Text>{errorStatus}</Text>
+            <Text style={{ fontFamily: fonts.text, color: colors.mainFontColour, alignSelf:'center' }}>{errorStatus}</Text>
           </View>}</>) : (<ActivityIndicator size={250} color={"#c0c0c0"} />)}
 
       <Modal
