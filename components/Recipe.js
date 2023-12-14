@@ -140,7 +140,7 @@ const Recipe = ({ navigation, route }) => {
 
     const notesList = notes.map((note, index) => (
 
-        <View style={styles.inputViewLarge}>
+        <View style={styles.inputViewLarge} key={index}>
             <TextInput
                 style={[styles.note, { height: 30 }]}
                 value={note}
