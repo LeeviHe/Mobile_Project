@@ -44,7 +44,7 @@ export default function Cocktails({ navigation, route }) {
   // To set current filter search for activating filter
   const [filterSearch, setFilterSearch] = useState('')
   // NEW FAVOURITE SYSTEM
-  const {favouritesData, setFavouritesData, addFavourite, removeFavourite} = useFavourites()
+  const { favouritesData, setFavouritesData, addFavourite, removeFavourite } = useFavourites()
   // Search query for multi-ingredient search
   const [filterQuery, setFilterQuery] = useState('')
   // Searched ingredients in the filterview search
@@ -236,7 +236,6 @@ export default function Cocktails({ navigation, route }) {
     setFilterSearch(search)
   }
 
-
   function activate(condition, search) {
     if (condition === 'c' || condition === 'a' || condition == 'i') {
       getDrink('filter.php?' + condition + '=' + search, search)
@@ -294,7 +293,41 @@ export default function Cocktails({ navigation, route }) {
     getDrink('search.php?s=' + searchQuery);
   }
 
-  const onFilterSearch = query => setFilterQuery(query)
+  // MULTIFILTER SEARCHBAR
+  const onFilterSearch = (query) => {
+    setFilterQuery(query)
+  }
+
+  const FilterSearchBar = ({ onSearch }) => {
+    const [localQuery, setLocalQuery] = useState(''); //keeps keyboard visible, dont move
+
+    const handleTextChange = (query) => {
+      setLocalQuery(query);
+    };
+
+    const handleSearchPress = () => {
+      onSearch(localQuery);
+    };
+
+    return (
+      <View style={{ flexDirection: 'row', marginHorizontal: 10, justifyContent: 'flex-start', marginBottom: 10 }}>
+        <Searchbar
+          placeholder="Search"
+          onChangeText={handleTextChange}
+          value={localQuery}
+          style={styles.filterSearch}
+          inputStyle={{ marginTop: -10 }}
+          iconColor={colors.mainFontColour}
+          placeholderTextColor={colors.mainFontColour}
+        />
+        <TouchableOpacity title="Search"
+          onPress={handleSearchPress}
+          style={styles.searchBtn}>
+          <Text>Search</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   const handleFilterSearch = () => {
     getJsonIngredients(URL, "search.php?i=" + filterQuery, setSearchedIngr)
@@ -315,7 +348,6 @@ export default function Cocktails({ navigation, route }) {
     setSelectedIngredients(filters)
 
     if (selectedIngredients[i]) {
-      console.log('splice')//delete
       setActiveFilters(oldValues => {
         return oldValues.filter(filter => filter !== ingredient)
       })
@@ -539,45 +571,33 @@ export default function Cocktails({ navigation, route }) {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 32 : 0}
-        style={{ flex: 1, backgroundColor: 'transparent' }}>
-        <View>
-          {showDropdown2 && (
-            <View style={styles.dropdownList}>
-              <Searchbar
-                placeholder="Search"
-                onChangeText={(value) => { onFilterSearch(value) }}
-                value={filterQuery}
-                style={styles.search}
-                inputStyle={{ marginTop: -10 }}
-                iconColor={colors.mainFontColour}
-                placeholderTextColor={colors.mainFontColour} />
-              {/*
-            <TouchableOpacity
-              onPress={() => onFilterSearch(ingrValue)}
-              style={styles.applyBtn}>
-              <Text style={textStyles.button}>Apply</Text>
-        </TouchableOpacity>*/}
-              {searchedIngr !== null && searchedIngr !== undefined && searchedIngr.length > 0 ?
-                <View>
-                  <FlatList
-                    data={searchedIngr}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={renderSingleItem}
-                  />
-                </View>
-                :
-                <FlatList
-                  data={ingredientJson.slice(0, visibleIngredients)}
-                  keyExtractor={(item, index) => index.toString()}
-                  renderItem={renderItem}
-                  onEndReached={() => setVisibleIngredients((prev) => prev + 20)}
-                  onEndReachedThreshold={0.2}
-                />}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+        style={{ flex: 1 }}>
 
-            </View>
-          )}
-        </View>
+        {showDropdown2 && (
+          <View style={styles.dropdownList}>
+
+            <FilterSearchBar onSearch={onFilterSearch} />
+
+            {searchedIngr !== null && searchedIngr !== undefined && searchedIngr.length > 0 ?
+              <View>
+                <FlatList
+                  data={searchedIngr}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={renderSingleItem}
+                />
+              </View>
+              :
+              <FlatList
+                data={ingredientJson.slice(0, visibleIngredients)}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderItem}
+                onEndReached={() => setVisibleIngredients((prev) => prev + 20)}
+                onEndReachedThreshold={0.2}
+              />}
+
+          </View>
+        )}
       </KeyboardAvoidingView>
     );
   };
@@ -684,7 +704,7 @@ export default function Cocktails({ navigation, route }) {
               </View>
             </View>
 
-            <View style={{ borderBottomWidth: showDropdown1 ? 1 : 0, marginTop: showDropdown1 ? 10 : 0 }}>
+            <View style={{ borderBottomWidth: showDropdown1 ? 1 : 0, marginTop: showDropdown1 ? 10 : 0, paddingBottom: showDropdown2 ? 10 : 0 }}>
               <View style={{ marginHorizontal: 20 }}>
                 {categoryDropdownContent}
               </View>
@@ -701,7 +721,7 @@ export default function Cocktails({ navigation, route }) {
               </View>
             </View>
 
-            <View style={{ borderBottomWidth: showDropdown2 ? 1 : 0, marginTop: showDropdown2 ? 10 : 0 }}>
+            <View style={{ borderBottomWidth: showDropdown2 ? 1 : 0, marginTop: showDropdown2 ? 10 : 0, paddingBottom: showDropdown2 ? 10 : 0 }}>
               <RenderIngredientDropdownContent
                 ingredientJson={ingredientJson}
                 showDropdown2={showDropdown2}

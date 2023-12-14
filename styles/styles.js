@@ -82,6 +82,28 @@ export default StyleSheet.create({
     height: 35,
     backgroundColor: 'white'
   },
+  filterSearch: {
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.mainFontColour,
+    height: 35,
+    width: 250,
+    backgroundColor: 'white',
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  searchBtn: {
+    borderWidth: 1,
+    borderColor: colors.mainFontColour,
+    height: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    borderTopRightRadius: 50,
+    borderBottomRightRadius: 50,
+    borderLeftWidth: 0,
+    backgroundColor: '#FFF48D40',
+    paddingHorizontal: 10
+  },
   ingrSearch: {
     backgroundColor: colors.white,
     borderWidth: 1,
