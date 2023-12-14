@@ -1,19 +1,43 @@
-import React from 'react';
-import { View, Text, ScrollView, ImageBackground, Image, TouchableOpacity, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, ImageBackground, Image, TouchableOpacity, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/styles';
 import { colors, fonts, textStyles } from '../styles/style-constants';
 import { StatusBar } from 'expo-status-bar';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import { usePockettini } from './PockettiniContext';
 
 const MyRecipe = ({ navigation, route }) => {
-  const pockettini = route.params.pockettini;
+  const [pockettini, setPockettini] = useState(route.params.pockettini)
+  const [newNote, setNewNote] = useState('')
   const { backgroundColor } = route.params;
+  const { updatePockettini } = usePockettini()
 
   if (!pockettini) {
     console.error("No pockettini data available");
     return <View><Text>No Data</Text></View>;
   }
+
+  const handleAddNote = () => {
+    const updatedPockettini = {
+      ...pockettini,
+      notes: [...pockettini.notes, newNote],
+    };
+    updatePockettini(route.params.index, updatedPockettini)
+    setPockettini(updatedPockettini)
+    setNewNote('')
+  };
+
+  const handleNoteChange = (index, text) => {
+    const updatedNotes = [...pockettini.notes];
+    updatedNotes[index] = text;
+    const updatedPockettini = {
+      ...pockettini,
+      notes: updatedNotes,
+    };
+    updatePockettini(route.params.index, updatedPockettini); // Update global state
+    setPockettini(updatedPockettini); // Update local state
+  };
 
   const ingredientsList = pockettini.drinkIngredients && pockettini.drinkIngredients.length > 0
     ? pockettini.drinkIngredients.map((ingredient, index) => (
@@ -52,9 +76,13 @@ const MyRecipe = ({ navigation, route }) => {
 
   const notesList = pockettini.notes.map((note, index) => (
 
-    <View key={index} style={styles.inputViewLarge}>
+    <View key={index} style={[styles.inputViewLarge, { borderWidth: 1 }]}>
       <View>
-        <Text style={styles.note}>{note}</Text>
+        <TextInput
+          style={styles.note}
+          value={note}
+          onChangeText={(text) => handleNoteChange(index, text)}
+        />
       </View>
 
       <BouncyCheckbox
@@ -120,9 +148,10 @@ const MyRecipe = ({ navigation, route }) => {
 
           <View style={{ gap: 10, marginTop: 30, marginHorizontal: 20 }}>
             <Text style={[textStyles.H1Upper, { marginLeft: 40 }]}>Notes</Text>
+
             {notesList}
 
-            <TouchableOpacity style={styles.noteBtn}>
+            <TouchableOpacity style={styles.noteBtn} onPress={() => handleAddNote()}>
               <Text style={[textStyles.H1Upper, { color: colors.white, fontFamily: fonts.text, alignSelf: 'center' }]}>Add notes</Text>
             </TouchableOpacity>
           </View>

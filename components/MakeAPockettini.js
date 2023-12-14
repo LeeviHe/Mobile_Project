@@ -332,7 +332,7 @@ export default function MakeAPockettini({ navigation, route }) {
 
             <View>
               {preparations.slice(1).map((preparation, index) => (
-                <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
+                <View key={index} style={[styles.shadow, { borderRadius: 10, marginBottom: 10, backgroundColor: 'white' }]}>
                   <View style={styles.inputViewLarge}>
                     <TextInput
                       style={[styles.prepName, { color: colors.mainFontColour }]}
@@ -358,7 +358,7 @@ export default function MakeAPockettini({ navigation, route }) {
 
             <View>
               {notes.map((note, index) => (
-                <View key={index} style={[styles.shadow, { borderRadius: 5, marginBottom: 10, backgroundColor: 'white' }]}>
+                <View key={index} style={[styles.shadow, { borderRadius: 10, marginBottom: 10, backgroundColor: 'white' }]}>
                   <View style={styles.inputViewLarge}>
                     <TextInput
                       style={[styles.prepName, { color: colors.mainFontColour }]}

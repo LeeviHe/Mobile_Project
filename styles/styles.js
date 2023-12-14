@@ -370,7 +370,7 @@ export default StyleSheet.create({
   partContainer: {
     marginTop: 20,
     marginHorizontal: 20,
-    gap: 10
+    gap: 10,
   },
   saveBtn: {
     paddingVertical: 6,
@@ -412,9 +412,7 @@ export default StyleSheet.create({
     borderBottomRightRadius: 5
   },
   inputViewLarge: {
-    borderWidth: 1,
     borderRadius: 10,
-    borderColor: colors.mainFontColour,
     justifyContent: 'space-between',
     paddingLeft: 10,
     flexDirection: 'row',
