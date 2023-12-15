@@ -1,4 +1,4 @@
-import { Text, View, TouchableOpacity, Image, Pressable, FlatList, ActivityIndicator, Modal } from 'react-native';
+import { Text, View, TouchableOpacity, Image, Pressable, FlatList, Modal } from 'react-native';
 import styles from '../styles/styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useState, useEffect } from 'react';
@@ -18,7 +18,7 @@ export default function MyPockettinis({ navigation, route }) {
   const [modalText, setModalText] = useState('')
   const [linkText, setLinkText] = useState('')
 
-
+  // Favouriting functions from context
   const { favouritesData, removeFavourite, ownedData, setOwnedData, removeOwned } = useFavourites()
   // To replace strCategory in filtering situation
   const [replaceCategory, setReplaceCategory] = useState('')
@@ -49,7 +49,6 @@ export default function MyPockettinis({ navigation, route }) {
     try {
       const response = await fetch(URL + method);
       if (response.ok) {
-        console.log(method)
         const json = await response.json();
         if (json.drinks === undefined || json.drinks === null || json.drinks === '' || json.drinks === 0 || !json.drinks || json.drinks === "None Found") {
           setErrorStatus('No drinks found!')
@@ -87,13 +86,12 @@ export default function MyPockettinis({ navigation, route }) {
           setTimeout(() => {
             setModal(false)
           }, 1000);
-          console.log('splice')
           setSelectedItems(oldValues => {
             return oldValues.filter(checked => checked !== item.strIngredient)
           })
           }
         } catch (error) {
-          console.log('Error saving ingredient: ' + error)
+          console.error('Error saving ingredient: ' + error)
           setOwnedData((prevOwned) =>
             prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
       }
@@ -132,17 +130,14 @@ export default function MyPockettinis({ navigation, route }) {
     setSelectedItemsIndex(selected)
 
     if (selectedItemsIndex[index]) {
-      console.log('splice')
       setSelectedItems(oldValues => {
         return oldValues.filter(checked => checked !== item)
       })
     } else {
-      console.log('push')
       let ItemCopy = [...selectedItems]
       ItemCopy.push(item)
       setSelectedItems(ItemCopy)
     }
-    console.log(selectedItems)
   }
 
   const viewCocktails = () => {

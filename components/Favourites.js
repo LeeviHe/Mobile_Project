@@ -54,7 +54,7 @@ export default function Favourites({ navigation, route }) {
           }, 1000);
         }
       } catch (error) {
-        console.log('Error saving favourite: ' + error)
+        console.error('Error saving favourite: ' + error)
         setFavouritesData((prevFavourites) =>
           prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
         )
@@ -62,7 +62,6 @@ export default function Favourites({ navigation, route }) {
     };
 
     const categoryBackgroundColor = () => {
-      // Duplicates for search query issues
       const categoryColors = {
         'Coffee_/_Tea': colors.brown,
         'Coffee / Tea': colors.brown,
@@ -170,7 +169,6 @@ export default function Favourites({ navigation, route }) {
             </View>
           </View>
         </Modal>
-
       </View>
     </ScrollView>
   );

@@ -92,7 +92,7 @@ export default function Ingredients({ navigation, route }) {
           }, 2000);
         }
       } catch (error) {
-        console.log('Error saving ingredient: ' + error)
+        console.error('Error saving ingredient: ' + error)
         setOwnedData((prevOwned) =>
           prevOwned.filter((own) => own.idIngredient !== item.idIngredient))
       }

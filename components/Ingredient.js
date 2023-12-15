@@ -19,7 +19,6 @@ const Ingredient = ({ navigation, route }) => {
   const {ownedData, setOwnedData, addOwned, removeOwned} = useFavourites()
 
   useEffect(() => {
-    console.log('route change: ' + route.params.idIngredient + " " + route.params.ingrName)
     getJsonIngredients(URL, 'lookup.php?iid=' + route.params.idIngredient, setIngredientData);
     getJsonDrinks(URL, 'filter.php?i=' + route.params.ingrName, setIngredientDrinks);
   }, [route]);
@@ -53,7 +52,7 @@ const Ingredient = ({ navigation, route }) => {
           }, 2000);
       }
     } catch (error) {
-      console.log('Error saving ingredient: ' + error)
+      console.error('Error saving ingredient: ' + error)
       setOwnedData((prevOwned) =>
         prevOwned.filter((own) => own.idIngredient !== ingredientData[0].idIngredient))
     }

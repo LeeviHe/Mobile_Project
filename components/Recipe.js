@@ -102,7 +102,7 @@ const Recipe = ({ navigation, route }) => {
                 }, 2000);
             }
         } catch (error) {
-            console.log('Error saving favourite: ' + error)
+            console.error('Error saving favourite: ' + error)
             setFavouritesData((prevFavourites) =>
                 prevFavourites.filter((fav) => fav.drinkId !== recipeData[0].idDrink))
         }

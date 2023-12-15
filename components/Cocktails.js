@@ -43,7 +43,7 @@ export default function Cocktails({ navigation, route }) {
   const [filterCondition, setFilterCondition] = useState('')
   // To set current filter search for activating filter
   const [filterSearch, setFilterSearch] = useState('')
-  // NEW FAVOURITE SYSTEM
+  // Favouriting functions from context
   const { favouritesData, setFavouritesData, addFavourite, removeFavourite } = useFavourites()
   // Search query for multi-ingredient search
   const [filterQuery, setFilterQuery] = useState('')
@@ -54,7 +54,6 @@ export default function Cocktails({ navigation, route }) {
   const [modalText, setModalText] = useState('')
   const [linkText, setLinkText] = useState('')
 
-  //const [ingrValue, setIngrValue] = useState('')
   const [errorStatus, setErrorStatus] = useState('')
   const [filterView, setFilterView] = useState(false)
   const [ascendSort, setAscendSort] = useState(false)
@@ -64,13 +63,13 @@ export default function Cocktails({ navigation, route }) {
   const [isAPIbusy, setAPIBusy] = useState(false)
 
   const [visibleItems, setVisibleItems] = useState(10);
+
   //
   //useEffects
 
   useEffect(() => {
     let string = activeFilters.toString()
     if (activeFilters.length === 0) {
-      console.log('empty')
       if (route.params !== undefined && route.params.id == 'empty' && !activeCategory && searchQuery.trim().length === 0) {
         setFilterCondition('')
         setFilterSearch('')
@@ -95,8 +94,6 @@ export default function Cocktails({ navigation, route }) {
     }
     if (filterQuery.trim().length > 0 && searchedIngr) {
       handleFilterSearch()
-      console.log(searchedIngr)
-      console.log(filterQuery)
     } else {
       setSearchedIngr([])
     }
@@ -104,9 +101,7 @@ export default function Cocktails({ navigation, route }) {
   }, [categoryJson, ingredientJson, filterQuery])
 
   useEffect(() => {
-    console.log(activeFilters)
     if (route.params !== undefined && route.params.id !== 'empty' && searchQuery.trim().length === 0) {
-      console.log('Cocktails Screen Params:', route.params)
       if (route.params.condition) {
         if (route.params.condition == 'popular' || route.params.condition == 'latest') {
           getDrink(route.params.search)
@@ -155,12 +150,9 @@ export default function Cocktails({ navigation, route }) {
   useEffect(() => {
     if (ascendSort) {
       setActiveDrinks(recipeData.sort((a, b) => a.strDrink.localeCompare(b.strDrink)))
-      console.log('Ascend on')
     } else if (descendSort) {
       setActiveDrinks(recipeData.sort((a, b) => b.strDrink.localeCompare(a.strDrink)))
-      console.log('Descend on')
     } else if (recipeData.length > 0) {
-      console.log('reset')
       setActiveDrinks(recipeData)
     }
   }, [ascendSort, descendSort, recipeData])
@@ -181,7 +173,6 @@ export default function Cocktails({ navigation, route }) {
     try {
       const response = await fetch(URL + method);
       if (response.ok) {
-        console.log(method)
         const json = await response.json();
         if (json.drinks === undefined || json.drinks === null || json.drinks === '' || json.drinks === 0 || !json.drinks || json.drinks === "None Found") {
           setErrorStatus('No drinks found!')
@@ -354,7 +345,6 @@ export default function Cocktails({ navigation, route }) {
         return oldValues.filter(filter => filter !== ingredient)
       })
     } else {
-      console.log('push')//delete
       let filterCopy = [...activeFilters]
       filterCopy.push(ingredient)
       setActiveFilters(filterCopy)
@@ -396,7 +386,7 @@ export default function Cocktails({ navigation, route }) {
           }, 2000);
         }
       } catch (error) {
-        console.log('Error saving favourite: ' + error)
+        console.error('Error saving favourite: ' + error)
         setFavouritesData((prevFavourites) =>
           prevFavourites.filter((fav) => fav.drinkId !== item.idDrink)
         )

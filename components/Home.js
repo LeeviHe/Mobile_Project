@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View, Image, ImageBackground, TouchableOpacity } from 'react-native';
-import { Container, Row, Col } from "react-native-flex-grid";
+import { Row, Col } from "react-native-flex-grid";
 import { PageSlider } from '@pietile-native-kit/page-slider';
 import styles from '../styles/styles'
 import { textStyles } from '../styles/style-constants';
@@ -39,7 +39,7 @@ function Home({ navigation, route }) {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setIsLoading(false);
-                console.log("Geolocation failed.");
+                console.error("Geolocation failed.");
                 return;
             }
 
