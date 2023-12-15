@@ -103,11 +103,6 @@ function Home({ navigation, route }) {
     ];
 
 
-    if (isLoading) {
-        return <View style={styles.container}>
-            <Text>Retrieving location...</Text>
-        </View>
-    } else
         return (
             <ScrollView>
 
@@ -196,7 +191,11 @@ function Home({ navigation, route }) {
                         <Text style={textStyles.H1Upper}>near me</Text>
                     </View>
 
-
+                {isLoading ? 
+                <View style={styles.container}>
+                    <Text>Retrieving location...</Text>
+                </View>
+                : 
                     <MapView style={styles.map}
                         provider={PROVIDER_GOOGLE}
                         initialRegion={{
@@ -228,7 +227,7 @@ function Home({ navigation, route }) {
                             }}
                         />
 
-                    </MapView>
+                    </MapView>}
 
                 </View>
 

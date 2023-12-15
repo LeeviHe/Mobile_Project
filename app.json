@@ -1,11 +1,12 @@
 {
   "expo": {
     "plugins": [
-      ["expo-image-picker",
-    {
-      "photosPermission": "Pockettini has access to your photos in order to use them in custom recipes"
-    }
-  ]
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Pockettini has access to your photos in order to use them in custom recipes"
+        }
+      ]
     ],
     "name": "Mobile_Project",
     "slug": "Mobile_Project",
@@ -17,6 +18,14 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "013a3edb-563b-435c-a3bd-443ca56bb0c6"
+      }
+    },
+    "android": {
+      "package": "com.lhelt.Mobile_Project"
     }
   }
 }
